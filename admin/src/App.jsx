@@ -1,0 +1,102 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
+import MasterProfileCMS from './pages/MasterProfileCMS';
+import InterpretationCMS from './pages/InterpretationCMS';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import { LayoutDashboard, Users, BookOpen, Settings, LogOut } from 'lucide-react';
+
+// Protected Route Wrapper
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  if (!token || user.role !== 'admin') {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
+
+// Admin Layout Component
+const AdminLayout = ({ children }) => {
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0f172a' }}>
+      {/* Sidebar */}
+      <aside style={{ 
+        width: '280px', 
+        backgroundColor: '#1a1a2e', 
+        borderRight: '1px solid rgba(197, 160, 89, 0.2)',
+        padding: '2rem 1.2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'sticky',
+        top: 0,
+        height: '100vh'
+      }}>
+        <div style={{ marginBottom: '3rem', padding: '0 1rem' }}>
+          <h2 style={{ color: '#c5a059', fontSize: '1.6rem', fontWeight: 'bold', letterSpacing: '1px' }}>TuVi Admin</h2>
+          <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Hệ thống quản trị v1.0</span>
+        </div>
+        
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', flex: 1 }}>
+          <NavLink to="/dashboard" className="nav-link">
+            <LayoutDashboard size={20} /> <span>Bảng điều khiển</span>
+          </NavLink>
+          <NavLink to="/masters" className="nav-link">
+            <Users size={20} /> <span>Quản lý Chuyên gia</span>
+          </NavLink>
+          <NavLink to="/interpretations" className="nav-link">
+            <BookOpen size={20} /> <span>Quản lý Luận giải</span>
+          </NavLink>
+          
+          <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid rgba(197, 160, 89, 0.1)' }}>
+            <NavLink to="/settings" className="nav-link">
+              <Settings size={20} /> <span>Cài đặt</span>
+            </NavLink>
+            <button className="nav-link logout-btn" onClick={handleLogout}>
+              <LogOut size={20} /> <span>Đăng xuất</span>
+            </button>
+          </div>
+        </nav>
+      </aside>
+
+      {/* Main Content Area */}
+      <main style={{ flex: 1, overflowY: 'auto' }}>
+        {children}
+      </main>
+    </div>
+  );
+};
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        
+        <Route path="/dashboard" element={
+          <ProtectedRoute><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>
+        } />
+        
+        <Route path="/masters" element={
+          <ProtectedRoute><AdminLayout><MasterProfileCMS /></AdminLayout></ProtectedRoute>
+        } />
+        
+        <Route path="/interpretations" element={
+          <ProtectedRoute><AdminLayout><InterpretationCMS /></AdminLayout></ProtectedRoute>
+        } />
+        
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Router>
+  );
+}

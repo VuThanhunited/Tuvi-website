@@ -1,0 +1,548 @@
+/* ============================================
+   XEM TU VI PAGE - tuvi.vn Style
+   ============================================ */
+
+.xemtuvi-page {
+  padding-top: var(--header-height);
+  min-height: 100vh;
+  background: var(--color-dark-bg);
+}
+
+/* ── Breadcrumb ── */
+.xemtuvi-breadcrumb {
+  background: var(--color-dark-card);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.75rem 0;
+  margin-bottom: var(--space-xl);
+}
+
+.xemtuvi-breadcrumb .container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.breadcrumb-link {
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-gold-light);
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.breadcrumb-current {
+  color: var(--color-text-muted);
+}
+
+/* ── 2 Column Layout ── */
+.xemtuvi-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--space-2xl);
+  align-items: start;
+  padding-bottom: var(--space-4xl);
+}
+
+/* ── MAIN CONTENT ── */
+.xemtuvi-main {
+  min-width: 0;
+}
+
+/* ── Form Card ── */
+.xemtuvi-form-card {
+  background: var(--color-dark-card);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  margin-bottom: var(--space-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Banner Header */
+.xemtuvi-form-banner {
+  background: url('https://tuvi.vn/images/bg-head.jpg') center/cover;
+  padding: 1.25rem var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.xemtuvi-form-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 20px,
+      rgba(139, 69, 19, 0.3) 20px,
+      rgba(139, 69, 19, 0.3) 21px
+    );
+  opacity: 0.3;
+}
+
+.xemtuvi-form-banner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-gold-gradient);
+}
+
+.form-banner-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  background: rgba(255, 215, 0, 0.15);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: var(--border-radius-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.form-banner-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.02em;
+}
+
+/* Form Body */
+.xemtuvi-form {
+  padding: var(--space-xl);
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  gap: var(--space-md);
+}
+
+.form-row--submit {
+  justify-content: center;
+  margin-top: var(--space-xl);
+  margin-bottom: 0;
+}
+
+.form-label-tv {
+  min-width: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  flex-shrink: 0;
+}
+
+.form-input-tv {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--color-text-on-dark);
+  background: var(--color-dark-surface);
+  border: 1px solid var(--color-dark-elevated);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-normal);
+  outline: none;
+}
+
+.form-input-tv:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
+.form-input-tv::placeholder {
+  color: var(--color-text-muted);
+}
+
+.form-input-tv--year {
+  max-width: 100px;
+}
+
+.form-select-tv {
+  padding: 0.6rem 2rem 0.6rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--color-text-on-dark);
+  background: var(--color-dark-surface);
+  border: 1px solid var(--color-dark-elevated);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-normal);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23D4AF37' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5l-4-4h8l-4 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  min-width: 80px;
+}
+
+.form-select-tv:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
+.form-select-tv--wide {
+  min-width: 130px;
+}
+
+.form-date-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.form-inline-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  margin-left: var(--space-sm);
+}
+
+/* Radio group */
+.form-radio-group-tv {
+  display: flex;
+  gap: var(--space-lg);
+  flex: 1;
+}
+
+.radio-btn-tv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  transition: color var(--transition-fast);
+  user-select: none;
+}
+
+.radio-btn-tv input[type="radio"] {
+  display: none;
+}
+
+.radio-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--color-dark-elevated);
+  background: var(--color-dark-surface);
+  position: relative;
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.radio-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  transition: transform var(--transition-normal);
+}
+
+.radio-btn-tv.active .radio-dot {
+  border-color: var(--color-gold);
+}
+
+.radio-btn-tv.active .radio-dot::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.radio-btn-tv.active {
+  color: var(--color-gold);
+}
+
+/* Submit Button */
+.btn-lap-la-so {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 3rem;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: #a98020;
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-lap-la-so::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-lap-la-so:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(139, 69, 19, 0.5);
+}
+
+.btn-lap-la-so:hover::before {
+  opacity: 1;
+}
+
+.btn-lap-la-so:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Loading */
+.xemtuvi-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-3xl);
+}
+
+.xemtuvi-loading p {
+  color: var(--color-gold);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.xemtuvi-loading span {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+/* ── Introduction Section ── */
+.xemtuvi-intro {
+  background: var(--color-dark-card);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.intro-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  background: url('https://tuvi.vn/images/bg-head.jpg') center/cover;
+  padding: 0.85rem var(--space-xl);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.intro-content {
+  padding: var(--space-xl);
+}
+
+.intro-content p {
+  color: var(--color-text-light);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  margin-bottom: var(--space-lg);
+  text-align: justify;
+}
+
+.intro-content h3 {
+  color: var(--color-gold);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.intro-content ul {
+  list-style: disc;
+  padding-left: var(--space-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.intro-content li {
+  color: var(--color-text-light);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  margin-bottom: var(--space-sm);
+}
+
+.intro-content li strong {
+  color: var(--color-gold);
+}
+
+/* ── SIDEBAR ── */
+.xemtuvi-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-lg));
+}
+
+.sidebar-block {
+  background: var(--color-dark-card);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  overflow: hidden;
+}
+
+.sidebar-block-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  padding: 0.7rem var(--space-md);
+  background: url('https://tuvi.vn/images/bg-head.jpg') center/cover;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.sidebar-block-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.5), transparent);
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: var(--space-sm) 0;
+}
+
+.sidebar-list li {
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.sidebar-list li:last-child {
+  border-bottom: none;
+}
+
+.sidebar-list a {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem var(--space-md);
+  font-size: 0.88rem;
+  color: var(--color-text-light);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-list a:hover {
+  color: var(--color-gold);
+  background: rgba(212, 175, 55, 0.05);
+  padding-left: 1.2rem;
+}
+
+.sidebar-hot {
+  font-weight: 600;
+}
+
+.hot-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #FF4500, #FF6347);
+  color: #fff;
+  margin-left: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: pulse-hot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-hot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .xemtuvi-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .xemtuvi-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .xemtuvi-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .form-label-tv {
+    min-width: unset;
+  }
+
+  .form-date-group {
+    width: 100%;
+  }
+
+  .form-radio-group-tv {
+    width: 100%;
+  }
+
+  .xemtuvi-form {
+    padding: var(--space-md);
+  }
+
+  .xemtuvi-form-banner {
+    padding: 1rem var(--space-md);
+  }
+
+  .form-banner-title {
+    font-size: 1.2rem;
+  }
+
+  .btn-lap-la-so {
+    width: 100%;
+  }
+}

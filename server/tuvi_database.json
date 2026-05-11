@@ -1,0 +1,532 @@
+{
+  "metadata": {
+    "name": "Cơ sở dữ liệu Tử Vi",
+    "description": "Dữ liệu luận giải tử vi chi tiết cho 12 con giáp",
+    "version": "2.0",
+    "updated": "2026-05-07",
+    "language": "vi"
+  },
+  "con_giap": [
+    {
+      "id": 1,
+      "ten": "Tý",
+      "chi": "子",
+      "sao_chinh": "Tham Lang",
+      "sao_phu": ["Hỗ Quân", "Lộc Tồn"],
+      "ngay_bat_dau": "19/11",
+      "ngay_ket_thuc": "20/12",
+      "sac_thai": {
+        "nam": "Thông minh, lanh lợi, sáng tạo",
+        "nu": "Nhanh nhạy, ngoài giao, tính hóm hỉnh"
+      },
+      "tinh_cach": "Thông minh, tính toán cao, có óc quan sát tốt. Thích khám phá, sáng tạo, luôn tìm tòi những điều mới mẻ. Nhanh nhạy trong phán đoán, dễ thích nghi với tình huống.",
+      "diem_manh": ["Thông minh", "Sáng tạo", "Nhanh nhạy", "Khả năng lãnh đạo tốt", "Giao tiếp dễ dàng"],
+      "diem_yeu": ["Hay thay đổi quyết định", "Tham lam", "Đôi khi bất ổn", "Có tính nham hiếu"],
+      "su_nghiep": {
+        "phu_hop": ["Công nghệ", "Kinh doanh", "Nghệ thuật", "Truyền thông", "Khoa học"],
+        "luận_giải": "Tuổi Tý có khả năng kiếm tiền tốt thông qua công việc sáng tạo. Phù hợp với các vị trí đòi hỏi sự tính toán và linh hoạt. Thường được các sếp tin tưởng vì năng lực."
+      },
+      "tinh_cam": {
+        "dac_diem": "Lãng mạn, chân thành nhưng dễ bị tổn thương",
+        "luận_giải": "Tuổi Tý là người yêu chân thành, đặt tình cảm lên cao. Dễ bị tổn thương vì quá lạc quan. Cần tìm được người bạn đời hiểu và bao dung."
+      },
+      "suc_khoe": "Thể chất khỏe mạnh, ít bệnh tật. Nên chú ý đến bệnh về hô hấp, tiêu hóa, mất ngủ do căng thẳng.",
+      "tai_loc": "Năng lực kiếm tiền tốt, có khả năng tích lũy. Nên tránh đầu cơ, đánh bạc. Tài lộc tốt nhất vào các năm Thần, Dậu, Sửu.",
+      "nam_tot": [2024, 2025, 2026],
+      "thang_tot": [1, 3, 5, 7, 9, 11],
+      "so_may_man": [1, 3, 5],
+      "mau_may_man": ["Xanh lá", "Trắng", "Đỏ"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 (Bính Ngọ) là năm vay kiếp của tuổi Tý. Vận trình sẽ có nhiều thay đổi, cần cẩn trọng.",
+        "tien_tai": "Thu nhập có xu hướng tăng nhưng chi tiêu cũng lớn. Nên quản lý tài chính chặt chẽ, tránh đầu cơ.",
+        "tinh_cam": "Mối quan hệ tình cảm cần nhiều giao tiếp, thấu hiểu. Có thể xuất hiện những mâu thuẫn nhỏ nhưng sẽ qua đi.",
+        "su_nghiep": "Công việc có cơ hội phát triển nếu nắm bắt tốt. Cần chủ động, kiên trì. Tránh xung động, vội vàng.",
+        "suc_khoe": "Cần chú ý đến bệnh về hô hấp, stress, mất ngủ. Nên tập thể dục thường xuyên, giữ tâm lý thoải mái.",
+        "phuong_huong": "Nên tăng cường hoạt động ngoài trời, gặp gỡ bạn bè để giảm stress. Cúng sao đầu năm sẽ giúp hóa giải vận hạn."
+      },
+      "van_han_theo_thang": [
+        {
+          "thang": 1,
+          "luận": "Tháng 1 là khởi đầu năm, vận khí còn chưa rõ ràng. Nên đi kiểm tra sức khỏe, chuẩn bị tinh thần cho những điều mới.",
+          "tien_tai": "Bình thường",
+          "su_nghiep": "Có cơ hội nhỏ",
+          "tinh_cam": "Bình yên"
+        },
+        {
+          "thang": 2,
+          "luận": "Tháng 2 có vẻ khó khăn hơn. Cần cẩn trọng trong giao dịch, hạn chế các quyết định lớn.",
+          "tien_tai": "Cần cẩn trọng",
+          "su_nghiep": "Có thử thách",
+          "tinh_cam": "Có mâu thuẫn"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "ten": "Sửu",
+      "chi": "丑",
+      "sao_chinh": "Cự Môn",
+      "sao_phu": ["Văn Khúc", "Hành Tạng"],
+      "ngay_bat_dau": "20/12",
+      "ngay_ket_thuc": "19/01",
+      "sac_thai": {
+        "nam": "Chân chất, kiên định, thất thực",
+        "nu": "Chăm chỉ, trung thành, ngoại tình không bao giờ"
+      },
+      "tinh_cach": "Chân chất, trung thực, kiên định. Tính cách chậm chạp, ít nói. Rất trung thành với gia đình và bạn bè. Có trách nhiệm cao trong công việc.",
+      "diem_manh": ["Trung thực", "Kiên định", "Trách nhiệm cao", "Tin cậy được", "Kỹ năng tốt"],
+      "diem_yeu": ["Chậm chạp", "Ít linh hoạt", "Khó thích nghi", "Hơi cứng nhắc"],
+      "su_nghiep": {
+        "phu_hop": ["Kế toán", "Hành chính", "Công chức", "Quản lý tài chính", "Xây dựng"],
+        "luận_giải": "Tuổi Sửu phù hợp với công việc yêu cầu tính tỉ mỉ, kiên nhẫn. Có khả năng lãnh đạo vững chắc nhưng cần từ từ. Thường là những nhân viên mẫu mực."
+      },
+      "tinh_cam": {
+        "dac_diem": "Chuyên nhất, chung thủy, là bạn đời tốt",
+        "luận_giải": "Tuổi Sửu là người bạn đời tin cậy, có trách nhiệm cao. Chung thủy, hiếm khi có biến động tình cảm. Gia đình luôn là ưu tiên hàng đầu."
+      },
+      "suc_khoe": "Sức khỏe bình thường. Cần chú ý đến bệnh về xương khớp, đau lưng, lưỡng liệt dạ dày.",
+      "tai_loc": "Thu nhập ổn định, cần kiên nhẫn tích lũy. Phù hợp với đầu tư dài hạn. Thường có được tài sản vững chắc trong cuộc đời.",
+      "nam_tot": [2024, 2025, 2027],
+      "thang_tot": [2, 4, 6, 8, 10, 12],
+      "so_may_man": [2, 4, 6],
+      "mau_may_man": ["Vàng", "Nâu", "Cam"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Sửu có vận khí ổn định. Cần kiên nhẫn, tránh vội vàng.",
+        "tien_tai": "Ổn định, tích lũy từ từ. Chi tiêu cần hợp lý.",
+        "tinh_cam": "Gia đình êm ấm, mối quan hệ bạn bè bền vững.",
+        "su_nghiep": "Công việc ổn định, có thể có mức lương tăng nhẹ.",
+        "suc_khoe": "Khỏe mạnh, cần chú ý đến xương khớp.",
+        "phuong_huong": "Nên duy trì cuộc sống hiện tại, không nên thay đổi lớn. Giữ bình tĩnh, sẽ vượt qua được mọi khó khăn."
+      }
+    },
+    {
+      "id": 3,
+      "ten": "Dần",
+      "chi": "寅",
+      "sao_chinh": "Lộc Tồn",
+      "sao_phu": ["Văn Khúc", "Hàn Tinh"],
+      "ngay_bat_dau": "19/01",
+      "ngay_ket_thuc": "18/02",
+      "sac_thai": {
+        "nam": "Mạnh mẽ, quyết đoán, can đảm",
+        "nu": "Nồng nàn, nhiệt tình, có ý chí"
+      },
+      "tinh_cach": "Mạnh mẽ, quyết đoán, dũng cảm. Có tính lãnh đạo cao, hay khởi xướng những công việc mới. Nóng nảy nhưng làm việc hiệu quả.",
+      "diem_manh": ["Mạnh mẽ", "Quyết đoán", "Dũng cảm", "Lãnh đạo tốt", "Sáng tạo mạnh"],
+      "diem_yeu": ["Nóng nảy", "Tham lam", "Vội vàng", "Xung động", "Dễ nóng tính"],
+      "su_nghiep": {
+        "phu_hop": ["Quân sự", "Thể thao", "Thương mại", "Quản lý nhân sự", "Khởi nghiệp"],
+        "luận_giải": "Tuổi Dần có khả năng lãnh đạo mạnh mẽ. Phù hợp với các vị trí cần quyết đoán, chủ động. Thường là những doanh nhân thành công."
+      },
+      "tinh_cam": {
+        "dac_diem": "Nóng tính, vừa tình vừa tính, dễ ghen tuông",
+        "luận_giải": "Tuổi Dần yêu sâu sắc nhưng dễ ghen tuông. Cần bạn đời hiểu, bao dung. Khi yêu thì yêu chân thành, không giả dối."
+      },
+      "suc_khoe": "Thể chất khỏe, sức bền tốt. Cần tránh chấn thương, tai nạn. Nên tập thể dục để giải stress.",
+      "tai_loc": "Thu nhập tăng nhanh, hay tham lam. Cần biết cách quản lý tài chính, tránh chi tiêu vô tội vạ.",
+      "nam_tot": [2024, 2026, 2027],
+      "thang_tot": [1, 3, 5, 7, 9, 11],
+      "so_may_man": [3, 6, 9],
+      "mau_may_man": ["Xanh lá", "Đen", "Đỏ"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Dần gặp vận khí cân bằng. Cần cẩn trọng, không nên vội vàng.",
+        "tien_tai": "Thu nhập có cơ hội tăng nhưng cần quản lý chặt chẽ.",
+        "tinh_cam": "Có thể xuất hiện những xung đột, cần thấu hiểu đối phương.",
+        "su_nghiep": "Công việc có cơ hội phát triển nếu nắm bắt tốt.",
+        "suc_khoe": "Cần cẩn trọng với chấn thương, tai nạn.",
+        "phuong_huong": "Nên bình tĩnh hơn, không nên quá nóng vội. Đầu tư dài hạn sẽ mang lại kết quả tốt."
+      }
+    },
+    {
+      "id": 4,
+      "ten": "Mão",
+      "chi": "卯",
+      "sao_chinh": "Văn Khúc",
+      "sao_phu": ["Tham Lang", "Cự Môn"],
+      "ngay_bat_dau": "18/02",
+      "ngay_ket_thuc": "20/03",
+      "sac_thai": {
+        "nam": "Lanh lợi, ngoài giao, tính toán cao",
+        "nu": "Xinh đẹp, thông minh, có sức hút"
+      },
+      "tinh_cach": "Rất lanh lợi, nhạy bén, có óc quan sát tốt. Hay nói chuyện, dễ thu phục mọi người. Có tính hóm hỉnh, vui tươi.",
+      "diem_manh": ["Lanh lợi", "Ngoài giao", "Sáng tạo", "Khéo léo", "Thuyết phục tốt"],
+      "diem_yeu": ["Hay nói dối", "Thiếu chân thành", "Hay thay đổi", "Hóm hỉnh quá mức"],
+      "su_nghiep": {
+        "phu_hop": ["Kinh doanh", "Truyền thông", "Du lịch", "Bán hàng", "Ngoại giao"],
+        "luận_giải": "Tuổi Mão phù hợp với công việc liên quan giao tiếp, bán hàng. Khả năng kiếm tiền rất tốt thông qua mối quan hệ. Thường có mạng lưới rộng."
+      },
+      "tinh_cam": {
+        "dac_diem": "Bản tính ngoài giao, dễ bị hấp dẫn bởi vẻ ngoài",
+        "luận_giải": "Tuổi Mão dễ tình nhưng cũng dễ quên. Cần suy tư thật kỹ trước khi yêu. Mối quan hệ bền vững cần sự cam kết thật sự."
+      },
+      "suc_khoe": "Sức khỏe tương đối ổn. Cần chú ý đến bệnh về hô hấp, viêm họng, mất ngủ.",
+      "tai_loc": "Khả năng kiếm tiền tốt thông qua giao dịch. Nên tránh vay nợ, giữ dòng tiền trong sạch.",
+      "nam_tot": [2024, 2025, 2026],
+      "thang_tot": [2, 4, 6, 8, 10, 12],
+      "so_may_man": [2, 5, 8],
+      "mau_may_man": ["Xanh da trời", "Vàng", "Trắng"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Mão có vận khí thuận lợi. Giao tiếp sẽ mang lại nhiều cơ hội.",
+        "tien_tai": "Thu nhập tốt, cơ hội kiếm tiền từ nhiều nguồn.",
+        "tinh_cam": "Tình cảm sẽ có sự cải thiện, hạnh phúc gia đình tăng lên.",
+        "su_nghiep": "Công việc phát triển tốt, được công nhận.",
+        "suc_khoe": "Khỏe mạnh, năng lượng cao.",
+        "phuong_huong": "Nên tận dụng mạng lưới của mình, giao dịch sẽ thuận lợi. Tránh nói nhiều không cần thiết."
+      }
+    },
+    {
+      "id": 5,
+      "ten": "Tỵ",
+      "chi": "巳",
+      "sao_chinh": "Tham Lang",
+      "sao_phu": ["Lộc Tồn", "Phúc Sinh"],
+      "ngay_bat_dau": "20/03",
+      "ngay_ket_thuc": "19/04",
+      "sac_thai": {
+        "nam": "Nóng nảy, ưu tư, có lý tưởng",
+        "nu": "Nhạy cảm, đam mê, có tính lạnh lùng"
+      },
+      "tinh_cach": "Nóng nảy, ưu tư, hay lo lắng. Có cảm xúc mạnh mẽ, nhạy cảm. Đam mê với những thứ mình thích, có lý tưởng cao.",
+      "diem_manh": ["Đam mê", "Sáng tạo", "Chuyên nhất", "Có lý tưởng", "Cảm xúc sâu sắc"],
+      "diem_yeu": ["Lo lắng", "Ưu tư", "Ghen tuông", "Nóng nảy", "Dễ tổn thương"],
+      "su_nghiep": {
+        "phu_hop": ["Nghệ thuật", "Giáo dục", "Y tế", "Tư vấn", "Sáng tạo"],
+        "luận_giải": "Tuổi Tỵ phù hợp với công việc sáng tạo, có đặc thù. Có khả năng đắm mình trong công việc, đạt thành tích cao. Thường là những chuyên gia uyên thâm."
+      },
+      "tinh_cam": {
+        "dac_diem": "Đam mê, chuyên nhất, dễ bị ghen tuông",
+        "luận_giải": "Tuổi Tỵ yêu sâu sắc, không chia rẽ tình cảm. Cần bạn đời hiểu được sâu kín tâm hồn của mình. Gia đình và tình yêu là thứ quan trọng nhất."
+      },
+      "suc_khoe": "Cần chú ý đến bệnh về tim, huyết áp, tiêu hóa. Stress là nguyên nhân chính của các bệnh này.",
+      "tai_loc": "Thu nhập tốt nhưng chi tiêu cũng lớn. Cần kiểm soát chi phí, tránh hoang phí.",
+      "nam_tot": [2025, 2026, 2027],
+      "thang_tot": [1, 3, 5, 7, 9, 11],
+      "so_may_man": [4, 7, 9],
+      "mau_may_man": ["Đỏ", "Tím", "Hồng"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Tỵ cần điều chỉnh tâm lý. Cảm xúc sẽ được cải thiện nếu tìm được cách giải tỏa.",
+        "tien_tai": "Thu nhập ổn định, cần tiết kiệm hơn.",
+        "tinh_cam": "Mối quan hệ sẽ được cải thiện với sự hiểu biết hơn.",
+        "su_nghiep": "Công việc phát triển tốt nếu tập trung.",
+        "suc_khoe": "Cần giảm stress, tập thể dục thường xuyên.",
+        "phuong_huong": "Nên tìm cách giải tỏa cảm xúc, như hobby, du lịch. Đó sẽ giúp cải thiện sức khỏe và tâm lý."
+      }
+    },
+    {
+      "id": 6,
+      "ten": "Ngọ",
+      "chi": "午",
+      "sao_chinh": "Sinh Quyên",
+      "sao_phu": ["Văn Khúc", "Hàn Tinh"],
+      "ngay_bat_dau": "19/04",
+      "ngay_ket_thuc": "20/05",
+      "sac_thai": {
+        "nam": "Nồng nhiệt, vui vẻ, đam mê",
+        "nu": "Chân thành, lãng mạn, có năng lực"
+      },
+      "tinh_cach": "Nồng nhiệt, tươi sáng, yêu đời. Có tính hóm hỉnh, vui vẻ. Dễ gần, dễ kết bạn, không có thành kiến.",
+      "diem_manh": ["Nồng nhiệt", "Vui vẻ", "Giao tiếp tốt", "Lạc quan", "Có năng lực"],
+      "diem_yeu": ["Hóm hỉnh quá mức", "Dễ che lấp điểm yếu", "Thiếu thận trọng", "Dễ bị tổn thương"],
+      "su_nghiep": {
+        "phu_hop": ["Dịch vụ", "Bán hàng", "Quản lý", "Giáo dục", "Du lịch"],
+        "luận_giải": "Tuổi Ngọ phù hợp với công việc có tương tác con người. Khả năng giao tiếp tuyệt vời, dễ được mọi người yêu mến. Thường được nâng cao nhanh."
+      },
+      "tinh_cam": {
+        "dac_diem": "Lãng mạn, tình cảm sâu sắc, là bạn đời ấm áp",
+        "luận_giải": "Tuổi Ngọ là người bạn đời chu đáo, tình cảm sâu sắc. Gia đình là ưu tiên hàng đầu, sẽ cố gắng tạo hạnh phúc cho gia đình."
+      },
+      "suc_khoe": "Sức khỏe tương đối tốt. Cần tránh tai nạn, chấn thương. Năng lượng cao nên dễ over-working.",
+      "tai_loc": "Thu nhập ổn định, biết cách tiết kiệm. Phù hợp với đầu tư ổn định, tránh rủi ro cao.",
+      "nam_tot": [2024, 2026, 2027],
+      "thang_tot": [2, 4, 6, 8, 10, 12],
+      "so_may_man": [1, 6, 8],
+      "mau_may_man": ["Đỏ", "Cam", "Hồng"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Ngọ vận khí bình thường. Cần cân bằng công việc và đời sống cá nhân.",
+        "tien_tai": "Thu nhập ổn định, không có biến động lớn.",
+        "tinh_cam": "Gia đình êm ấm, mối quan hệ tình cảm ổn định.",
+        "su_nghiep": "Công việc phát triển từ từ, cần kiên trì.",
+        "suc_khoe": "Khỏe mạnh, cần tránh over-working.",
+        "phuong_huong": "Nên cân bằng giữa công việc và gia đình. Đó sẽ giúp đạt được hạnh phúc toàn diện."
+      }
+    },
+    {
+      "id": 7,
+      "ten": "Mùi",
+      "chi": "未",
+      "sao_chinh": "Cự Môn",
+      "sao_phu": ["Tham Lang", "Hành Tạng"],
+      "ngay_bat_dau": "20/05",
+      "ngay_ket_thuc": "21/06",
+      "sac_thai": {
+        "nam": "Thận trọng, tỉ mỉ, có tính toán",
+        "nu": "Nhẫn nại, chăm chỉ, tâm huyết cao"
+      },
+      "tinh_cach": "Thận trọng, cẩn thận, tỉ mỉ. Có óc phân tích tốt, suy luận logic. Làm việc chu đáo, không bao giờ bỏ sót chi tiết.",
+      "diem_manh": ["Thận trọng", "Tỉ mỉ", "Logic", "Phân tích tốt", "Trách nhiệm"],
+      "diem_yeu": ["Quá cẩn thận", "Dễ lo lắng", "Chậm chạp", "Dễ rơi vào do dự"],
+      "su_nghiep": {
+        "phu_hop": ["Kế toán", "Thiết kế", "Chỉnh sửa", "Nghiên cứu", "Công chức"],
+        "luận_giải": "Tuổi Mùi phù hợp với công việc chi tiết, yêu cầu chính xác cao. Là những nhân viên mẫu mực, được tin tưởng. Thường được giao những công việc quan trọng."
+      },
+      "tinh_cam": {
+        "dac_diem": "Chân thành, không hay thay đổi, có trách nhiệm cao",
+        "luận_giải": "Tuổi Mùi là người bạn đời tin cậy, có trách nhiệm với gia đình. Tình cảm chân thành nhưng thiếu biểu hiện. Cần bạn đời hiểu rõ tâm tình."
+      },
+      "suc_khoe": "Sức khỏe ổn định. Cần chú ý đến bệnh về tiêu hóa, dạ dày, lo lắng mà không ngủ.",
+      "tai_loc": "Thu nhập ổn định, tích lũy chậm nhưng chắc. Phù hợp đầu tư dài hạn, tránh rủi ro cao.",
+      "nam_tot": [2024, 2025, 2026],
+      "thang_tot": [1, 3, 5, 7, 9, 11],
+      "so_may_man": [3, 6, 9],
+      "mau_may_man": ["Vàng", "Đất", "Nâu"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Mùi có vận khí ổn định. Cần giảm bớt lo lắng, tin tưởng vào năng lực của mình.",
+        "tien_tai": "Thu nhập ổn định, tích lũy từ từ nhưng chắc chắn.",
+        "tinh_cam": "Gia đình êm ấm, mối quan hệ bền vững.",
+        "su_nghiep": "Công việc ổn định, có thể có mức lương tăng.",
+        "suc_khoe": "Khỏe mạnh, cần giảm stress bằng cách tập thể dục.",
+        "phuong_huong": "Nên tin tưởng vào bản thân hơn, không cần quá lo lắng. Mọi việc sẽ ổn thỏa nếu cứ kiên nhẫn."
+      }
+    },
+    {
+      "id": 8,
+      "ten": "Thân",
+      "chi": "申",
+      "sao_chinh": "Lộc Tồn",
+      "sao_phu": ["Cự Môn", "Phúc Sinh"],
+      "ngay_bat_dau": "21/06",
+      "ngay_ket_thuc": "23/07",
+      "sac_thai": {
+        "nam": "Thoáng đãng, hiền lành, có nhân ái",
+        "nu": "Rộng rãi, hiền hòa, có trái tim nhân ái"
+      },
+      "tinh_cach": "Thoáng đãng, rộng rãi, hiền lành. Có tính nhân ái cao, sẵn sàng giúp đỡ người khác. Không hay nhủ tiêu, sống khơi khoảng.",
+      "diem_manh": ["Hiền lành", "Nhân ái", "Thoáng đãng", "Sẵn sàng giúp đỡ", "Lạc quan"],
+      "diem_yeu": ["Vô tư", "Dễ bị lợi dụng", "Thiếu tính toán", "Dễ chịu thua"],
+      "su_nghiep": {
+        "phu_hop": ["Y tế", "Giáo dục", "Tình nguyện", "Phúc lợi xã hội", "Dịch vụ"],
+        "luận_giải": "Tuổi Thân phù hợp với công việc có ý nghĩa xã hội. Khả năng lãnh đạo tốt, được mọi người yêu mến. Thường đạt thành tích cao trong ngành nhân văn."
+      },
+      "tinh_cam": {
+        "dac_diem": "Vô tư, chân thành, không hay giấu giếm",
+        "luận_giải": "Tuổi Thân là bạn đời tốt, trung thực tuyệt đối. Không có gì để che giấu, tình cảm chân thành. Gia đình luôn được ưu tiên."
+      },
+      "suc_khoe": "Sức khỏe tốt, ít bệnh tật. Cần chú ý đến bệnh về xương khớp, giữ cân nặng hợp lý.",
+      "tai_loc": "Thu nhập tốt, biết cách chi tiêu. Hay giúp đỡ người khác, có khả năng tích lũy tốt.",
+      "nam_tot": [2025, 2026, 2027],
+      "thang_tot": [2, 4, 6, 8, 10, 12],
+      "so_may_man": [4, 7, 8],
+      "mau_may_man": ["Cam", "Vàng", "Đỏ"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Thân vận khí thuận lợi. Cơ hội phát triển công việc và gia đình.",
+        "tien_tai": "Thu nhập tốt, cơ hội tăng lương.",
+        "tinh_cam": "Gia đình hạnh phúc, mối quan hệ tình cảm tốt đẹp.",
+        "su_nghiep": "Công việc phát triển tốt, được công nhận.",
+        "suc_khoe": "Khỏe mạnh, năng lượng cao.",
+        "phuong_huong": "Nên tận dụng cơ hội, không nên cứ vô tư. Đầu tư vào bản thân sẽ mang lại kết quả tốt."
+      }
+    },
+    {
+      "id": 9,
+      "ten": "Dậu",
+      "chi": "酉",
+      "sao_chinh": "Hàn Tinh",
+      "sao_phu": ["Lộc Tồn", "Cự Môn"],
+      "ngay_bat_dau": "23/07",
+      "ngay_ket_thuc": "23/08",
+      "sac_thai": {
+        "nam": "Trầm lặng, sâu sắc, suy tư nhiều",
+        "nu": "Bí ẩn, tính toán, có óc quan sát tốt"
+      },
+      "tinh_cach": "Trầm lặng, sâu sắc, suy tư. Có trí tưởng tượng phong phú, nội tâm phức tạp. Ít nói nhưng lắng nghe kỹ, hiểu rõ mọi người.",
+      "diem_manh": ["Sâu sắc", "Tưởng tượng phong phú", "Suy tư logic", "Nội tâm phức tạp", "Hiểu sâu"],
+      "diem_yeu": ["Trầm lặng", "Dễ lo lắng", "Ưu tư", "Có tính khác biệt", "Khó tiếp xúc"],
+      "su_nghiep": {
+        "phu_hop": ["Nghiên cứu", "Viết lách", "Tư vấn", "Điều hành", "Nghệ thuật"],
+        "luận_giải": "Tuổi Dậu phù hợp với công việc yên tĩnh, chuyên sâu. Có khả năng phân tích sâu sắc, tìm ra vấn đề cốt lõi. Thường là những chuyên gia tầm cao."
+      },
+      "tinh_cam": {
+        "dac_diem": "Sâu sắc, lãng mạn, có tính ưu tư",
+        "luận_giải": "Tuổi Dậu yêu sâu sắc nhưng ít bộc lộ. Cần bạn đời hiểu được tâm tình ẩn sâu. Mối quan hệ càng lâu càng bền vững."
+      },
+      "suc_khoe": "Cần chú ý đến bệnh về tâm thần, stress, mất ngủ, lo âu.",
+      "tai_loc": "Thu nhập ổn định nhưng cần kiên nhẫn. Tránh đầu cơ, cờ bạc. Tích lũy từ từ sẽ có được tài sản lớn.",
+      "nam_tot": [2024, 2025, 2027],
+      "thang_tot": [1, 3, 5, 7, 9, 11],
+      "so_may_man": [2, 5, 8],
+      "mau_may_man": ["Đen", "Xanh đen", "Tím"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Dậu cần chú ý đến sức khỏe tâm thần. Giảm stress sẽ giúp cải thiện mọi khía cạnh.",
+        "tien_tai": "Thu nhập ổn định, cần quản lý tài chính tốt.",
+        "tinh_cam": "Mối quan hệ sẽ được cải thiện nếu bộc lộ tâm tình hơn.",
+        "su_nghiep": "Công việc phát triển nếu tập trung, tránh xao lãng.",
+        "suc_khoe": "Cần giảm stress, tập thể dục, sở thích yên tĩnh.",
+        "phuong_huong": "Nên tìm những hoạt động thích hợp để giảm stress như đọc sách, vẽ vời, thiền định. Đó sẽ giúp cân bằng cuộc sống."
+      }
+    },
+    {
+      "id": 10,
+      "ten": "Tuất",
+      "chi": "戌",
+      "sao_chinh": "Phúc Sinh",
+      "sao_phu": ["Hàn Tinh", "Lộc Tồn"],
+      "ngay_bat_dau": "23/08",
+      "ngay_ket_thuc": "23/09",
+      "sac_thai": {
+        "nam": "Thà thiệt, kiêng cự, có nguyên tắc",
+        "nu": "Trung thành, bảo vệ gia đình, có trách nhiệm"
+      },
+      "tinh_cach": "Thà thiệt, kiêng cự, có nguyên tắc. Sát cánh bên bạn, trung thành. Có tính cách cứng nhắc nhưng rất đáng tin cậy.",
+      "diem_manh": ["Thà thiệt", "Kiêng cự", "Trung thành", "Nguyên tắc rõ ràng", "Bảo vệ gia đình"],
+      "diem_yeu": ["Cứng nhắc", "Khó thích nghi", "Kiêng cự quá mức", "Ít linh hoạt"],
+      "su_nghiep": {
+        "phu_hop": ["Hành chính", "Quân sự", "Pháp luật", "Công chức", "Bảo vệ"],
+        "luận_giải": "Tuổi Tuất phù hợp với công việc ổn định, có quy tắc rõ ràng. Là những nhân viên mẫu mực, được tin tưởng hoàn toàn. Thường được giao vị trí lãnh đạo."
+      },
+      "tinh_cam": {
+        "dac_diem": "Trung thành, bảo vệ gia đình, có trách nhiệm cao",
+        "luận_giải": "Tuổi Tuất là bạn đời tin cậy, có trách nhiệm với gia đình. Trung thành tuyệt đối, không bao giờ có tình xảy lạc. Gia đình là trung tâm cuộc sống."
+      },
+      "suc_khoe": "Sức khỏe ổn định. Cần tránh stress, over-working. Giữ cân nặng hợp lý.",
+      "tai_loc": "Thu nhập ổn định, chăm chỉ tiết kiệm. Phù hợp đầu tư dài hạn, tích lũy từ từ nhưng chắc.",
+      "nam_tot": [2024, 2026, 2027],
+      "thang_tot": [2, 4, 6, 8, 10, 12],
+      "so_may_man": [1, 3, 9],
+      "mau_may_man": ["Xanh da trời", "Trắng", "Vàng"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Tuất vận khí ổn định. Cần kiên nhẫn, không nên vội vàng thay đổi.",
+        "tien_tai": "Thu nhập ổn định, tích lũy từ từ.",
+        "tinh_cam": "Gia đình êm ấm, mối quan hệ bền vững.",
+        "su_nghiep": "Công việc ổn định, có thể có mức lương tăng nhẹ.",
+        "suc_khoe": "Khỏe mạnh, cần tránh stress.",
+        "phuong_huong": "Nên duy trì cuộc sống hiện tại, không nên thay đổi lớn. Kiên nhẫn sẽ mang lại kết quả tốt."
+      }
+    },
+    {
+      "id": 11,
+      "ten": "Hợi",
+      "chi": "亥",
+      "sao_chinh": "Tham Lang",
+      "sao_phu": ["Phúc Sinh", "Văn Khúc"],
+      "ngay_bat_dau": "23/09",
+      "ngay_ket_thuc": "23/10",
+      "sac_thai": {
+        "nam": "Vui vẻ, vô tư, hiền lành",
+        "nu": "Đơn sơ, lãng mạn, có thái độ tích cực"
+      },
+      "tinh_cach": "Vui vẻ, vô tư, hiền lành. Dễ gần, dễ kết bạn, không có thành kiến. Sống tự nhiên, không có thao tác giả tạo.",
+      "diem_manh": ["Vui vẻ", "Vô tư", "Hiền lành", "Dễ gần", "Có nhân ái"],
+      "diem_yeu": ["Vô tư", "Chi tiêu lớn", "Dễ bị lợi dụng", "Thiếu suy tính"],
+      "su_nghiep": {
+        "phu_hop": ["Giáo dục", "Truyền thông", "Phục vụ", "Liên lạc", "Phúc lợi xã hội"],
+        "luận_giải": "Tuổi Hợi phù hợp với công việc có tính nhân văn. Khả năng giao tiếp tốt, được mọi người yêu mến. Thường là những cán bộ được yêu quý."
+      },
+      "tinh_cam": {
+        "dac_diem": "Đơn sơ, lãng mạn, chân thành",
+        "luận_giải": "Tuổi Hợi là người bạn đời hiền hòa, không nổi sóng. Tình cảm chân thành, gia đình luôn được ưu tiên. Lạc quan với cuộc sống."
+      },
+      "suc_khoe": "Sức khỏe tương đối tốt. Cần tránh thói quen xấu, chế độ ăn uống không lành.",
+      "tai_loc": "Thu nhập tốt nhưng chi tiêu cũng lớn. Cần kiểm soát chi phí để tích lũy được tài sản.",
+      "nam_tot": [2024, 2025, 2026],
+      "thang_tot": [1, 3, 5, 7, 9, 11],
+      "so_may_man": [2, 4, 6],
+      "mau_may_man": ["Xanh lá", "Nâu", "Vàng"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 tuổi Hợi vận khí bình thường. Cần cân bằng giữa vui chơi và trách nhiệm.",
+        "tien_tai": "Thu nhập ổn định nhưng chi tiêu cũng lớn.",
+        "tinh_cam": "Gia đình êm ấm, mối quan hệ tốt đẹp.",
+        "su_nghiep": "Công việc ổn định, có cơ hội phát triển.",
+        "suc_khoe": "Khỏe mạnh, cần giữ thói quen tốt.",
+        "phuong_huong": "Nên kiểm soát chi tiêu hơn, tích lũy cho tương lai. Vui vẻ nhưng cũng cần có trách nhiệm."
+      }
+    }
+  ],
+  "sao_chinh_chi_tiet": {
+    "tam_lang": {
+      "ten": "Tham Lang",
+      "am_duong": "Dương",
+      "mô_tả": "Sao Tham Lang tượng trưng cho sự tham vọng, sáng tạo, khát vọng cải thiện cuộc sống. Người có Tham Lang là sao chính thường có khả năng kiến tạo, không sợ khó khăn.",
+      "dac_diem": "Thông minh, sáng tạo, tham vọng cao, khả năng lãnh đạo, ngoài giao tốt",
+      "anh_huong": "Tích cực"
+    },
+    "co_mon": {
+      "ten": "Cự Môn",
+      "am_duong": "Dương",
+      "mô_tả": "Sao Cự Môn tượng trưng cho sự bảo vệ, trăn trở, trách nhiệm. Người có Cự Môn là sao chính thường cẩn thận, lo lắng, có trách nhiệm cao.",
+      "dac_diem": "Cẩn thận, trách nhiệm, lo lắng, bảo vệ gia đình, tỉ mỉ",
+      "anh_huong": "Bình thường"
+    },
+    "loc_ton": {
+      "ten": "Lộc Tồn",
+      "am_duong": "Âm",
+      "mô_tả": "Sao Lộc Tồn tượng trưng cho may mắn, tài lộc và sự no đủ. Người có Lộc Tồn là sao chính thường có cuộc sống ổn định, tài lộc tốt.",
+      "dac_diem": "May mắn, tài lộc tốt, ổn định, no đủ, được trợ lực",
+      "anh_huong": "Tích cực"
+    },
+    "han_tinh": {
+      "ten": "Hàn Tinh",
+      "am_duong": "Dương",
+      "mô_tả": "Sao Hàn Tinh tượng trưng cho sự khắc tinh, khắt khe, yêu cầu cao. Người có Hàn Tinh là sao chính thường có tiêu chuẩn cao, tính cách khác biệt.",
+      "dac_diem": "Khắt khe, yêu cầu cao, tính cách khác biệt, sâu sắc, bí ẩn",
+      "anh_huong": "Thách thức"
+    },
+    "van_khuc": {
+      "ten": "Văn Khúc",
+      "am_duong": "Âm",
+      "mô_tả": "Sao Văn Khúc tượng trưng cho sự tính toán, ngoài giao và tư duy. Người có Văn Khúc là sao chính thường giao tiếp tốt, lanh lợi.",
+      "dac_diem": "Tính toán, ngoài giao, tư duy logic, khéo léo, thuyết phục tốt",
+      "anh_huong": "Tích cực"
+    },
+    "phuc_sinh": {
+      "ten": "Phúc Sinh",
+      "am_duong": "Âm",
+      "mô_tả": "Sao Phúc Sinh tượng trưng cho sự trợ lực, phúc lộc và may mắn. Người có Phúc Sinh là sao chính thường nhận được sự giúp đỡ, may mắn gặp quý nhân.",
+      "dac_diem": "May mắn, nhận được sự giúp đỡ, phúc lộc tốt, được quý nhân hỗ trợ",
+      "anh_huong": "Tích cực"
+    },
+    "sinh_quyen": {
+      "ten": "Sinh Quyên",
+      "am_duong": "Dương",
+      "mô_tả": "Sao Sinh Quyên tượng trưng cho sự tự do, độc lập và khả năng tự chủ. Người có Sinh Quyên là sao chính thường độc lập, không phụ thuộc.",
+      "dac_diem": "Độc lập, tự chủ, tự do, có khả năng tự lực, không cần phụ thuộc",
+      "anh_huong": "Tích cực"
+    }
+  },
+  "van_han_hang_nam": {
+    "2026": {
+      "nam_can_chi": "Bính Ngọ",
+      "tong_quan": "Năm 2026 được gọi là năm Bính Ngọ, là năm của Rồng theo lịch âm. Đây là một năm với nhiều biến chuyển, cơ hội và thách thức.",
+      "tu_vi_tong_the": "Năm 2026 mang tính chất Bính Ngọ, với ngũ hành là Hỏa. Đây là một năm năng động, sôi nổi. Mọi người đều có cơ hội phát triển nếu biết nắm bắt.",
+      "tuy_ban_nhat_luong": [
+        {
+          "con_giap": "Tý",
+          "tong_quan": "Năm vay kiếp, nhiều biến đổi. Cần cẩn trọng, quản lý tốt.",
+          "diem": "Cơ hội phát triển nếu kiên trì"
+        },
+        {
+          "con_giap": "Sửu",
+          "tong_quan": "Vận khí ổn định. Hợp với đầu tư lâu dài.",
+          "diem": "Tài lộc ổn định"
+        }
+      ]
+    }
+  },
+  "huong_dan_su_dung": {
+    "mo_ta": "Dữ liệu này được thiết kế để sử dụng trên website luận giải tử vi.",
+    "cac_truong_du_lieu": {
+      "id": "Mã con giáp từ 1-12",
+      "ten": "Tên con giáp",
+      "sao_chinh": "Sao chính tại cung Mệnh",
+      "sao_phu": "Mảng sao phụ",
+      "tinh_cach": "Mô tả tính cách",
+      "diem_manh": "Danh sách điểm mạnh",
+      "diem_yeu": "Danh sách điểm yếu",
+      "su_nghiep": "Thông tin sự nghiệp",
+      "tinh_cam": "Thông tin tình cảm",
+      "van_han_nam_2026": "Vận hạn chi tiết năm 2026"
+    },
+    "cach_hien_thi": "Có thể sử dụng các trường dữ liệu này để tạo thành các trang luận giải chi tiết, bảng vận hạn hàng tháng, so sánh điểm mạnh yếu.",
+    "ghichu": "Các thông tin này mang tính tham khảo, không thay thế lời khuyên từ các chuyên gia tử vi thực sự."
+  }
+}

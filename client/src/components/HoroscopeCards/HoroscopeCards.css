@@ -1,0 +1,109 @@
+/* HOROSCOPE CARDS */
+.horoscope-section {
+  padding: var(--space-4xl) 0;
+  background: linear-gradient(180deg, var(--color-dark-bg) 0%, rgba(0, 51, 102, 0.08) 50%, var(--color-dark-bg) 100%);
+}
+
+.horoscope-date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.horoscope-date-btn {
+  display: flex; align-items: center; gap: var(--space-xs);
+  padding: 0.5rem 1rem;
+  background: var(--color-dark-surface);
+  border: 1px solid var(--color-dark-elevated);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-light);
+  cursor: pointer; font-size: 0.85rem;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.horoscope-date-btn:hover { border-color: rgba(212, 175, 55, 0.3); color: var(--color-gold); }
+
+.horoscope-current-date {
+  font-size: 1rem; font-weight: 600; color: var(--color-gold);
+  padding: 0.5rem 1.25rem;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.horoscope-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+.horoscope-card {
+  background: var(--color-dark-card);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(212, 175, 55, 0.08);
+  padding: var(--space-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative; overflow: hidden;
+}
+
+.horoscope-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.horoscope-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 175, 55, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.horoscope-card:hover::after { opacity: 1; }
+
+.horoscope-emoji {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
+  position: relative; z-index: 1;
+  transition: transform var(--transition-spring);
+}
+
+.horoscope-card:hover .horoscope-emoji { transform: scale(1.15); }
+
+.horoscope-name { font-size: 1rem; font-weight: 700; color: var(--color-text-on-dark); margin-bottom: var(--space-xs); position: relative; z-index: 1; }
+.horoscope-years { font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: var(--space-sm); position: relative; z-index: 1; }
+
+.horoscope-stars { display: flex; justify-content: center; gap: 2px; margin-bottom: var(--space-sm); position: relative; z-index: 1; }
+
+.horoscope-summary {
+  font-size: 0.8rem; padding: 0.3rem 0.8rem;
+  border-radius: 50px; display: inline-block;
+  position: relative; z-index: 1;
+}
+
+.horoscope-summary.excellent { background: rgba(39, 174, 96, 0.15); color: var(--color-success-light); }
+.horoscope-summary.good { background: rgba(212, 175, 55, 0.15); color: var(--color-gold-light); }
+.horoscope-summary.average { background: rgba(230, 126, 34, 0.15); color: var(--color-warning-light); }
+.horoscope-summary.caution { background: rgba(231, 76, 60, 0.15); color: var(--color-danger-light); }
+
+.horoscope-detail-link {
+  display: block; margin-top: var(--space-sm);
+  font-size: 0.8rem; color: var(--color-gold);
+  opacity: 0; transform: translateY(5px);
+  transition: all var(--transition-normal);
+  position: relative; z-index: 1;
+}
+
+.horoscope-card:hover .horoscope-detail-link { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 900px) { .horoscope-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px) {
+  .horoscope-grid { grid-template-columns: repeat(2, 1fr); }
+  .horoscope-date-nav { gap: var(--space-sm); flex-wrap: wrap; justify-content: center; }
+}

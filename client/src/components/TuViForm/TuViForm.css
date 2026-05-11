@@ -1,0 +1,152 @@
+/* TU VI FORM */
+.tuvi-form-section { position: relative; padding: var(--space-4xl) 0; z-index: 1; }
+
+.tuvi-form-card {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--space-2xl);
+  background: var(--color-dark-card);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 60px rgba(212, 175, 55, 0.06), 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.tuvi-form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--color-gold-gradient);
+}
+
+.tuvi-form-header { text-align: center; margin-bottom: var(--space-2xl); }
+
+.tuvi-form-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px; height: 64px;
+  border-radius: var(--border-radius-md);
+  background: rgba(212, 175, 55, 0.1);
+  font-size: 2rem;
+  margin-bottom: var(--space-md);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.tuvi-form-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  background: var(--color-gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+.tuvi-form-desc { color: var(--color-text-muted); font-size: 0.95rem; }
+
+.tuvi-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md) var(--space-lg);
+}
+
+.tuvi-form-grid .form-group.full-width { grid-column: 1 / -1; }
+
+.radio-group { display: flex; gap: var(--space-sm); }
+.radio-option { flex: 1; }
+.radio-option input[type="radio"] { display: none; }
+
+.radio-option label {
+  display: block;
+  padding: 0.65rem 1rem;
+  text-align: center;
+  background: var(--color-dark-surface);
+  border: 2px solid var(--color-dark-elevated);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.radio-option input[type="radio"]:checked + label {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.calendar-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-dark-surface);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-dark-elevated);
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.toggle-label input[type="checkbox"] { display: none; }
+
+.toggle-switch {
+  width: 42px; height: 22px;
+  background: var(--color-dark-elevated);
+  border-radius: 11px;
+  position: relative;
+  transition: background var(--transition-normal);
+}
+
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: var(--color-text-muted);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+}
+
+.toggle-label input:checked + .toggle-switch { background: rgba(212, 175, 55, 0.3); }
+.toggle-label input:checked + .toggle-switch::before { left: 23px; background: var(--color-gold); }
+
+.tuvi-form-actions { display: flex; gap: var(--space-md); margin-top: var(--space-xl); }
+.tuvi-form-actions .btn { flex: 1; }
+
+.btn-reset {
+  background: var(--color-dark-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-dark-elevated);
+}
+
+.btn-reset:hover {
+  background: var(--color-dark-elevated);
+  color: var(--color-text-light);
+}
+
+.tuvi-form-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+}
+
+.tuvi-form-loading p { color: var(--color-gold); font-weight: 500; }
+
+@media (max-width: 640px) {
+  .tuvi-form-card { padding: var(--space-lg); margin: 0 var(--space-md); }
+  .tuvi-form-grid { grid-template-columns: 1fr; }
+  .tuvi-form-actions { flex-direction: column; }
+}
