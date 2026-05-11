@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './InterpretationCMS.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
 export default function InterpretationCMS() {
   const [data, setData] = useState([]);
