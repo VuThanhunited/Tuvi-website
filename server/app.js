@@ -33,7 +33,7 @@ app.use(helmet({
 
 const corsOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map(url => url.trim())
-  : ['http://localhost:3000', 'http://localhost:3001'];
+  : ['http://localhost:3000', 'http://localhost:3001', 'https://tuvi-website-sigma.vercel.app'];
 
 app.use(cors({
   origin: corsOrigins,

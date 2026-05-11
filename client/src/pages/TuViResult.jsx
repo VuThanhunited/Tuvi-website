@@ -4,7 +4,7 @@ import ParticleBackground from '../components/ParticleBackground/ParticleBackgro
 import ContentGate from '../components/ContentGate/ContentGate.jsx';
 import './TuViResult.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
 /*
  * Cung Chiếu Overlay - Đường chiếu cung (tam hợp + xung chiếu)

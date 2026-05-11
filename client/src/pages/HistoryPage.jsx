@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import './StaticPages.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
 const NGU_HANH_COLORS = {
   'Kim': '#C0C0C0', 'Thủy': '#1E90FF', 'Hỏa': '#FF4500',

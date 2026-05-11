@@ -12,7 +12,8 @@ export default function Home() {
   useEffect(() => {
     const fetchMasters = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/masters');
+        const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
+        const res = await fetch(`${API_URL}/masters`);
         const result = await res.json();
         if (result.success) {
           setMasters(result.data);

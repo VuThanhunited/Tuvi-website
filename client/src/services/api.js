@@ -2,7 +2,7 @@
  * Enhanced API Service with Error Handling and Retry Logic
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
 const REQUEST_TIMEOUT = 10000; // 10 seconds
 const MAX_RETRIES = 3;
