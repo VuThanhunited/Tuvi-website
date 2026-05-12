@@ -393,6 +393,27 @@
   }
 }
 
+@media (max-width: 768px) {
+  .dashboard-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-buy-coin, .btn-auth {
+    width: 100%;
+    text-align: center;
+  }
+
+  .chat-quick-actions {
+    justify-content: center;
+  }
+
+  .chat-tag {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
 /* Adjust TuViForm to fit perfectly without extra padding */
 .home-left-col .tuvi-form-section {
   padding: 0;

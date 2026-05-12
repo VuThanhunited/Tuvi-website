@@ -203,8 +203,15 @@
 
 @media (max-width: 768px) {
   .hero { min-height: calc(100vh - 60px); }
-  .hero-zodiac-ring { width: 350px; height: 350px; }
+  .hero-zodiac-ring { width: 350px; height: 350px; max-width: 90vw; max-height: 90vw; }
   .hero-content { padding: var(--space-md); }
-  .hero-actions { flex-direction: column; }
+  .hero-actions { flex-direction: column; width: 100%; }
   .hero-actions .btn { width: 100%; max-width: 300px; }
+  .hero-title { font-size: clamp(2rem, 8vw, 2.5rem); }
+}
+
+@media (max-width: 480px) {
+  .hero-zodiac-ring { width: 300px; height: 300px; }
+  .hero-title { font-size: clamp(1.8rem, 7vw, 2rem); }
+  .hero-description { font-size: 1rem; }
 }

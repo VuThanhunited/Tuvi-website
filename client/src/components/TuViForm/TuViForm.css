@@ -150,3 +150,10 @@
   .tuvi-form-grid { grid-template-columns: 1fr; }
   .tuvi-form-actions { flex-direction: column; }
 }
+
+@media (max-width: 480px) {
+  .tuvi-form-card { padding: var(--space-md); margin: 0 var(--space-sm); }
+  .tuvi-form-title { font-size: 1.4rem; }
+  .tuvi-form-icon { width: 48px; height: 48px; font-size: 1.5rem; }
+  .radio-group { flex-direction: column; }
+}

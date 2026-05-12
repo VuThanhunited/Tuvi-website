@@ -7,6 +7,7 @@ import './Header.css';
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, isAdmin, isMaster, credits, logout } = useAuth();
@@ -22,7 +23,10 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => { setMenuOpen(false); }, [location]);
+  useEffect(() => { 
+    setMenuOpen(false); 
+    setOpenDropdown('');
+  }, [location]);
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -30,6 +34,12 @@ export default function Header() {
 
   const isActive = (path) => location.pathname === path;
   const isGroupActive = (paths) => paths.some(p => location.pathname.startsWith(p));
+
+  const toggleDropdown = (name) => {
+    if (window.innerWidth <= 960) {
+      setOpenDropdown(prev => prev === name ? '' : name);
+    }
+  };
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`} id="main-header">
@@ -46,8 +56,11 @@ export default function Header() {
           </Link>
 
           {/* Tính Toán & Công Cụ - Dropdown */}
-          <div className="nav-dropdown">
-            <span className={`nav-link nav-dropdown-trigger ${isGroupActive(['/xem-tu-vi', '/la-so', '/ket-qua']) ? 'active' : ''}`}>
+          <div className={`nav-dropdown ${openDropdown === 'tinh-toan' ? 'open' : ''}`}>
+            <span 
+              className={`nav-link nav-dropdown-trigger ${isGroupActive(['/xem-tu-vi', '/la-so', '/ket-qua']) ? 'active' : ''}`}
+              onClick={() => toggleDropdown('tinh-toan')}
+            >
               Tính Toán <span className="nav-dropdown-arrow">▼</span>
             </span>
             <div className="nav-dropdown-menu">
@@ -71,8 +84,11 @@ export default function Header() {
           </Link>
 
           {/* Tài Khoản - Dropdown */}
-          <div className="nav-dropdown">
-            <span className={`nav-link nav-dropdown-trigger ${isGroupActive(['/tai-khoan', '/lich-su', '/yeu-thich', '/cong-dong']) ? 'active' : ''}`}>
+          <div className={`nav-dropdown ${openDropdown === 'cong-dong' ? 'open' : ''}`}>
+            <span 
+              className={`nav-link nav-dropdown-trigger ${isGroupActive(['/tai-khoan', '/lich-su', '/yeu-thich', '/cong-dong']) ? 'active' : ''}`}
+              onClick={() => toggleDropdown('cong-dong')}
+            >
               Cộng Đồng <span className="nav-dropdown-arrow">▼</span>
             </span>
             <div className="nav-dropdown-menu">
@@ -89,8 +105,11 @@ export default function Header() {
           </div>
 
           {/* Hỗ Trợ - Dropdown */}
-          <div className="nav-dropdown">
-            <span className={`nav-link nav-dropdown-trigger ${isGroupActive(['/ve-chung-toi', '/lien-he', '/dieu-khoan', '/bao-mat', '/faq']) ? 'active' : ''}`}>
+          <div className={`nav-dropdown ${openDropdown === 'ho-tro' ? 'open' : ''}`}>
+            <span 
+              className={`nav-link nav-dropdown-trigger ${isGroupActive(['/ve-chung-toi', '/lien-he', '/dieu-khoan', '/bao-mat', '/faq']) ? 'active' : ''}`}
+              onClick={() => toggleDropdown('ho-tro')}
+            >
               Hỗ Trợ <span className="nav-dropdown-arrow">▼</span>
             </span>
             <div className="nav-dropdown-menu">
