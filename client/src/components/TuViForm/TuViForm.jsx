@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 import './TuViForm.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
 const GIO_SINH = [
   { value: '', label: 'Chọn giờ sinh' },
@@ -20,7 +23,9 @@ const GIO_SINH = [
 
 export default function TuViForm() {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [isLunar, setIsLunar] = useState(false);
   const [formData, setFormData] = useState({
     hoTen: '', gioiTinh: 'nam', ngaySinh: '', thangSinh: '', namSinh: '', gioSinh: '',
@@ -34,9 +39,35 @@ export default function TuViForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    navigate('/ket-qua', { state: { ...formData, isLunar } });
-    setLoading(false);
+    setError('');
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const res = await fetch(`${API_URL}/tuvi/calculate`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          ...formData,
+          isLunar,
+          namXem: String(new Date().getFullYear()),
+          thangXem: String(new Date().getMonth() + 1),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'Có lỗi xảy ra');
+      }
+
+      navigate('/ket-qua', { state: data.data });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -68,11 +99,21 @@ export default function TuViForm() {
         <div className="tuvi-form-card">
           <div className="tuvi-form-header">
             <div className="tuvi-form-icon">☯</div>
-            <h2 className="tuvi-form-title">Tính Tử Vi Trọn Đời</h2>
-            <p className="tuvi-form-desc">Nhập thông tin ngày giờ sinh để xem tử vi chi tiết 12 cung mệnh</p>
+            <h2 className="tuvi-form-title">Lập Lá Số Tử Vi</h2>
+            <p className="tuvi-form-desc">Nhập thông tin ngày giờ sinh để lập lá số chi tiết 12 cung mệnh</p>
           </div>
 
           <form onSubmit={handleSubmit}>
+            {error && (
+              <div style={{
+                background: '#ffeaea', color: '#c0392b',
+                padding: '0.75rem 1rem', borderRadius: '6px',
+                marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center',
+                gridColumn: '1 / -1'
+              }}>
+                {error}
+              </div>
+            )}
             <div className="tuvi-form-grid">
               <div className="form-group full-width">
                 <label className="form-label" htmlFor="hoTen">Họ và Tên</label>
@@ -127,7 +168,7 @@ export default function TuViForm() {
             </div>
 
             <div className="tuvi-form-actions">
-              <button type="submit" className="btn btn-primary btn-lg" id="submit-tuvi">✨ Tính Tử Vi</button>
+              <button type="submit" className="btn btn-primary btn-lg" id="submit-tuvi">✨ Lập Lá Số</button>
               <button type="button" className="btn btn-reset" onClick={handleReset} id="reset-tuvi">✕ Xóa</button>
             </div>
           </form>

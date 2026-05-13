@@ -64,9 +64,6 @@ export default function Header() {
               Tính Toán <span className="nav-dropdown-arrow">▼</span>
             </span>
             <div className="nav-dropdown-menu">
-              <Link to="/xem-tu-vi" className="nav-dropdown-item">
-                <span>🔮</span> Xem Tử Vi Trọn Đời
-              </Link>
               <Link to="/la-so" className="nav-dropdown-item">
                 <span>📊</span> Lập Lá Số Tử Vi
               </Link>

@@ -18,8 +18,7 @@ export default function Footer() {
                 <li><Link to="/xem-tu-vi">Tử vi {currentYear}</Link></li>
                 <li><Link to="/xem-tu-vi">Tử vi hàng ngày</Link></li>
                 <li><Link to="/horoscope">Tử vi 12 con giáp</Link></li>
-                <li><Link to="/xem-tu-vi">Tử vi trọn đời</Link></li>
-                <li><Link to="/xem-tu-vi">Lập lá số tử vi</Link></li>
+                <li><Link to="/la-so">Lập lá số tử vi</Link></li>
                 <li><Link to="#">Cân xương tính số</Link></li>
                 <li><Link to="#">Thống kê cân xương</Link></li>
               </ul>

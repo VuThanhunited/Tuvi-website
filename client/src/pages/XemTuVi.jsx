@@ -315,14 +315,14 @@ export default function XemTuVi() {
 
                 <h3>Lấy lá số tử vi để làm gì ?</h3>
                 <p>
-                  Xem lá số tử vi trọn đời có bình giải chi tiết sẽ giúp cho quý bạn mệnh biết về tương lai, vận hạn theo các năm. Khi lấy lá số tử vi theo giờ sinh và ngày tháng năm sinh thì quý bạn cần khám phá phần luận giải lá số để nắm bắt vận mệnh của chính mình. Lá số tử vi trọn đời mang yếu tố tham khảo giúp quý bạn mệnh tránh việc không nên, tăng cường việc tốt từ đó có một cuộc sống suôn sẻ và nhiều may mắn.
+                  Lập lá số tử vi có bình giải chi tiết sẽ giúp cho quý bạn mệnh biết về tương lai, vận hạn theo các năm. Khi lấy lá số tử vi theo giờ sinh và ngày tháng năm sinh thì quý bạn cần khám phá phần luận giải lá số để nắm bắt vận mệnh của chính mình. Lá số tử vi mang yếu tố tham khảo giúp quý bạn mệnh tránh việc không nên, tăng cường việc tốt từ đó có một cuộc sống suôn sẻ và nhiều may mắn.
                 </p>
 
-                <h3>Lá số tử vi trọn đời thể hiện điều gì ?</h3>
+                <h3>Lá số tử vi thể hiện điều gì ?</h3>
                 <ul>
                   <li>Trên mỗi lá số tử vi sẽ thể hiện các phương diện cuộc sống của quý bạn mệnh theo từng năm tuổi cụ thể như: <strong>công danh, sự nghiệp, gia đạo, tình duyên, tiền tài, sức khỏe, anh chị em, quan hệ xã hội...</strong></li>
-                  <li>Để tra cứu và lấy lá số tử vi trọn đời trực tuyến miễn phí quý bạn cần cung cấp đầy đủ và chính xác nhất về <strong>họ tên, giờ sinh, ngày sinh, tháng sinh, năm sinh và giới tính.</strong></li>
-                  <li>Ngoài ra: cách xem lá số tử vi có thể thay đổi theo các năm. Vì vậy để luận đoán và có cái nhìn chính xác nhất về tương lai và vận mệnh của mình trong năm {currentYear}, quý bạn nên lấy lá số tử vi {currentYear} và cách lập lá số tử vi để tham khảo chi tiết tử vi năm {currentYear} của mình, cũng như phân tích và khám phá lá số tử vi trọn đời của các năm khác.</li>
+                  <li>Để tra cứu và lập lá số tử vi trực tuyến miễn phí quý bạn cần cung cấp đầy đủ và chính xác nhất về <strong>họ tên, giờ sinh, ngày sinh, tháng sinh, năm sinh và giới tính.</strong></li>
+                  <li>Ngoài ra: cách xem lá số tử vi có thể thay đổi theo các năm. Vì vậy để luận đoán và có cái nhìn chính xác nhất về tương lai và vận mệnh của mình trong năm {currentYear}, quý bạn nên lấy lá số tử vi {currentYear} và cách lập lá số tử vi để tham khảo chi tiết tử vi năm {currentYear} của mình, cũng như phân tích và khám phá lá số tử vi của các năm khác.</li>
                 </ul>
               </div>
             </div>
@@ -340,7 +340,6 @@ export default function XemTuVi() {
                 <li><Link to="/xem-tu-vi">◆ Tử vi năm {currentYear - 3}</Link></li>
                 <li><Link to="/xem-tu-vi">◆ Tử vi hàng ngày</Link></li>
                 <li><Link to="/xem-tu-vi">◆ Tử vi 12 con giáp</Link></li>
-                <li><Link to="/xem-tu-vi">◆ Tử vi trọn đời</Link></li>
                 <li><Link to="/xem-tu-vi" className="sidebar-hot">◆ Lập lá số tử vi <span className="hot-badge">Hot</span></Link></li>
                 <li><Link to="/xem-tu-vi" className="sidebar-hot">◆ Cân xương tính số <span className="hot-badge">Hot</span></Link></li>
                 <li><Link to="/xem-tu-vi">◆ Thống kê cân xương</Link></li>

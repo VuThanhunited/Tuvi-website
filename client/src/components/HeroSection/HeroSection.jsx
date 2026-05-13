@@ -24,17 +24,14 @@ export default function HeroSection() {
         </h1>
 
         <p className="hero-description">
-          Xem tử vi trọn đời, dự báo tương lai, hiểu rõ bản thân hơn 
+          Lập lá số tử vi, dự báo tương lai, hiểu rõ bản thân hơn 
           với công cụ tử vi cổ học chính xác nhất. Phân tích chi tiết 
           12 cung mệnh và hơn 100 sao tinh tú.
         </p>
 
         <div className="hero-actions">
-          <Link to="/xem-tu-vi" className="btn btn-primary btn-lg">
-            ✨ Xem Tử Vi Ngay
-          </Link>
-          <Link to="/la-so" className="btn btn-outline btn-lg">
-            📊 Lập Lá Số
+          <Link to="/la-so" className="btn btn-primary btn-lg">
+            ✨ Lập Lá Số Ngay
           </Link>
         </div>
 

@@ -111,6 +111,9 @@ export default function TuViResult() {
     );
   }
 
+  const menhIndex = result.cungResults.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
+  const activeCung = hoveredCung !== null ? hoveredCung : (menhIndex !== -1 ? menhIndex : 0);
+
   return (
     <div className="result-page">
       <div className="tuvi-result-container">
@@ -168,7 +171,7 @@ export default function TuViResult() {
                   return (
                     <div 
                       key={i} 
-                      className={`cung-card pos-${i}${hoveredCung === i ? ' cung-hovered' : ''}`}
+                      className={`cung-card pos-${i}${activeCung === i ? ' cung-hovered' : ''}`}
                       onMouseEnter={() => setHoveredCung(i)}
                       onMouseLeave={() => setHoveredCung(null)}
                     >
@@ -272,7 +275,7 @@ export default function TuViResult() {
                   </div>
 
                   {/* Đường chiếu cung tam hợp + xung chiếu - chỉ nằm trong khung giữa */}
-                  <CungChieuOverlay hoveredCung={hoveredCung} />
+                  <CungChieuOverlay hoveredCung={activeCung} />
                 </div>
               </div>
 
