@@ -33,10 +33,29 @@ app.use(helmet({
 
 const corsOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map(url => url.trim())
-  : ['http://localhost:3000', 'http://localhost:3001', 'https://tuvi-website-sigma.vercel.app'];
+  : [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175',
+      'http://localhost:4173',
+      'https://tuvi-website-sigma.vercel.app',
+      'https://tuvi-website.vercel.app',
+    ];
 
 app.use(cors({
-  origin: corsOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow any localhost port for development
+    if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+    // Allow configured origins
+    if (corsOrigins.includes(origin)) return callback(null, true);
+    // Allow all vercel and render deployments
+    if (origin.endsWith('.vercel.app') || origin.endsWith('.onrender.com')) return callback(null, true);
+    return callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
