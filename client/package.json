@@ -12,6 +12,7 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "prop-types": "^15.8.1",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-router-dom": "^7.14.0"
@@ -19,8 +20,9 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.5.2",
     "@vitest/ui": "^1.0.4",
-    "vitest": "^1.0.4",
+    "jsdom": "^29.1.1",
     "react-test-renderer": "19.2.6",
-    "vite": "^6.3.0"
+    "vite": "^6.3.0",
+    "vitest": "^1.0.4"
   }
 }

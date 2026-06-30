@@ -193,3 +193,23 @@ export const addCredits = async (req, res, next) => {
     next(error);
   }
 };
+
+import scraperService from '../services/scraperService.js';
+
+/**
+ * @desc    Cào dữ liệu diễn đàn tử vi
+ * @route   POST /api/admin/crawl-forum
+ * @access  Admin only
+ */
+export const crawlForum = async (req, res, next) => {
+  try {
+    const result = await scraperService.runCrawl();
+    res.status(200).json({
+      success: true,
+      message: 'Cào dữ liệu diễn đàn hoàn tất!',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};

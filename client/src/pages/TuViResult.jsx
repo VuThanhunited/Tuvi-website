@@ -97,7 +97,7 @@ function HoaTinhItem({ hoa, prefix = '' }) {
 }
 
 // Component một ô cung trong lưới
-function CungCard({ cung, gridPos, isActive, onMouseEnter, onMouseLeave }) {
+function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, onMouseLeave }) {
   // Backward compatibility: support both old format (name, rating, label) and new format (saoChinhList, etc.)
   const hasNewFormat = cung.saoChinhList !== undefined;
   const diaChiList = ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu'];
@@ -108,7 +108,8 @@ function CungCard({ cung, gridPos, isActive, onMouseEnter, onMouseLeave }) {
 
   return (
     <div
-      className={`cung-card pos-${gridPos}${isActive ? ' cung-hovered' : ''}`}
+      className={`cung-card pos-${gridPos}${isActive ? ' cung-hovered' : ''}${isSelected ? ' cung-selected' : ''}`}
+      onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -439,6 +440,7 @@ export default function TuViResult() {
   const [searchParams] = useSearchParams();
   const [result, setResult] = useState(null);
   const [hoveredCung, setHoveredCung] = useState(null);
+  const [selectedCungIdx, setSelectedCungIdx] = useState(null);
   const [activeSection, setActiveSection] = useState('tong-quan');
 
   useEffect(() => {
@@ -446,12 +448,18 @@ export default function TuViResult() {
 
     if (location.state && location.state.cungResults) {
       setResult(location.state);
+      const mIdx = location.state.cungResults.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
+      setSelectedCungIdx(mIdx !== -1 ? mIdx : 0);
       window.scrollTo(0, 0);
     } else if (lasoId) {
       fetch(`${API_URL}/tuvi/${lasoId}`)
         .then(res => res.json())
         .then(data => {
-          if (data.success) setResult(data.data);
+          if (data.success) {
+            setResult(data.data);
+            const mIdx = data.data.cungResults.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
+            setSelectedCungIdx(mIdx !== -1 ? mIdx : 0);
+          }
           else navigate('/xem-tu-vi');
         })
         .catch(() => navigate('/xem-tu-vi'));
@@ -562,8 +570,10 @@ export default function TuViResult() {
                   <CungCard
                     key={i}
                     cung={cung}
-                    gridPos={i}
+                    gridPos={cung.gridIdx}
                     isActive={activeCung === i}
+                    isSelected={selectedCungIdx === i}
+                    onClick={() => setSelectedCungIdx(i)}
                     onMouseEnter={() => setHoveredCung(i)}
                     onMouseLeave={() => setHoveredCung(null)}
                   />
@@ -719,6 +729,30 @@ export default function TuViResult() {
                 ))}
               </div>
             </div>
+
+            {/* LUẬN GIẢI CHI TIẾT CUNG ĐANG CHỌN */}
+            {selectedCungIdx !== null && result.cungResults?.[selectedCungIdx] && (
+              <div className="section-block selected-cung-interpretation" id="selected-cung-giai">
+                <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <span>{result.cungResults[selectedCungIdx].icon} Luận giải chi tiết Cung {result.cungResults[selectedCungIdx].name}</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 'normal', color: '#ffda75', opacity: 0.9 }}>
+                    (Bấm vào cung khác trên lá số để xem giải nghĩa tương ứng)
+                  </span>
+                </div>
+                <div className="section-content cung-interp-content">
+                  {result.cungResults[selectedCungIdx].interpretation ? (
+                    <div 
+                      dangerouslySetInnerHTML={{ __html: result.cungResults[selectedCungIdx].interpretation }}
+                      className="cung-rich-content"
+                    />
+                  ) : (
+                    <p style={{ color: '#888', fontStyle: 'italic', padding: '10px 0' }}>
+                      Chưa có dữ liệu luận giải cho các sao/cung này trong cơ sở dữ liệu CMS. Vui lòng nhập dữ liệu trong trang quản trị để hiển thị tại đây!
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* BÌNH GIẢI TỔNG QUAN */}
             <div className="section-block" id="binh-giai">

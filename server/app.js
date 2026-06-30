@@ -16,6 +16,7 @@ import interpretationRoutes from './routes/interpretationRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import masterRoutes from './routes/masterRoutes.js';
+import discussionRoutes from './routes/discussionRoutes.js';
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use('/api/interpretations', interpretationRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/masters', masterRoutes);
+app.use('/api/discussions', discussionRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({

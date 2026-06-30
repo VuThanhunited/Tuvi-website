@@ -6,6 +6,7 @@ import {
   toggleUserActive,
   getDashboardStats,
   addCredits,
+  crawlForum,
 } from '../controllers/adminController.js';
 import {
   getMasterProfiles,
@@ -27,6 +28,7 @@ router.get('/users', getUsers);
 router.put('/users/:id/role', updateUserRole);
 router.put('/users/:id/toggle-active', toggleUserActive);
 router.put('/users/:id/credits', addCredits);
+router.post('/crawl-forum', crawlForum);
 
 // Master CMS Routes
 router.get('/masters', getMasterProfiles);

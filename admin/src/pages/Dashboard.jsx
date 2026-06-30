@@ -20,6 +20,39 @@ export default function Dashboard() {
     totalUsers: 0
   });
   const [loading, setLoading] = useState(true);
+  const [crawling, setCrawling] = useState(false);
+  const [crawlStatus, setCrawlStatus] = useState(null);
+
+  const handleCrawl = async () => {
+    setCrawling(true);
+    setCrawlStatus(null);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${API_URL}/admin/crawl-forum`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.success) {
+        setCrawlStatus({
+          success: true,
+          message: 'Cào dữ liệu diễn đàn hoàn tất thành công!',
+          data: res.data.data
+        });
+      } else {
+        setCrawlStatus({
+          success: false,
+          message: res.data.message || 'Cào dữ liệu thất bại'
+        });
+      }
+    } catch (error) {
+      console.error('Error crawling:', error);
+      setCrawlStatus({
+        success: false,
+        message: 'Lỗi kết nối API Server!'
+      });
+    } finally {
+      setCrawling(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -98,13 +131,63 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* System Health */}
-        <div style={cardStyle}>
-          <h3 style={{ marginBottom: '1.5rem' }}>Trạng thái hệ thống</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <HealthItem label="Database" status="Ổn định" color="#10b981" />
-            <HealthItem label="API Server" status="Hoạt động" color="#10b981" />
-            <HealthItem label="Storage (Images)" status="85% dung lượng" color="#f59e0b" />
+        {/* Right Sidebar: Health & Scraper */}
+        <div>
+          {/* System Health */}
+          <div style={cardStyle}>
+            <h3 style={{ marginBottom: '1.5rem' }}>Trạng thái hệ thống</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <HealthItem label="Database" status="Ổn định" color="#10b981" />
+              <HealthItem label="API Server" status="Hoạt động" color="#10b981" />
+              <HealthItem label="Storage (Images)" status="85% dung lượng" color="#f59e0b" />
+            </div>
+          </div>
+
+          {/* Forum Crawler Card */}
+          <div style={{ ...cardStyle, marginTop: '1.5rem' }}>
+            <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              🤖 Cào dữ liệu Diễn đàn
+            </h3>
+            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: '1.5' }}>
+              Thu thập các bài đăng thảo luận lá số từ <strong>tuvivietnam.vn</strong> và <strong>lyso.vn</strong> để đẩy lên tường Cộng đồng của bạn.
+            </p>
+            {crawlStatus && (
+              <div style={{ 
+                padding: '0.8rem', 
+                borderRadius: '8px', 
+                backgroundColor: crawlStatus.success ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
+                color: crawlStatus.success ? '#10b981' : '#ef4444',
+                fontSize: '0.82rem',
+                marginBottom: '1rem',
+                border: `1px solid ${crawlStatus.success ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
+              }}>
+                {crawlStatus.message}
+                {crawlStatus.data && (
+                  <div style={{ fontSize: '0.75rem', marginTop: '4px', color: '#94a3b8' }}>
+                    Đã cào: {crawlStatus.data.totalCrawled} | Lưu mới: {crawlStatus.data.savedToDb} ({crawlStatus.data.source === 'real_forum' ? 'Diễn đàn thực tế' : 'Hạt giống dự phòng'})
+                  </div>
+                )}
+              </div>
+            )}
+            <button 
+              onClick={handleCrawl} 
+              disabled={crawling}
+              style={{
+                width: '100%',
+                background: crawling ? '#475569' : 'linear-gradient(135deg, #c5a059, #ab853a)',
+                color: '#fff',
+                border: 'none',
+                padding: '10px',
+                borderRadius: '8px',
+                fontWeight: '700',
+                cursor: crawling ? 'not-allowed' : 'pointer',
+                boxShadow: crawling ? 'none' : '0 4px 12px rgba(197, 160, 89, 0.2)',
+                fontSize: '0.9rem',
+                transition: 'all 0.2s'
+              }}
+            >
+              {crawling ? '⏳ ĐANG CÀO DỮ LIỆU...' : '📥 CÀO DỮ LIỆU NGAY'}
+            </button>
           </div>
         </div>
       </div>
