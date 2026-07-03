@@ -118,7 +118,7 @@ export default function Home() {
               </div>
             </a>
             
-            <a href="#" className="support-card fb-group">
+            <a href="https://www.facebook.com/groups/1353837944687586/" className="support-card fb-group" target="_blank" rel="noreferrer">
               <div className="icon-box">👥</div>
               <div className="support-info">
                 <h4>Nhóm Facebook</h4>
