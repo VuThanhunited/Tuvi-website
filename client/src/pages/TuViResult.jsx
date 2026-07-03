@@ -321,7 +321,7 @@ function SidebarForm({ result }) {
       
       {/* Widget 1: Adjust controls */}
       <div className="sidebar-widget controls-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
+        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', backgroundImage: "url('https://tuvi.vn/images/bg-head.jpg')", backgroundPosition: 'center', backgroundSize: 'cover', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
           Điều chỉnh Năm/Tháng xem
         </div>
         <div className="widget-content" style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -350,7 +350,7 @@ function SidebarForm({ result }) {
 
       {/* Widget 2: Created Horoscopes */}
       <div className="sidebar-widget created-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
+        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', backgroundImage: "url('https://tuvi.vn/images/bg-head.jpg')", backgroundPosition: 'center', backgroundSize: 'cover', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
           📁 Lá số đã tạo
         </div>
         <div className="widget-content" style={{ padding: '0' }}>
@@ -393,7 +393,7 @@ function SidebarForm({ result }) {
 
       {/* Widget 3: Complete Horoscope Form */}
       <div className="sidebar-widget form-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
+        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', backgroundImage: "url('https://tuvi.vn/images/bg-head.jpg')", backgroundPosition: 'center', backgroundSize: 'cover', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
           Lập lá số tử vi
         </div>
         <div className="widget-content" style={{ padding: '12px' }}>
@@ -509,14 +509,16 @@ function SidebarForm({ result }) {
               style={{ 
                 width: '100%', 
                 padding: '8px 10px', 
-                background: '#8f7e28', 
+                background: '#8c731f',
+                backgroundImage: 'linear-gradient(180deg, #997e23, #7d6519)',
+                border: '1px solid #6b5511',
                 color: '#fff', 
-                border: 'none', 
                 borderRadius: '4px', 
                 fontWeight: 'bold', 
                 cursor: 'pointer',
                 fontSize: '0.88rem',
-                marginTop: '5px'
+                marginTop: '5px',
+                textTransform: 'uppercase'
               }}
             >
               {loading ? 'Đang tính...' : 'LẬP LÁ SỐ'}
@@ -859,7 +861,7 @@ export default function TuViResult() {
                 <button className="btn-action" onClick={() => setShowBirthInfo(!showBirthInfo)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   {showBirthInfo ? '👁️ Ẩn thông tin sinh' : '👁️ Hiện thông tin sinh'}
                 </button>
-                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
+                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#8c731f', backgroundImage: 'linear-gradient(180deg, #997e23, #7d6519)', border: '1px solid #6b5511', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   💾 Lưu lá số
                 </button>
                 <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
@@ -874,8 +876,8 @@ export default function TuViResult() {
                 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   🖥️ Toàn màn hình
                 </button>
-                <button className="btn-action btn-ai" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #7a1618, #9e2326)', border: 'none', color: '#ffda75', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  🤖 Xem tử vi bằng AI
+                <button className="btn-action btn-ai" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #8e24aa, #7b1fa2)', border: 'none', color: '#ffda75', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
+                  🔮 Xem tử vi bằng AI
                 </button>
                 <button className="btn-action btn-blue" onClick={handleShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#1565c0', border: 'none', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   🔗 Chia sẻ
