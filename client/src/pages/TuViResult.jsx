@@ -851,18 +851,18 @@ export default function TuViResult() {
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="board-actions" style={{ background: '#fff', border: '1px solid #ddd', padding: '15px', borderRadius: '4px', marginBottom: '16px' }}>
+            <div className="board-actions" style={{ display: 'block', background: '#fff', border: '1px solid #ddd', padding: '15px', borderRadius: '4px', marginBottom: '16px' }}>
               <p style={{ color: '#666', fontSize: '0.88rem', margin: '0 0 12px 0', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 💡 <em>Lưu ý: Bấm vào các cung trên lá số để xem luận giải chi tiết. Nhấn giữ lá số để lưu ảnh.</em>
               </p>
-              <div className="action-buttons-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
-                <button className="btn-action" onClick={() => setShowBirthInfo(!showBirthInfo)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+              <div className="action-buttons-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', width: '100%' }}>
+                <button className="btn-action" onClick={() => setShowBirthInfo(!showBirthInfo)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   {showBirthInfo ? '👁️ Ẩn thông tin sinh' : '👁️ Hiện thông tin sinh'}
                 </button>
-                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   💾 Lưu lá số
                 </button>
-                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   ⚙️ In lá số
                 </button>
                 <button className="btn-action" onClick={() => {
@@ -871,13 +871,13 @@ export default function TuViResult() {
                   } else {
                     document.exitFullscreen?.();
                   }
-                }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   🖥️ Toàn màn hình
                 </button>
-                <button className="btn-action btn-ai" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #7a1618, #9e2326)', border: 'none', color: '#ffda75', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button className="btn-action btn-ai" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #7a1618, #9e2326)', border: 'none', color: '#ffda75', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   🤖 Xem tử vi bằng AI
                 </button>
-                <button className="btn-action btn-blue" onClick={handleShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#1565c0', border: 'none', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button className="btn-action btn-blue" onClick={handleShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#1565c0', border: 'none', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
                   🔗 Chia sẻ
                 </button>
               </div>
