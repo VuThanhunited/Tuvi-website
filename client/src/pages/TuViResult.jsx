@@ -48,35 +48,56 @@ const HOA_TINH_STYLE = {
   'hoa-ky':    { color: '#b71c1c', label: 'Hóa Kỵ' },
 };
 
-// Màu sao phụ theo loại
+// Màu sao phụ theo loại - Match exactly tuvi.vn colors
 const SAO_PHU_COLOR = {
-  'sat':  '#757575',  // sát tinh - xám
+  'sat':  '#555555',  // sát tinh - xám đen
   'loc':  '#d32f2f',  // lộc - đỏ
   'van':  '#1565c0',  // văn - xanh
   'quy':  '#d32f2f',  // quý nhân - đỏ
   'phu':  '#7b1fa2',  // phụ trợ - tím
-  'tro':  '#388e3c',  // hỗ trợ - xanh lá
+  'tro':  '#2e7d32',  // hỗ trợ - xanh lá đậm
   'dao':  '#f57c00',  // đào hoa - cam
+  'ham':  '#888888',  // hung tinh - xám
   'default': '#555',
 };
 
-// Component hiển thị sao chính
+// Color map for sao chính by trangThai - matching tuvi.vn
+function getSaoChinhColor(trangThai) {
+  switch(trangThai) {
+    case 'M': return '#c62828'; // Miếu - đỏ đậm
+    case 'V': return '#d32f2f'; // Vượng - đỏ
+    case 'Đ': return '#e65100'; // Đắc - cam đậm
+    case 'B': return '#555555'; // Bình hòa - xám
+    case 'H': return '#9e9e9e'; // Hãm - xám nhạt
+    default:  return '#555555';
+  }
+}
+
+// Component hiển thị sao chính - giống tuvi.vn
 function SaoChinhItem({ sao }) {
-  const isTot = sao.trangThai === 'M' || sao.trangThai === 'V';
-  const isHam = sao.trangThai === 'H';
+  const color = getSaoChinhColor(sao.trangThai);
+  const statusLabel = sao.trangThai === 'M' ? 'Miếu' : sao.trangThai === 'V' ? 'Vượng' : sao.trangThai === 'Đ' ? 'Đắc' : sao.trangThai === 'B' ? 'Bình hòa' : sao.trangThai === 'H' ? 'Hãm' : '';
+  const isBold = sao.trangThai === 'M' || sao.trangThai === 'V';
   return (
     <span
-      className={`sao-chinh ${isTot ? 'sao-tot' : isHam ? 'sao-ham' : 'sao-binh'}`}
-      title={`${sao.ten} - ${sao.trangThai === 'M' ? 'Miếu' : sao.trangThai === 'V' ? 'Vượng' : sao.trangThai === 'Đ' ? 'Đắc' : sao.trangThai === 'B' ? 'Bình hòa' : 'Hãm'}`}
+      className="sao-chinh"
+      style={{ color, fontWeight: isBold ? '700' : '600' }}
+      title={statusLabel ? `${sao.ten} - ${statusLabel}` : sao.ten}
     >
       {sao.ten}{sao.trangThai ? ` (${sao.trangThai})` : ''}
     </span>
   );
 }
 
-// Component hiển thị sao phụ
+// Component hiển thị sao phụ - giống tuvi.vn
 function SaoPhuItem({ sao }) {
-  const color = SAO_PHU_COLOR[sao.loai] || SAO_PHU_COLOR.default;
+  // Sao Lưu (dynamic stars) show in specific green color
+  let color;
+  if (sao.isLuu) {
+    color = '#006400'; // dark green for L. stars
+  } else {
+    color = SAO_PHU_COLOR[sao.mau] || SAO_PHU_COLOR[sao.loai] || SAO_PHU_COLOR.default;
+  }
   return (
     <span className="sao-phu" style={{ color }} title={sao.ten}>
       {sao.ten}{sao.trangThai && sao.trangThai !== 'B' ? ` (${sao.trangThai})` : ''}
@@ -96,15 +117,18 @@ function HoaTinhItem({ hoa, prefix = '' }) {
   );
 }
 
-// Component một ô cung trong lưới
+// Đia chi order for grid positions
+const GRID_DIACHI = ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu'];
+
+// Component một ô cung trong lưới - Redesigned to match tuvi.vn exactly
 function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, onMouseLeave }) {
-  // Backward compatibility: support both old format (name, rating, label) and new format (saoChinhList, etc.)
   const hasNewFormat = cung.saoChinhList !== undefined;
-  const diaChiList = ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu'];
-  const canChiChars = ['M', 'K', 'C', 'T', 'N', 'Q', 'G', 'Ấ', 'B', 'Đ', 'M', 'K'];
-  // For old format: generate basic can-chi from grid position
-  const fallbackCanChi = cung.canChi || `${canChiChars[gridPos] || ''}.${diaChiList[gridPos] || ''}`;
   const fallbackDaiHan = cung.daiHan || (gridPos * 10 + 6);
+  
+  // Determine Địa Chi of cung from gridPos or canChi
+  const diaChiName = GRID_DIACHI[gridPos] || '';
+  // Get the Can part and hanh from canChi field (e.g. 'C.Thìn' -> 'C')
+  const canPart = cung.canChi ? cung.canChi.split('.')[0] : '';
 
   return (
     <div
@@ -113,10 +137,10 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Header: Can-Chi | Tên cung | Đại hạn */}
+      {/* Header Row: Can+Hanh | Cung Name | Đại hạn */}
       <div className="cung-card-header">
         <div className="cung-top-left">
-          <span className="cung-canchhi-text">{fallbackCanChi}</span>
+          <span className="cung-canchhi-text">{canPart}.{diaChiName}</span>
           {cung.hanhDisplay && (
             <span className="cung-hanh" style={{ color: cung.hanhColor }}>
               {cung.hanhDisplay}
@@ -124,7 +148,7 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
           )}
         </div>
         <div className="cung-top-center">
-          <div className="cung-name" style={{ fontWeight: cung.isMinh ? 'bold' : 'normal' }}>
+          <div className={`cung-name${cung.isMenh ? ' cung-name-menh' : ''}${cung.isMinh ? ' cung-name-minh' : ''}`}>
             {cung.name ? (cung.isMinh ? `${cung.name} <Thân>` : cung.name).toUpperCase() : ''}
           </div>
         </div>
@@ -134,73 +158,49 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
         </div>
       </div>
 
-      {/* Sao chính (new format) */}
-      {hasNewFormat ? (
-        <div className="cung-sao-chinh-area">
-          {cung.saoChinhList && cung.saoChinhList.length > 0 ? (
+      {/* Sao chính - displayed prominently in center */}
+      <div className="cung-sao-chinh-area">
+        {hasNewFormat ? (
+          cung.saoChinhList && cung.saoChinhList.length > 0 ? (
             cung.saoChinhList.map((sao, idx) => (
               <SaoChinhItem key={idx} sao={sao} />
             ))
           ) : (
-            <span className="cung-no-star">—</span>
-          )}
-        </div>
-      ) : (
-        /* Old format: show rating label as star info */
-        <div className="cung-sao-chinh-area">
-          {cung.label ? (
-            <span className="sao-chinh sao-binh" style={{ color: cung.labelColor || '#555' }}>
-              {cung.label}
-            </span>
+            <span className="cung-no-star"></span>
+          )
+        ) : (
+          cung.label ? (
+            <span className="sao-chinh" style={{ color: cung.labelColor || '#555' }}>{cung.label}</span>
           ) : (
-            <span className="cung-no-star">—</span>
-          )}
-        </div>
-      )}
+            <span className="cung-no-star"></span>
+          )
+        )}
+      </div>
 
-      {/* Sao phụ (new format only) */}
+      {/* Sao phụ - displayed in a single left-aligned column like tuvi.vn */}
       {hasNewFormat && cung.saoPhuList && cung.saoPhuList.length > 0 && (
         <div className="cung-sao-phu-area">
-          <div className="sao-phu-cols">
-            <div className="sao-col">
-              {cung.saoPhuList.slice(0, Math.ceil(cung.saoPhuList.length / 2)).map((sao, idx) => (
-                // Do not display Tràng Sinh in the main list since we display it in the footer
-                sao.ten !== cung.trangSinh && <SaoPhuItem key={idx} sao={sao} />
-              ))}
-            </div>
-            <div className="sao-col">
-              {cung.saoPhuList.slice(Math.ceil(cung.saoPhuList.length / 2)).map((sao, idx) => (
-                sao.ten !== cung.trangSinh && <SaoPhuItem key={idx} sao={sao} />
-              ))}
-            </div>
-          </div>
+          {cung.saoPhuList.map((sao, idx) => (
+            sao.ten !== cung.trangSinh && <SaoPhuItem key={idx} sao={sao} />
+          ))}
         </div>
       )}
 
-      {/* Hóa tinh năm sinh (new format only) */}
+      {/* Hóa tinh năm sinh */}
       {hasNewFormat && cung.hoaTinhList && cung.hoaTinhList.length > 0 && (
-        <div className="cung-hoa-tinh-area">
+        <div className="cung-hoa-area">
           {cung.hoaTinhList.map((hoa, idx) => (
             <HoaTinhItem key={idx} hoa={hoa} />
           ))}
         </div>
       )}
 
-      {/* Hóa tinh năm xem (new format only) */}
+      {/* Hóa tinh năm xem */}
       {hasNewFormat && cung.namXemHoaTinh && cung.namXemHoaTinh.length > 0 && (
-        <div className="cung-namxem-hoa-area">
+        <div className="cung-hoa-area">
           {cung.namXemHoaTinh.map((hoa, idx) => (
             <HoaTinhItem key={idx} hoa={hoa} />
           ))}
-        </div>
-      )}
-
-      {/* Old format: show interpretation if available */}
-      {!hasNewFormat && cung.interpretation && (
-        <div className="cung-old-interp">
-          <span style={{ fontSize: '0.65rem', color: '#777', display: 'block', marginTop: 'auto' }}>
-            {cung.interpretation.slice(0, 60)}...
-          </span>
         </div>
       )}
 
@@ -208,7 +208,7 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
       {hasNewFormat && (
         <div className="cung-card-footer">
           <div className="cung-bottom-left">{cung.dvLabel || ''}</div>
-          <div className="cung-bottom-center" style={{ fontWeight: 'bold', color: '#2E8B57' }}>{cung.trangSinh || ''}</div>
+          <div className="cung-bottom-center">{cung.trangSinh || ''}</div>
           <div className="cung-bottom-right">{cung.lnLabel || ''}</div>
         </div>
       )}
@@ -837,60 +837,103 @@ export default function TuViResult() {
                 </div>
               </div>
 
-              {/* BẢNG CHÚ GIẢI */}
-              <div className="astrology-legend">
-                <div className="legend-status">
-                  <strong>M</strong>:Miếu&nbsp;
-                  <strong>V</strong>:Vượng&nbsp;
-                  <strong>Đ</strong>:Đắc&nbsp;
-                  <strong>B</strong>:Bình hòa&nbsp;
-                  <strong>H</strong>:Hãm
+              {/* BẢNG CHÚ GIẢI - Matches tuvi.vn */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '6px',
+                padding: '6px 10px',
+                background: '#f9f9f9',
+                border: '1px solid #ccc',
+                borderTop: 'none',
+                fontSize: '0.78rem',
+                color: '#555'
+              }}>
+                <div>
+                  <span style={{ color: '#c62828' }}>M</span>:Miếu&nbsp;
+                  <span style={{ color: '#d32f2f' }}>V</span>:Vượng&nbsp;
+                  <span style={{ color: '#e65100' }}>Đ</span>:Đắc&nbsp;
+                  <span style={{ color: '#555' }}>B</span>:Bình hòa&nbsp;
+                  <span style={{ color: '#9e9e9e' }}>H</span>:Hãm
                 </div>
-                <div className="legend-colors">
-                  <span className="color-box kim"></span> Kim
-                  <span className="color-box moc"></span> Mộc
-                  <span className="color-box thuy"></span> Thủy
-                  <span className="color-box hoa"></span> Hỏa
-                  <span className="color-box tho"></span> Thổ
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span><span className="color-box kim" style={{ display: 'inline-block', width: '10px', height: '10px', background: '#9e9e9e', marginRight: '3px', borderRadius: '2px' }}></span>Kim</span>
+                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#2E8B57', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Mộc</span>
+                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#1565c0', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Thủy</span>
+                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#c62828', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Hỏa</span>
+                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#DAA520', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Thổ</span>
                 </div>
-                <div className="legend-hoa">
-                  <span style={{ color: HOA_TINH_STYLE['hoa-loc'].color }}>■</span> Lộc&nbsp;
-                  <span style={{ color: HOA_TINH_STYLE['hoa-quyen'].color }}>■</span> Quyền&nbsp;
-                  <span style={{ color: HOA_TINH_STYLE['hoa-khoa'].color }}>■</span> Khoa&nbsp;
-                  <span style={{ color: HOA_TINH_STYLE['hoa-ky'].color }}>■</span> Kỵ
-                </div>
+                <div style={{ color: '#999', fontStyle: 'italic' }}>Lá số #{result._id?.slice(-6) || '000001'}</div>
               </div>
             </div>
 
-            {/* ACTION BUTTONS */}
-            <div className="board-actions" style={{ display: 'block', background: '#fff', border: '1px solid #ddd', padding: '15px', borderRadius: '4px', marginBottom: '16px' }}>
-              <p style={{ color: '#666', fontSize: '0.88rem', margin: '0 0 12px 0', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                💡 <em>Lưu ý: Bấm vào các cung trên lá số để xem luận giải chi tiết. Nhấn giữ lá số để lưu ảnh.</em>
-              </p>
-              <div className="action-buttons-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', width: '100%' }}>
-                <button className="btn-action" onClick={() => setShowBirthInfo(!showBirthInfo)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  {showBirthInfo ? '👁️ Ẩn thông tin sinh' : '👁️ Hiện thông tin sinh'}
+            {/* ACTION BUTTONS - tuvi.vn style bottom bar */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              padding: '8px 12px', 
+              background: '#f5f5f5', 
+              border: '1px solid #ddd',
+              borderTop: 'none',
+              flexWrap: 'wrap',
+              gap: '8px',
+              marginBottom: '16px'
+            }}>
+              {/* Toggle switch - Ẩn thông tin sinh */}
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.82rem', color: '#333', userSelect: 'none' }}>
+                <div 
+                  onClick={() => setShowBirthInfo(!showBirthInfo)}
+                  style={{
+                    width: '38px', height: '20px', borderRadius: '10px',
+                    background: showBirthInfo ? '#7a1618' : '#ccc',
+                    position: 'relative', cursor: 'pointer', transition: 'background 0.2s',
+                    flexShrink: 0
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute', top: '2px', 
+                    left: showBirthInfo ? '20px' : '2px',
+                    width: '16px', height: '16px', borderRadius: '50%',
+                    background: '#fff', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                  }} />
+                </div>
+                Ẩn thông tin sinh
+              </label>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <button 
+                  onClick={handlePrint} 
+                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#4CAF50', color: '#fff', border: 'none', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  ⬇️ Lưu lá số
                 </button>
-                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#8c731f', backgroundImage: 'linear-gradient(180deg, #997e23, #7d6519)', border: '1px solid #6b5511', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  💾 Lưu lá số
+                <button 
+                  onClick={handlePrint} 
+                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#fff', color: '#333', border: '1px solid #ccc', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  🖨 In lá số
                 </button>
-                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  ⚙️ In lá số
+                <button 
+                  onClick={() => {
+                    if (!document.fullscreenElement) {
+                      document.documentElement.requestFullscreen?.().catch(e => console.error(e));
+                    } else {
+                      document.exitFullscreen?.();
+                    }
+                  }} 
+                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#fff', color: '#333', border: '1px solid #ccc', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  ⛶ Toàn màn hình
                 </button>
-                <button className="btn-action" onClick={() => {
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen?.().catch(e => console.error(e));
-                  } else {
-                    document.exitFullscreen?.();
-                  }
-                }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  🖥️ Toàn màn hình
-                </button>
-                <button className="btn-action btn-ai" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #8e24aa, #7b1fa2)', border: 'none', color: '#ffda75', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  🔮 Xem tử vi bằng AI
-                </button>
-                <button className="btn-action btn-blue" onClick={handleShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#1565c0', border: 'none', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flex: '1 1 120px' }}>
-                  🔗 Chia sẻ
+                <button 
+                  onClick={handleShare} 
+                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#1977F3', color: '#fff', border: 'none', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  ⬡ Chia sẻ
                 </button>
               </div>
             </div>
