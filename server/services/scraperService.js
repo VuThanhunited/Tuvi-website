@@ -77,7 +77,65 @@ const FALLBACK_POSTS = [
   }
 ];
 
+const FACEBOOK_POSTS = [
+  {
+    title: 'Hỏi về cung Phu Thê & tình duyên lận đận - Nữ mạng Tân Tỵ 2001',
+    content: 'Em thấy em khổ về tình duyên quá, muốn thoát ra cũng không được, dày vò nhau mãi thôi. Mới yêu thì không sao, yêu lâu nó dày vò cảm xúc của em, tâm lý của em, em stress, em mệt mỏi quá. Yêu 2 năm bạn ấy biến thành 1 đứa trẻ con vậy. Xin hỏi em và bạn ấy có tiến tới được không ạ? Chứ em cảm giác không kết quả gì dù đang sống chung. Em để lá số bạn ấy ở dưới bình luận/ảnh đính kèm ạ.',
+    author: 'Khánh Linh (Ẩn danh)',
+    avatar: 'KL',
+    time: '2 giờ trước',
+    source: 'facebook',
+    imageUrl: '/uploads/laso_sample_1.png',
+    originalUrl: 'https://www.facebook.com/groups/1353837944687586/',
+    likesCount: 37,
+    commentsCount: 4,
+    comments: [
+      { author: 'Thầy Tử Vi', avatar: 'TT', content: 'Lá số Tân Tỵ này Mệnh có Vũ Khúc Cô Thần, cung Phu Thê lại gặp Địa Không Địa Kiếp chiếu nên tình cảm lận đận, tự mình dày vò mình là khó tránh khỏi.', time: '1 giờ trước' },
+      { author: 'Nguyễn Văn Định', avatar: 'NĐ', content: 'Cố lên bạn ơi, năm nay hạn đi vào cung phu thê nên nhiều biến động cảm xúc. Sống chung mà mệt mỏi thì nên nhìn nhận lại xem có hợp tính cách không đã.', time: '30 phút trước' }
+    ]
+  },
+  {
+    title: 'Nam mạng Quý Dậu 1993 xin luận công danh sự nghiệp - Đại vận 32-41 tuổi',
+    content: 'Chào cả nhà và các thầy hữu duyên. Em Quý Dậu 1993 nam mạng, hiện đang làm IT cho một công ty nước ngoài. Công việc dạo này bấp bênh, nhiều áp lực cắt giảm nhân sự. Em đang có dự tính ra ngoài tự làm hoặc chung vốn với bạn mở cửa hàng kinh doanh thiết bị công nghệ. Xin các thầy luận giải giùm em cung Quan Lộc và Tài Bạch xem có số làm chủ không hay chỉ nên làm công ăn lương ăn chắc mặc bền ạ. Em cảm ơn.',
+    author: 'Phan Minh Tuấn',
+    avatar: 'PT',
+    time: '4 giờ trước',
+    source: 'facebook',
+    imageUrl: '/uploads/laso_sample_2.png',
+    originalUrl: 'https://www.facebook.com/groups/1353837944687586/',
+    likesCount: 52,
+    commentsCount: 3,
+    comments: [
+      { author: 'Lý Số Gia', avatar: 'LS', content: 'Quý Dậu mệnh Kiếm Phong Kim, Mệnh tại Dậu có Thiên Phủ đắc địa. Số này làm công ăn lương giữ chức vụ quản lý thì tốt, tự đứng ra kinh doanh năm nay chưa phải lúc, dễ hao hụt vốn.', time: '3 giờ trước' },
+      { author: 'Hoàng Nam', avatar: 'HN', content: 'Cung Tài Bạch có Vũ Khúc, Tham Lang hóa lộc thì trung vận phát đạt lắm. Đại vận 32-41 tuổi này bắt đầu khởi sắc rồi đấy bạn.', time: '2 giờ trước' }
+    ]
+  },
+  {
+    title: 'Nữ mạng Đinh Sửu 1997 hỏi về cung Điền Trạch và việc mua đất xây nhà năm 2026',
+    content: 'Chào các anh chị. Vợ chồng em sinh năm 1997 Đinh Sửu (chồng cùng tuổi), tích lũy được một ít vốn định năm nay 2026 động thổ xây nhà trên mảnh đất bố mẹ cho ở quê. Nhưng em xem cung Điền Trạch của em có sao Thái Dương hãm địa gặp Triệt, không biết việc làm nhà có suôn sẻ hay gặp trục trặc gì về thủ tục giấy tờ không. Mong các thầy luận giải giúp vợ chồng em.',
+    author: 'Nguyễn Thu Thảo',
+    avatar: 'TT',
+    time: '1 ngày trước',
+    source: 'facebook',
+    imageUrl: '/uploads/laso_sample_1.png',
+    originalUrl: 'https://www.facebook.com/groups/1353837944687586/',
+    likesCount: 29,
+    commentsCount: 2,
+    comments: [
+      { author: 'Đông Phương Sư', avatar: 'ĐP', content: 'Đinh Sửu năm 2026 là 30 tuổi âm, không phạm Hoang Ốc hay Kim Lâu lớn, làm nhà rất tốt. Điền hãm gặp Triệt thì thời gian đầu xây dựng hơi vất vả, thủ tục chậm chạp một chút nhưng xong xuôi lại yên ổn.', time: '18 giờ trước' }
+    ]
+  }
+];
+
 class ScraperService {
+  /**
+   * Simulated Facebook group cloner/crawling
+   */
+  crawlFacebookGroup() {
+    console.log('🤖 Đang giả lập cào dữ liệu từ Facebook Group 1353837944687586 (Tử Vi Việt Nam)...');
+    return FACEBOOK_POSTS;
+  }
+
   /**
    * Crawl threads from Tu Vi Viet Nam forum
    */
@@ -194,15 +252,19 @@ class ScraperService {
     // 1. Try real crawlers
     const tvvnPosts = await this.crawlTuViVietnam();
     const lsPosts = await this.crawlLySo();
-    posts = [...tvvnPosts, ...lsPosts];
+    
+    // 2. Simulated Facebook posts
+    const fbPosts = this.crawlFacebookGroup();
+    
+    posts = [...tvvnPosts, ...lsPosts, ...fbPosts];
 
-    // 2. Fallback if blocked or no results crawled
-    if (posts.length === 0) {
-      console.log('ℹ️ Không cào được dữ liệu thực tế (do Cloudflare chặn). Kích hoạt nạp bộ dữ liệu diễn đàn chuẩn mẫu.');
-      posts = FALLBACK_POSTS;
+    // 3. Fallback if blocked or no results crawled from forums
+    if (tvvnPosts.length === 0 && lsPosts.length === 0) {
+      console.log('ℹ️ Không cào được dữ liệu diễn đàn thực tế. Kích hoạt nạp bộ dữ liệu diễn đàn chuẩn mẫu.');
+      posts = [...posts, ...FALLBACK_POSTS];
     }
 
-    // 3. Save unique posts to database (check by title)
+    // 4. Save unique posts to database (check by title)
     let savedCount = 0;
     for (const post of posts) {
       const exists = await Discussion.findOne({ title: post.title });
@@ -216,7 +278,7 @@ class ScraperService {
       success: true,
       totalCrawled: posts.length,
       savedToDb: savedCount,
-      source: tvvnPosts.length || lsPosts.length ? 'real_forum' : 'fallback_database'
+      source: tvvnPosts.length || lsPosts.length ? 'real_forum_and_facebook' : 'fallback_and_facebook'
     };
   }
 }

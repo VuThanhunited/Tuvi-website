@@ -124,7 +124,9 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
           )}
         </div>
         <div className="cung-top-center">
-          <div className="cung-name">{cung.name ? cung.name.toUpperCase() : ''}</div>
+          <div className="cung-name" style={{ fontWeight: cung.isMinh ? 'bold' : 'normal' }}>
+            {cung.name ? (cung.isMinh ? `${cung.name} <Thân>` : cung.name).toUpperCase() : ''}
+          </div>
         </div>
         <div className="cung-top-right">
           <div className="cung-daihan">{fallbackDaiHan}</div>
@@ -162,12 +164,13 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
           <div className="sao-phu-cols">
             <div className="sao-col">
               {cung.saoPhuList.slice(0, Math.ceil(cung.saoPhuList.length / 2)).map((sao, idx) => (
-                <SaoPhuItem key={idx} sao={sao} />
+                // Do not display Tràng Sinh in the main list since we display it in the footer
+                sao.ten !== cung.trangSinh && <SaoPhuItem key={idx} sao={sao} />
               ))}
             </div>
             <div className="sao-col">
               {cung.saoPhuList.slice(Math.ceil(cung.saoPhuList.length / 2)).map((sao, idx) => (
-                <SaoPhuItem key={idx} sao={sao} />
+                sao.ten !== cung.trangSinh && <SaoPhuItem key={idx} sao={sao} />
               ))}
             </div>
           </div>
@@ -200,6 +203,15 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
           </span>
         </div>
       )}
+
+      {/* Cung Footer: ĐV | Tràng Sinh | LN */}
+      {hasNewFormat && (
+        <div className="cung-card-footer">
+          <div className="cung-bottom-left">{cung.dvLabel || ''}</div>
+          <div className="cung-bottom-center" style={{ fontWeight: 'bold', color: '#2E8B57' }}>{cung.trangSinh || ''}</div>
+          <div className="cung-bottom-right">{cung.lnLabel || ''}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -212,13 +224,21 @@ function SidebarForm({ result }) {
     ngaySinh: result?.ngaySinh || 1,
     thangSinh: result?.thangSinh || 1,
     namSinh: result?.namSinh || 2000,
-    gioSinh: result?.gioSinh || '17-19',
+    gioSinh: result?.gioSinh || '11-13',
     gioiTinh: result?.gioiTinh || 'nam',
     isLunar: result?.isLunar || false,
   });
   const [namXem, setNamXem] = useState(result?.namXem || new Date().getFullYear());
   const [thangXem, setThangXem] = useState(result?.thangXem || new Date().getMonth() + 1);
   const [loading, setLoading] = useState(false);
+  const [createdList, setCreatedList] = useState([]);
+
+  useEffect(() => {
+    try {
+      const list = JSON.parse(localStorage.getItem('created_horoscopes') || '[]');
+      setCreatedList(list);
+    } catch (e) {}
+  }, [result]);
 
   const GIO_SINH = [
     { value: '23-1', label: 'Tý (23:00-01:00)' },
@@ -235,14 +255,25 @@ function SidebarForm({ result }) {
     { value: '21-23', label: 'Hợi (21:00-23:00)' },
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const formatTimeAgo = (timestamp) => {
+    if (!timestamp) return 'Gần đây';
+    const diffMs = Date.now() - timestamp;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} ngày trước`;
+  };
+
+  const executeCalculate = async (params) => {
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/tuvi/calculate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, namXem, thangXem }),
+        body: JSON.stringify(params),
       });
       const data = await res.json();
       if (data.success) {
@@ -256,179 +287,244 @@ function SidebarForm({ result }) {
     }
   };
 
+  const handleYearChange = (newYear) => {
+    setNamXem(newYear);
+    executeCalculate({ ...formData, namXem: newYear, thangXem });
+  };
+
+  const handleMonthChange = (newMonth) => {
+    setThangXem(newMonth);
+    executeCalculate({ ...formData, namXem, thangXem: newMonth });
+  };
+
+  const handleLoadCreated = (item) => {
+    executeCalculate({
+      hoTen: item.hoTen,
+      gioiTinh: item.gioiTinh,
+      ngaySinh: item.ngaySinh,
+      thangSinh: item.thangSinh,
+      namSinh: item.namSinh,
+      gioSinh: item.gioSinh,
+      isLunar: item.isLunar,
+      namXem: namXem,
+      thangXem: thangXem
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    executeCalculate({ ...formData, namXem, thangXem });
+  };
+
   return (
-    <div className="sidebar-widget form-widget">
-      <div className="widget-header">Lập lá số tử vi</div>
-      <div className="widget-content">
-        <form onSubmit={handleSubmit}>
-          {/* Năm xem điều chỉnh */}
-          <div className="namxem-control">
-            <button type="button" className="namxem-btn" onClick={() => setNamXem(v => v - 1)}>−</button>
-            <span className="namxem-display">Năm {namXem}</span>
-            <button type="button" className="namxem-btn" onClick={() => setNamXem(v => v + 1)}>+</button>
-          </div>
-          <div className="thangxem-control">
-            <button type="button" className="thangxem-btn" onClick={() => setThangXem(v => v <= 1 ? 12 : v - 1)}>−</button>
-            <span className="thangxem-display">Tháng {thangXem}</span>
-            <button type="button" className="thangxem-btn" onClick={() => setThangXem(v => v >= 12 ? 1 : v + 1)}>+</button>
-          </div>
-
-          <div className="sidebar-divider" />
-
-          {/* Lá số đã tạo thông tin */}
-          {result && (
-            <div className="la-so-info-mini">
-              <div className="la-so-info-row">
-                <span className="lsi-label">Họ tên:</span>
-                <span className="lsi-val">{result.hoTen}</span>
-              </div>
-              <div className="la-so-info-row">
-                <span className="lsi-label">Năm sinh:</span>
-                <span className="lsi-val">{result.namSinh} · {result.canChi}</span>
-              </div>
-              <div className="la-so-info-row">
-                <span className="lsi-label">Con giáp:</span>
-                <span className="lsi-val">{result.conGiap?.emoji} {result.conGiap?.name}</span>
-              </div>
-              <div className="la-so-info-row" style={{ color: '#b71c1c', fontWeight: 600 }}>
-                <span className="lsi-label">Tuổi {result.namXem}:</span>
-                <span className="lsi-val">{result.tuoi} tuổi</span>
-              </div>
+    <div className="sidebar-widgets-container" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      
+      {/* Widget 1: Adjust controls */}
+      <div className="sidebar-widget controls-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
+        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
+          Điều chỉnh Năm/Tháng xem
+        </div>
+        <div className="widget-content" style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: '600', color: '#333' }}>Năm xem:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <button type="button" onClick={() => handleYearChange(namXem - 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>−</button>
+              <input type="text" readOnly value={namXem} style={{ width: '55px', height: '28px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.88rem', fontWeight: 'bold' }} />
+              <button type="button" onClick={() => handleYearChange(namXem + 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
             </div>
-          )}
-
-          <div className="sidebar-divider" />
-
-          {/* Form nhập thông tin */}
-          <div className="form-group">
-            <label>Họ Tên</label>
-            <input
-              type="text"
-              value={formData.hoTen}
-              onChange={e => setFormData(p => ({ ...p, hoTen: e.target.value }))}
-              placeholder="Nhập họ tên..."
-              required
-            />
           </div>
-
-          <div className="form-group">
-            <label>Ngày sinh</label>
-            <div className="date-inputs">
-              <select
-                value={formData.ngaySinh}
-                onChange={e => setFormData(p => ({ ...p, ngaySinh: e.target.value }))}
-              >
-                {Array.from({ length: 31 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>{i + 1}</option>
-                ))}
-              </select>
-              <select
-                value={formData.thangSinh}
-                onChange={e => setFormData(p => ({ ...p, thangSinh: e.target.value }))}
-              >
+          <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: '600', color: '#333' }}>Tháng xem:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <button type="button" onClick={() => handleMonthChange(thangXem <= 1 ? 12 : thangXem - 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>−</button>
+              <select value={thangXem} onChange={(e) => handleMonthChange(parseInt(e.target.value))} style={{ width: '90px', height: '28px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.82rem', padding: '0 4px', fontWeight: 'bold' }}>
                 {Array.from({ length: 12 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
                 ))}
               </select>
-              <input
-                type="number"
-                value={formData.namSinh}
-                onChange={e => setFormData(p => ({ ...p, namSinh: e.target.value }))}
-                min="1920"
-                max="2030"
-                style={{ width: '70px' }}
-              />
+              <button type="button" onClick={() => handleMonthChange(thangXem >= 12 ? 1 : thangXem + 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
             </div>
           </div>
-
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                name="sb-cal"
-                checked={!formData.isLunar}
-                onChange={() => setFormData(p => ({ ...p, isLunar: false }))}
-              />
-              &nbsp;Lịch dương
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="sb-cal"
-                checked={formData.isLunar}
-                onChange={() => setFormData(p => ({ ...p, isLunar: true }))}
-              />
-              &nbsp;Lịch âm
-            </label>
-          </div>
-
-          <div className="form-group">
-            <label>Giờ sinh</label>
-            <select
-              value={formData.gioSinh}
-              onChange={e => setFormData(p => ({ ...p, gioSinh: e.target.value }))}
-            >
-              {GIO_SINH.map(g => (
-                <option key={g.value} value={g.value}>{g.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Giới tính</label>
-            <div className="radio-group">
-              <label>
-                <input
-                  type="radio"
-                  name="sb-gender"
-                  value="nam"
-                  checked={formData.gioiTinh === 'nam'}
-                  onChange={e => setFormData(p => ({ ...p, gioiTinh: e.target.value }))}
-                />
-                &nbsp;Nam
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="sb-gender"
-                  value="nu"
-                  checked={formData.gioiTinh === 'nu'}
-                  onChange={e => setFormData(p => ({ ...p, gioiTinh: e.target.value }))}
-                />
-                &nbsp;Nữ
-              </label>
-            </div>
-          </div>
-
-          <div className="form-group double">
-            <div>
-              <label>Năm xem</label>
-              <input
-                type="number"
-                value={namXem}
-                onChange={e => setNamXem(parseInt(e.target.value))}
-                min="2020"
-                max="2035"
-              />
-            </div>
-            <div>
-              <label>Tháng xem (ÂL)</label>
-              <select
-                value={thangXem}
-                onChange={e => setThangXem(parseInt(e.target.value))}
-              >
-                {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" className="btn-submit-form" disabled={loading}>
-            {loading ? 'Đang tính...' : 'LẬP LÁ SỐ'}
-          </button>
-        </form>
+        </div>
       </div>
+
+      {/* Widget 2: Created Horoscopes */}
+      <div className="sidebar-widget created-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
+        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
+          📁 Lá số đã tạo
+        </div>
+        <div className="widget-content" style={{ padding: '0' }}>
+          {createdList.length === 0 ? (
+            <p style={{ fontSize: '0.82rem', color: '#888', margin: '15px 12px' }}>Chưa có lá số nào được tạo.</p>
+          ) : (
+            <ul className="created-horoscope-list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              {createdList.map((item, idx) => (
+                <li 
+                  key={item.id || idx} 
+                  onClick={() => handleLoadCreated(item)}
+                  style={{ 
+                    padding: '10px 12px', 
+                    borderBottom: '1px solid #eee', 
+                    cursor: 'pointer',
+                    transition: 'background 0.15s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#fcf8f2'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#1565c0' }}>{item.hoTen}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#888' }}>{formatTimeAgo(item.timestamp)}</span>
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#555' }}>
+                    {item.gioiTinh === 'nam' ? 'Nam mệnh' : 'Nữ mệnh'} · {item.namSinh} · {item.canChi}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#b71c1c', fontWeight: '600' }}>
+                    {item.napAm} · {item.cuc}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Widget 3: Complete Horoscope Form */}
+      <div className="sidebar-widget form-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
+        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
+          Lập lá số tử vi
+        </div>
+        <div className="widget-content" style={{ padding: '12px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Họ Tên</label>
+              <input
+                type="text"
+                value={formData.hoTen}
+                onChange={e => setFormData(p => ({ ...p, hoTen: e.target.value }))}
+                placeholder="Nhập họ tên..."
+                style={{ width: '100%', padding: '6px 8px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                required
+              />
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Ngày sinh</label>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <select
+                  value={formData.ngaySinh}
+                  onChange={e => setFormData(p => ({ ...p, ngaySinh: parseInt(e.target.value) }))}
+                  style={{ flex: 1, padding: '5px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                >
+                  {Array.from({ length: 31 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                  ))}
+                </select>
+                <select
+                  value={formData.thangSinh}
+                  onChange={e => setFormData(p => ({ ...p, thangSinh: parseInt(e.target.value) }))}
+                  style={{ flex: 1.2, padding: '5px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
+                  ))}
+                </select>
+                <input
+                  type="number"
+                  value={formData.namSinh}
+                  onChange={e => setFormData(p => ({ ...p, namSinh: parseInt(e.target.value) }))}
+                  min="1900"
+                  max="2035"
+                  style={{ width: '60px', padding: '5px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div className="radio-group" style={{ display: 'flex', gap: '15px', padding: '2px 0' }}>
+              <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="sb-cal"
+                  checked={!formData.isLunar}
+                  onChange={() => setFormData(p => ({ ...p, isLunar: false }))}
+                />
+                &nbsp;Lịch dương
+              </label>
+              <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="sb-cal"
+                  checked={formData.isLunar}
+                  onChange={() => setFormData(p => ({ ...p, isLunar: true }))}
+                />
+                &nbsp;Lịch âm
+              </label>
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Giờ sinh</label>
+              <select
+                value={formData.gioSinh}
+                onChange={e => setFormData(p => ({ ...p, gioSinh: e.target.value }))}
+                style={{ width: '100%', padding: '6px 8px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
+              >
+                {GIO_SINH.map(g => (
+                  <option key={g.value} value={g.value}>{g.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Giới tính</label>
+              <div className="radio-group" style={{ display: 'flex', gap: '20px' }}>
+                <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="sb-gender"
+                    value="nam"
+                    checked={formData.gioiTinh === 'nam'}
+                    onChange={e => setFormData(p => ({ ...p, gioiTinh: e.target.value }))}
+                  />
+                  &nbsp;Nam
+                </label>
+                <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="sb-gender"
+                    value="nu"
+                    checked={formData.gioiTinh === 'nu'}
+                    onChange={e => setFormData(p => ({ ...p, gioiTinh: e.target.value }))}
+                  />
+                  &nbsp;Nữ
+                </label>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={loading}
+              style={{ 
+                width: '100%', 
+                padding: '8px 10px', 
+                background: '#8f7e28', 
+                color: '#fff', 
+                border: 'none', 
+                borderRadius: '4px', 
+                fontWeight: 'bold', 
+                cursor: 'pointer',
+                fontSize: '0.88rem',
+                marginTop: '5px'
+              }}
+            >
+              {loading ? 'Đang tính...' : 'LẬP LÁ SỐ'}
+            </button>
+          </form>
+        </div>
+      </div>
+
     </div>
   );
 }
@@ -442,6 +538,7 @@ export default function TuViResult() {
   const [hoveredCung, setHoveredCung] = useState(null);
   const [selectedCungIdx, setSelectedCungIdx] = useState(null);
   const [activeSection, setActiveSection] = useState('tong-quan');
+  const [showBirthInfo, setShowBirthInfo] = useState(true);
 
   useEffect(() => {
     const lasoId = searchParams.get('id');
@@ -469,12 +566,43 @@ export default function TuViResult() {
     }
   }, [location.state, searchParams, navigate]);
 
+  useEffect(() => {
+    if (result) {
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem('created_horoscopes') || '[]');
+      } catch (e) {}
+      const exists = list.some(item => item.hoTen === result.hoTen && item.namSinh === result.namSinh && item.ngaySinh === result.ngaySinh);
+      if (!exists) {
+        const newItem = {
+          id: result._id || Date.now().toString(),
+          hoTen: result.hoTen,
+          namSinh: result.namSinh,
+          canChi: result.canChi || '',
+          napAm: result.napAm || '',
+          cuc: result.cuc?.name || '',
+          canXuong: result.canXuong || '',
+          ngaySinh: result.ngaySinh,
+          thangSinh: result.thangSinh,
+          gioSinh: result.gioSinh || '',
+          gioiTinh: result.gioiTinh || 'nam',
+          isLunar: result.isLunar || false,
+          timestamp: Date.now()
+        };
+        list = [newItem, ...list].slice(0, 5);
+        localStorage.setItem('created_horoscopes', JSON.stringify(list));
+      }
+    }
+  }, [result]);
+
+  const namXemDisplay = result ? (result.namXemCanChi || `${result.namXem}`) : '';
+
   if (!result) {
     return (
       <div className="result-page">
         <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
           <div className="spinner" style={{ margin: '0 auto' }} />
-          <p style={{ color: 'var(--color-text-muted)', marginTop: '1rem' }}>Đang tải lá số...</p>
+          <p style={{ color: '#666', marginTop: '1rem' }}>Đang tải lá số...</p>
         </div>
       </div>
     );
@@ -484,12 +612,10 @@ export default function TuViResult() {
   const menhIndex = result.cungResults?.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
   const activeCung = hoveredCung !== null ? hoveredCung : (menhIndex !== -1 ? menhIndex : 0);
 
-  const namXemDisplay = result.namXemCanChi || `${result.namXem}`;
-
   const handlePrint = () => window.print();
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({ title: `Lá số tử vi - ${result.hoTen}`, url: window.location.href });
+      navigator.share({ title: `Lá số tử vi - ${result?.hoTen}`, url: window.location.href });
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert('Đã sao chép link lá số!');
@@ -583,75 +709,100 @@ export default function TuViResult() {
                 <div className="astrology-center">
                   <ParticleBackground />
                   <div className="astrology-center-content">
-                    <div className="center-top-text">
-                      <div className="center-brand">TRANG TỬ VI CỔ HỌC HÀNG ĐẦU VIỆT NAM</div>
-                      <a href="https://tuvi.vn" className="center-link" target="_blank" rel="noreferrer">https://tuvi.vn</a>
-                      <div className="center-contact">Đặt lịch luận giải qua Hotline/Zalo:</div>
-                      <div className="center-phone">0969.975.886</div>
+                    <div className="center-top-text" style={{ paddingBottom: '3px', borderBottom: '1px solid rgba(212,175,55,0.2)' }}>
+                      <div className="center-brand" style={{ fontSize: '0.62rem', letterSpacing: '0.05em' }}>TRANG TỬ VI CỔ HỌC HÀNG ĐẦU VIỆT NAM</div>
+                      <a href="https://tuvi.vn" className="center-link" target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: '#1565c0', fontWeight: 'bold' }}>https://tuvi.vn</a>
+                      <div className="center-contact" style={{ fontSize: '0.62rem', marginTop: '2px' }}>Đặt lịch luận giải qua Hotline/Zalo: <strong>0969.975.886</strong></div>
                     </div>
 
-                    <h1 className="center-main-title">Lá Số Tử Vi</h1>
+                    <h1 className="center-main-title" style={{ fontSize: '1.25rem', margin: '5px 0 8px 0', letterSpacing: '0.05em' }}>Lá Số Tử Vi</h1>
 
-                    <div className="center-info-table">
-                      <div className="info-row">
-                        <span className="info-label">Họ tên:</span>
-                        <span className="info-value name-highlight">{result.hoTen}</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Năm:</span>
-                        <span className="info-value">{result.namSinh} · {result.canChi}</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Tháng:</span>
-                        <span className="info-value">{result.thangSinh} ({result.isLunar ? 'Âm' : 'Dương'})</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Ngày:</span>
-                        <span className="info-value">{result.ngaySinh}</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Giờ:</span>
-                        <span className="info-value">Giờ {result.gioChiName} ({result.gioHour})</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Năm xem:</span>
-                        <span className="info-value" style={{ color: '#b71c1c', fontWeight: 600 }}>
-                          {namXemDisplay}{result.tuoi ? `, ${result.tuoi} tuổi` : ''}
-                        </span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Âm dương:</span>
-                        <span className="info-value">{result.amDuong || (result.gioiTinh === 'nam' ? 'Dương Nam' : 'Âm Nữ')}</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Bản mệnh:</span>
-                        <span className="info-value">{result.napAm} - {result.cuc?.name}</span>
-                      </div>
-                      {result.canXuong && (
+                    {showBirthInfo ? (
+                      <div className="center-info-table">
                         <div className="info-row">
-                          <span className="info-label">Cân lượng:</span>
-                          <span className="info-value">{result.canXuong}</span>
+                          <span className="info-label">Họ tên:</span>
+                          <span className="info-value name-highlight">{result.hoTen}</span>
                         </div>
-                      )}
-                      {result.chuMenh && (
                         <div className="info-row">
-                          <span className="info-label">Chủ mệnh:</span>
-                          <span className="info-value" style={{ color: '#b71c1c' }}>{result.chuMenh}</span>
+                          <span className="info-label">Năm:</span>
+                          <span className="info-value">{result.namSinh} · {result.canChi}</span>
                         </div>
-                      )}
-                      {result.chuThan && (
                         <div className="info-row">
-                          <span className="info-label">Chủ thân:</span>
-                          <span className="info-value" style={{ color: '#b71c1c' }}>{result.chuThan}</span>
+                          <span className="info-label">Tháng:</span>
+                          <span className="info-value">{result.thangSinh} ({result.lunarMonth || result.thangSinh})</span>
                         </div>
-                      )}
-                      {result.laiNhanCung && (
                         <div className="info-row">
-                          <span className="info-label">Lai nhân:</span>
-                          <span className="info-value">{result.laiNhanCung}</span>
+                          <span className="info-label">Ngày:</span>
+                          <span className="info-value">{result.ngaySinh} ({result.lunarDay || result.ngaySinh})</span>
                         </div>
-                      )}
-                    </div>
+                        <div className="info-row">
+                          <span className="info-label">Giờ:</span>
+                          <span className="info-value">{result.gioHour} ({result.gioChiName})</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="info-label">Năm xem:</span>
+                          <span className="info-value" style={{ color: '#b71c1c', fontWeight: 600 }}>
+                            {namXemDisplay}{result.tuoi ? `, ${result.tuoi} tuổi` : ''}
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="info-label">Âm dương:</span>
+                          <span className="info-value">{result.amDuong || (result.gioiTinh === 'nam' ? 'Dương Nam' : 'Âm Nữ')}</span>
+                        </div>
+                        <div className="info-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+                          <div style={{ display: 'flex', width: '100%' }}>
+                            <span className="info-label">Bản mệnh:</span>
+                            <span className="info-value">{result.napAm} - {result.cuc?.name}</span>
+                          </div>
+                          {result.menhCucRelation && (
+                            <div style={{ fontSize: '0.8rem', color: '#ffda75', paddingLeft: '80px', marginTop: '-2px', fontStyle: 'italic' }}>
+                              ({result.menhCucRelation})
+                            </div>
+                          )}
+                        </div>
+                        {result.canXuong && (
+                          <div className="info-row">
+                            <span className="info-label">Cân lượng:</span>
+                            <span className="info-value">{result.canXuong}</span>
+                          </div>
+                        )}
+                        {result.chuMenh && (
+                          <div className="info-row">
+                            <span className="info-label">Chủ mệnh:</span>
+                            <span className="info-value" style={{ color: '#b71c1c' }}>{result.chuMenh}</span>
+                          </div>
+                        )}
+                        {result.chuThan && (
+                          <div className="info-row">
+                            <span className="info-label">Chủ thân:</span>
+                            <span className="info-value" style={{ color: '#b71c1c' }}>{result.chuThan}</span>
+                          </div>
+                        )}
+                        {result.laiNhanCung && (
+                          <div className="info-row">
+                            <span className="info-label">Lai nhân cung:</span>
+                            <span className="info-value">{result.laiNhanCung}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="center-info-placeholder-yinyang" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '190px',
+                        color: '#ffda75',
+                        textAlign: 'center',
+                        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                        position: 'relative',
+                        zIndex: 10
+                      }}>
+                        <div className="yinyang-big-icon" style={{ fontSize: '4.5rem', lineHeight: 1, marginBottom: '5px' }}>☯</div>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333' }}>Lá Số Tử Vi</div>
+                        <div style={{ fontSize: '0.85rem', color: '#b71c1c', fontWeight: 'bold', marginTop: '2px' }}>{result.hoTen}</div>
+                      </div>
+                    )}
                   </div>
 
                   {/* 12 Zodiac labels */}
@@ -700,15 +851,35 @@ export default function TuViResult() {
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="board-actions">
-              <p><em>Lưu ý: bấm vào các cung trên lá số để xem luận giải chi tiết. Nhấn giữ vào lá số để lưu ảnh.</em></p>
-              <div className="action-buttons">
-                <button className="btn-ai">
-                  Xem tử vi bằng AI <span className="hot-badge">Hot!</span>
+            <div className="board-actions" style={{ background: '#fff', border: '1px solid #ddd', padding: '15px', borderRadius: '4px', marginBottom: '16px' }}>
+              <p style={{ color: '#666', fontSize: '0.88rem', margin: '0 0 12px 0', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                💡 <em>Lưu ý: Bấm vào các cung trên lá số để xem luận giải chi tiết. Nhấn giữ lá số để lưu ảnh.</em>
+              </p>
+              <div className="action-buttons-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                <button className="btn-action" onClick={() => setShowBirthInfo(!showBirthInfo)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  {showBirthInfo ? '👁️ Ẩn thông tin sinh' : '👁️ Hiện thông tin sinh'}
                 </button>
-                <button className="btn-action" onClick={() => document.documentElement.requestFullscreen?.()}>⛶ Toàn màn hình</button>
-                <button className="btn-action" onClick={handlePrint}>🖨 In lá số</button>
-                <button className="btn-action btn-blue" onClick={handleShare}>🔗 Chia sẻ</button>
+                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  💾 Lưu lá số
+                </button>
+                <button className="btn-action" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  ⚙️ In lá số
+                </button>
+                <button className="btn-action" onClick={() => {
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen?.().catch(e => console.error(e));
+                  } else {
+                    document.exitFullscreen?.();
+                  }
+                }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f5f5f5', border: '1px solid #ccc', color: '#333', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  🖥️ Toàn màn hình
+                </button>
+                <button className="btn-action btn-ai" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #7a1618, #9e2326)', border: 'none', color: '#ffda75', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  🤖 Xem tử vi bằng AI
+                </button>
+                <button className="btn-action btn-blue" onClick={handleShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#1565c0', border: 'none', color: '#fff', padding: '8px 10px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  🔗 Chia sẻ
+                </button>
               </div>
             </div>
 
@@ -932,25 +1103,6 @@ export default function TuViResult() {
           {/* ================== SIDEBAR ================== */}
           <div className="sidebar">
             <SidebarForm result={result} />
-
-            <div className="sidebar-widget toc-widget">
-              <div className="widget-header">Mục lục</div>
-              <div className="widget-content">
-                <ul className="toc-list">
-                  <li onClick={() => setActiveSection('tong-quan')}>Tổng quan</li>
-                  <li>
-                    12 cung <span className="arrow">▾</span>
-                    <ul className="toc-sub">
-                      {result.cungResults?.map((c, i) => (
-                        <li key={i}>{c.name}</li>
-                      ))}
-                    </ul>
-                  </li>
-                  <li onClick={() => setActiveSection('dai-van')}>Đại vận</li>
-                  <li onClick={() => setActiveSection('tieu-van')}>Tiểu vận</li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
       </div>

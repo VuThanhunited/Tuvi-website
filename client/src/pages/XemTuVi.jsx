@@ -55,10 +55,13 @@ export default function XemTuVi() {
     ngaySinh: '1',
     thangSinh: '1',
     namSinh: '1990',
-    gioSinh: '',
+    gioSinh: '11-13',
   });
-  const [namXem, setNamXem] = useState(String(currentYear));
-  const [thangXem, setThangXem] = useState(String(new Date().getMonth() + 1));
+  const [birthHour, setBirthHour] = useState('12');
+  const [birthMin, setBirthMin] = useState('30');
+  const [timezone, setTimezone] = useState('GMT+7');
+  const [namXem, setNamXem] = useState('2026');
+  const [thangXem, setThangXem] = useState('5');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,11 +77,28 @@ export default function XemTuVi() {
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers.Authorization = `Bearer ${token}`;
 
+      // Map hour to double-hour interval (gioSinh)
+      const h = parseInt(birthHour);
+      let gioSinhVal = '11-13'; // default for 12
+      if (h >= 23 || h < 1) gioSinhVal = '23-1';
+      else if (h >= 1 && h < 3) gioSinhVal = '1-3';
+      else if (h >= 3 && h < 5) gioSinhVal = '3-5';
+      else if (h >= 5 && h < 7) gioSinhVal = '5-7';
+      else if (h >= 7 && h < 9) gioSinhVal = '7-9';
+      else if (h >= 9 && h < 11) gioSinhVal = '9-11';
+      else if (h >= 11 && h < 13) gioSinhVal = '11-13';
+      else if (h >= 13 && h < 15) gioSinhVal = '13-15';
+      else if (h >= 15 && h < 17) gioSinhVal = '15-17';
+      else if (h >= 17 && h < 19) gioSinhVal = '17-19';
+      else if (h >= 19 && h < 21) gioSinhVal = '19-21';
+      else if (h >= 21 && h < 23) gioSinhVal = '21-23';
+
       const res = await fetch(`${API_URL}/tuvi/calculate`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
           ...formData,
+          gioSinh: gioSinhVal,
           isLunar,
           namXem,
           thangXem,
@@ -117,191 +137,277 @@ export default function XemTuVi() {
         <div className="xemtuvi-layout">
           {/* ====== MAIN CONTENT ====== */}
           <div className="xemtuvi-main">
-            {/* Form Card */}
-            <div className="xemtuvi-form-card">
-              <div className="xemtuvi-form-banner">
-                <div className="form-banner-icon">☯</div>
-                <h1 className="form-banner-title">Lập Lá Số Tử Vi</h1>
+            {/* Scroll Wrapper Container */}
+            <div className="scroll-wrapper-container">
+              {/* Left rod */}
+              <div className="scroll-rod rod-left">
+                <div className="rod-cap cap-top"></div>
+                <div className="rod-shaft"></div>
+                <div className="rod-cap cap-bottom"></div>
               </div>
 
-              {loading ? (
-                <div className="xemtuvi-loading">
-                  <div className="spinner" />
-                  <p>Đang tính toán lá số tử vi...</p>
-                  <span>Phân tích 12 cung, an sao, luận giải chi tiết</span>
+              {/* Scroll Paper */}
+              <div className="scroll-paper-body">
+                {/* Red Capsule Header */}
+                <div className="scroll-title-capsule">
+                  <div className="capsule-left-decor"></div>
+                  <span className="scroll-title-text">Lập lá số Tử Vi</span>
+                  <div className="capsule-right-decor"></div>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="xemtuvi-form">
-                  {error && (
-                    <div style={{
-                      background: '#ffeaea', color: '#c0392b',
-                      padding: '0.75rem 1rem', borderRadius: '6px',
-                      marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center',
-                    }}>
-                      {error}
-                    </div>
-                  )}
-                  {/* Họ Tên */}
-                  <div className="form-row">
-                    <label className="form-label-tv" htmlFor="hoTen-xem">Họ Tên</label>
-                    <input
-                      type="text"
-                      id="hoTen-xem"
-                      name="hoTen"
-                      className="form-input-tv"
-                      placeholder="Nhập họ tên..."
-                      value={formData.hoTen}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
 
-                  {/* Ngày sinh */}
-                  <div className="form-row">
-                    <label className="form-label-tv">Ngày sinh</label>
-                    <div className="form-date-group">
-                      <select
-                        name="ngaySinh"
-                        className="form-select-tv"
-                        value={formData.ngaySinh}
-                        onChange={handleChange}
-                        required
-                      >
-                        {NGAY_OPTIONS.map(d => (
-                          <option key={d.value} value={d.value}>{d.label}</option>
-                        ))}
-                      </select>
-                      <select
-                        name="thangSinh"
-                        className="form-select-tv form-select-tv--wide"
-                        value={formData.thangSinh}
-                        onChange={handleChange}
-                        required
-                      >
-                        {THANG_OPTIONS.map(m => (
-                          <option key={m.value} value={m.value}>{m.label}</option>
-                        ))}
-                      </select>
+                {loading ? (
+                  <div className="xemtuvi-loading">
+                    <div className="spinner" />
+                    <p>Đang tính toán lá số tử vi...</p>
+                    <span>Phân tích 12 cung, an sao, luận giải chi tiết</span>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="scroll-form-inner">
+                    {error && (
+                      <div style={{
+                        background: '#ffeaea', color: '#c0392b',
+                        padding: '0.75rem 1rem', borderRadius: '6px',
+                        marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center',
+                        border: '1px solid #ebccd1'
+                      }}>
+                        {error}
+                      </div>
+                    )}
+                    
+                    {/* Họ Tên */}
+                    <div className="scroll-form-row">
+                      <label className="scroll-form-label" htmlFor="hoTen-xem">Họ Tên</label>
                       <input
-                        type="number"
-                        name="namSinh"
-                        className="form-input-tv form-input-tv--year"
-                        placeholder="Năm sinh"
-                        min="1920"
-                        max={currentYear}
-                        value={formData.namSinh}
+                        type="text"
+                        id="hoTen-xem"
+                        name="hoTen"
+                        className="scroll-form-input"
+                        placeholder="Vũ Đình Thành"
+                        value={formData.hoTen}
                         onChange={handleChange}
                         required
                       />
                     </div>
-                  </div>
 
-                  {/* Lịch dương / Lịch âm */}
-                  <div className="form-row">
-                    <label className="form-label-tv">Lịch</label>
-                    <div className="form-radio-group-tv">
-                      <label className={`radio-btn-tv ${!isLunar ? 'active' : ''}`}>
-                        <input
-                          type="radio"
-                          name="calendarType"
-                          checked={!isLunar}
-                          onChange={() => setIsLunar(false)}
-                        />
-                        <span className="radio-dot" />
-                        Lịch dương
-                      </label>
-                      <label className={`radio-btn-tv ${isLunar ? 'active' : ''}`}>
-                        <input
-                          type="radio"
-                          name="calendarType"
-                          checked={isLunar}
-                          onChange={() => setIsLunar(true)}
-                        />
-                        <span className="radio-dot" />
-                        Lịch âm
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Giờ sinh */}
-                  <div className="form-row">
-                    <label className="form-label-tv" htmlFor="gioSinh-xem">Giờ sinh</label>
-                    <select
-                      id="gioSinh-xem"
-                      name="gioSinh"
-                      className="form-select-tv"
-                      value={formData.gioSinh}
-                      onChange={handleChange}
-                      required
-                    >
-                      {GIO_SINH.map(g => (
-                        <option key={g.value} value={g.value}>{g.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Giới tính */}
-                  <div className="form-row">
-                    <label className="form-label-tv">Giới tính</label>
-                    <div className="form-radio-group-tv">
-                      <label className={`radio-btn-tv ${formData.gioiTinh === 'nam' ? 'active' : ''}`}>
-                        <input
-                          type="radio"
-                          name="gioiTinh"
-                          value="nam"
-                          checked={formData.gioiTinh === 'nam'}
+                    {/* Ngày sinh */}
+                    <div className="scroll-form-row">
+                      <label className="scroll-form-label">Ngày sinh</label>
+                      <div className="scroll-form-date-group">
+                        <select
+                          name="ngaySinh"
+                          className="scroll-form-select"
+                          value={formData.ngaySinh}
                           onChange={handleChange}
-                        />
-                        <span className="radio-dot" />
-                        Nam
-                      </label>
-                      <label className={`radio-btn-tv ${formData.gioiTinh === 'nu' ? 'active' : ''}`}>
-                        <input
-                          type="radio"
-                          name="gioiTinh"
-                          value="nu"
-                          checked={formData.gioiTinh === 'nu'}
+                          required
+                        >
+                          {NGAY_OPTIONS.map(d => (
+                            <option key={d.value} value={d.value}>{d.label}</option>
+                          ))}
+                        </select>
+                        <select
+                          name="thangSinh"
+                          className="scroll-form-select"
+                          value={formData.thangSinh}
                           onChange={handleChange}
+                          required
+                        >
+                          {THANG_OPTIONS.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          name="namSinh"
+                          className="scroll-form-input scroll-input--year"
+                          placeholder="1911"
+                          min="1900"
+                          max={currentYear}
+                          value={formData.namSinh}
+                          onChange={handleChange}
+                          required
                         />
-                        <span className="radio-dot" />
-                        Nữ
-                      </label>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Năm xem / Tháng xem */}
-                  <div className="form-row">
-                    <label className="form-label-tv">Năm xem</label>
-                    <div className="form-date-group">
-                      <input
-                        type="number"
-                        className="form-input-tv"
-                        min="2020"
-                        max="2030"
-                        value={namXem}
-                        onChange={(e) => setNamXem(e.target.value)}
-                      />
-                      <div className="form-inline-label">Tháng xem (Âm lịch)</div>
-                      <select
-                        className="form-select-tv"
-                        value={thangXem}
-                        onChange={(e) => setThangXem(e.target.value)}
-                      >
-                        {THANG_OPTIONS.map(m => (
-                          <option key={m.value} value={m.value}>{m.label}</option>
-                        ))}
-                      </select>
+                    {/* Lịch dương / Lịch âm */}
+                    <div className="scroll-form-row">
+                      <label className="scroll-form-label"></label>
+                      <div className="scroll-form-radio-group">
+                        <label className={`scroll-radio-label ${!isLunar ? 'active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="calendarType"
+                            checked={!isLunar}
+                            onChange={() => setIsLunar(false)}
+                          />
+                          <span className="scroll-radio-dot" />
+                          Lịch dương
+                        </label>
+                        <label className={`scroll-radio-label ${isLunar ? 'active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="calendarType"
+                            checked={isLunar}
+                            onChange={() => setIsLunar(true)}
+                          />
+                          <span className="scroll-radio-dot" />
+                          Lịch âm
+                        </label>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Submit */}
-                  <div className="form-row form-row--submit">
-                    <button type="submit" className="btn-lap-la-so" id="submit-lap-la-so">
-                      🔮 Lập Lá Số
-                    </button>
-                  </div>
-                </form>
-              )}
+                    {/* Giờ sinh */}
+                    <div className="scroll-form-row">
+                      <label className="scroll-form-label">Giờ sinh</label>
+                      <div className="scroll-form-date-group">
+                        <select
+                          className="scroll-form-select"
+                          value={timezone}
+                          onChange={(e) => setTimezone(e.target.value)}
+                        >
+                          <option value="GMT+7">GMT +7</option>
+                          <option value="GMT+8">GMT +8</option>
+                          <option value="GMT+9">GMT +9</option>
+                        </select>
+                        <select
+                          className="scroll-form-select"
+                          value={birthHour}
+                          onChange={(e) => setBirthHour(e.target.value)}
+                        >
+                          {Array.from({ length: 24 }, (_, h) => (
+                            <option key={h} value={String(h)}>{h} Giờ</option>
+                          ))}
+                        </select>
+                        <select
+                          className="scroll-form-select"
+                          value={birthMin}
+                          onChange={(e) => setBirthMin(e.target.value)}
+                        >
+                          {Array.from({ length: 60 }, (_, m) => (
+                            <option key={m} value={String(m)}>{m} Phút</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Giới tính */}
+                    <div className="scroll-form-row">
+                      <label className="scroll-form-label">Giới tính</label>
+                      <div className="scroll-form-radio-group">
+                        <label className={`scroll-radio-label ${formData.gioiTinh === 'nam' ? 'active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="gioiTinh"
+                            value="nam"
+                            checked={formData.gioiTinh === 'nam'}
+                            onChange={handleChange}
+                          />
+                          <span className="scroll-radio-dot" />
+                          Nam
+                        </label>
+                        <label className={`scroll-radio-label ${formData.gioiTinh === 'nu' ? 'active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="gioiTinh"
+                            value="nu"
+                            checked={formData.gioiTinh === 'nu'}
+                            onChange={handleChange}
+                          />
+                          <span className="scroll-radio-dot" />
+                          Nữ
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Năm xem / Tháng xem */}
+                    <div className="scroll-form-row">
+                      <label className="scroll-form-label">Năm xem</label>
+                      <div className="scroll-form-date-group scroll-form-date-group--half">
+                        <input
+                          type="number"
+                          className="scroll-form-input"
+                          min="2020"
+                          max="2035"
+                          value={namXem}
+                          onChange={(e) => setNamXem(e.target.value)}
+                        />
+                        <div className="scroll-inline-label">Tháng xem (Âm lịch)</div>
+                        <select
+                          className="scroll-form-select"
+                          value={thangXem}
+                          onChange={(e) => setThangXem(e.target.value)}
+                        >
+                          {THANG_OPTIONS.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Submit */}
+                    <div className="scroll-submit-row">
+                      <button type="submit" className="scroll-submit-btn">
+                        Lập lá số
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
+              {/* Right rod */}
+              <div className="scroll-rod rod-right">
+                <div className="rod-cap cap-top"></div>
+                <div className="rod-shaft"></div>
+                <div className="rod-cap cap-bottom"></div>
+              </div>
+            </div>
+
+            {/* Promo Banner Card */}
+            <div className="promo-banner-card" style={{
+              background: '#ffffff',
+              border: '1px solid #d4c2a5',
+              borderRadius: '6px',
+              padding: '12px 18px',
+              marginBottom: '2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div className="promo-banner-content" style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: '1' }}>
+                <div className="promo-banner-badge" style={{
+                  background: 'linear-gradient(135deg, #a62b2b, #8b1c1c)',
+                  color: '#ffda75',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  border: '1px solid #ffda75'
+                }}>AI</div>
+                <div className="promo-banner-text">
+                  <h3 style={{ margin: 0, fontSize: '1rem', color: '#8b1c1c', fontWeight: 'bold', textTransform: 'uppercase', fontFamily: 'inherit' }}>Xem Nhân Tướng Học</h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#666', fontWeight: '600' }}>SIÊU HAY BẰNG AI - XEM NGAY</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <a href="/horoscope" className="promo-banner-btn" style={{
+                  background: '#8c731f',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s',
+                  display: 'inline-block'
+                }}>XEM NGAY</a>
+              </div>
             </div>
 
             {/* Introduction Section */}
@@ -330,59 +436,37 @@ export default function XemTuVi() {
 
           {/* ====== SIDEBAR ====== */}
           <aside className="xemtuvi-sidebar">
-            {/* Xem Tử Vi */}
-            <div className="sidebar-block">
-              <h3 className="sidebar-block-title">Xem Tử Vi</h3>
-              <ul className="sidebar-list">
-                <li><Link to="/xem-tu-vi">◆ Tử vi năm {currentYear}</Link></li>
-                <li><Link to="/xem-tu-vi">◆ Tử vi năm {currentYear - 1}</Link></li>
-                <li><Link to="/xem-tu-vi">◆ Tử vi năm {currentYear - 2}</Link></li>
-                <li><Link to="/xem-tu-vi">◆ Tử vi năm {currentYear - 3}</Link></li>
-                <li><Link to="/xem-tu-vi">◆ Tử vi hàng ngày</Link></li>
-                <li><Link to="/xem-tu-vi">◆ Tử vi 12 con giáp</Link></li>
-                <li><Link to="/xem-tu-vi" className="sidebar-hot">◆ Lập lá số tử vi <span className="hot-badge">Hot</span></Link></li>
-                <li><Link to="/xem-tu-vi" className="sidebar-hot">◆ Cân xương tính số <span className="hot-badge">Hot</span></Link></li>
-                <li><Link to="/xem-tu-vi">◆ Thống kê cân xương</Link></li>
-              </ul>
+            <div className="sidebar-decor-header">
+              Danh mục
             </div>
+            
+            <div className="sidebar-main-menu">
+              {/* Xem Tử Vi Block */}
+              <div className="sidebar-menu-section">
+                <div className="menu-section-header">
+                  <span>☯ Xem tử vi</span>
+                  <span className="arrow-icon">▼</span>
+                </div>
+                <ul className="menu-section-list">
+                  <li><Link to="/xem-tu-vi">Tử vi 2026</Link></li>
+                  <li><Link to="/xem-tu-vi">Tử vi hàng ngày</Link></li>
+                  <li><Link to="/xem-tu-vi">Tử vi theo năm</Link></li>
+                  <li><Link to="/xem-tu-vi">Tử vi trọn đời</Link></li>
+                  <li><Link to="/xem-tu-vi">Tử vi 12 con giáp</Link></li>
+                  <li><Link to="/xem-tu-vi" className="sidebar-menu-hot">Lập lá số tử vi <span className="hot-badge-text">Hot!</span></Link></li>
+                  <li><Link to="/xem-tu-vi">Lập lá số tứ trụ</Link></li>
+                  <li><Link to="/xem-tu-vi">Cân xương tính số</Link></li>
+                  <li><Link to="/xem-tu-vi">Thống kê cân xương</Link></li>
+                </ul>
+              </div>
 
-            {/* Xem Tuổi */}
-            <div className="sidebar-block">
-              <h3 className="sidebar-block-title">Xem Tuổi</h3>
-              <ul className="sidebar-list">
-                <li><Link to="#">◆ Xem tuổi xông đất</Link></li>
-                <li><Link to="#">◆ Xem tuổi vợ chồng</Link></li>
-                <li><Link to="#">◆ Xem tuổi kết hôn</Link></li>
-                <li><Link to="#">◆ Xem tuổi làm nhà</Link></li>
-                <li><Link to="#">◆ Xem tuổi sinh con</Link></li>
-                <li><Link to="#">◆ Xem tuổi làm ăn</Link></li>
-                <li><Link to="#">◆ Xem tuổi hợp nhau</Link></li>
-              </ul>
-            </div>
-
-            {/* Lịch Vạn Niên */}
-            <div className="sidebar-block">
-              <h3 className="sidebar-block-title">Lịch Vạn Niên</h3>
-              <ul className="sidebar-list">
-                <li><Link to="#">◆ Lịch âm hôm nay</Link></li>
-                <li><Link to="#">◆ Lịch âm dương tháng</Link></li>
-                <li><Link to="#">◆ Lịch âm dương {currentYear}</Link></li>
-                <li><Link to="#">◆ Lịch âm dương {currentYear - 1}</Link></li>
-              </ul>
-            </div>
-
-            {/* Xem Ngày */}
-            <div className="sidebar-block">
-              <h3 className="sidebar-block-title">Xem Ngày</h3>
-              <ul className="sidebar-list">
-                <li><Link to="#">◆ Xem ngày tốt xấu</Link></li>
-                <li><Link to="#">◆ Xem ngày kết hôn</Link></li>
-                <li><Link to="#">◆ Xem ngày xuất hành</Link></li>
-                <li><Link to="#">◆ Xem ngày nhập trạch</Link></li>
-                <li><Link to="#">◆ Xem ngày mua xe</Link></li>
-                <li><Link to="#">◆ Xem ngày động thổ</Link></li>
-                <li><Link to="#">◆ Xem ngày an táng</Link></li>
-              </ul>
+              {/* Lịch Vạn Niên Block */}
+              <div className="sidebar-menu-section">
+                <div className="menu-section-header">
+                  <span>📅 Lịch vạn niên</span>
+                  <span className="arrow-icon">▼</span>
+                </div>
+              </div>
             </div>
           </aside>
         </div>

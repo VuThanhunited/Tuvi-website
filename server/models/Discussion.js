@@ -33,8 +33,12 @@ const discussionSchema = new mongoose.Schema({
   },
   source: {
     type: String,
-    enum: ['tuvivietnam.vn', 'lyso.vn', 'user', 'khac'],
+    enum: ['tuvivietnam.vn', 'lyso.vn', 'facebook', 'user', 'khac'],
     default: 'user',
+  },
+  imageUrl: {
+    type: String,
+    default: '',
   },
   originalUrl: {
     type: String,

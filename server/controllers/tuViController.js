@@ -68,6 +68,36 @@ function tinhCanXuong(tcIdx, thang, ngay, gioChiIdx) {
   return `${Math.min(luongVal, 8)} lượng ${chiVal} chỉ`;
 }
 
+function getMenhCucQuanHe(menh, cucName) {
+  if (!menh || !cucName) return '';
+  const cuc = cucName.replace(/Nhị|Tam|Tứ|Ngũ|Lục|Cục/g, '').trim();
+  const m = menh.replace(/Mạng|Mệnh/g, '').trim();
+  const c = cuc.trim();
+
+  if (m === c) return 'Cục Mệnh bình hòa';
+
+  const sinhMap = {
+    'Kim': 'Thủy', 'Thủy': 'Mộc', 'Mộc': 'Hỏa', 'Hỏa': 'Thổ', 'Thổ': 'Kim'
+  };
+  const khacMap = {
+    'Kim': 'Mộc', 'Mộc': 'Thổ', 'Thổ': 'Thủy', 'Thủy': 'Hỏa', 'Hỏa': 'Kim'
+  };
+
+  if (sinhMap[c] === m) return `Cục sinh Mệnh (Cục ${c} sinh Mệnh ${m})`;
+  if (sinhMap[m] === c) return `Mệnh sinh Cục (Mệnh ${m} sinh Cục ${c})`;
+  if (khacMap[c] === m) return `Cục khắc Mệnh (Cục ${c} khắc Mệnh ${m})`;
+  if (khacMap[m] === c) return `Mệnh khắc Cục (Mệnh ${m} khắc Cục ${c})`;
+
+  return '';
+}
+
+function getCungCanName(tcIdx, chiCung) {
+  const danCanIdx = (tcIdx * 2 + 2) % 10;
+  const dist = (chiCung - 2 + 12) % 12;
+  const canIdx = (danCanIdx + dist) % 10;
+  return THIEN_CAN[canIdx];
+}
+
 function capitalize(str) {
   if (!str) return '';
   return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -181,7 +211,7 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
 
     // Thiên can / Địa chi của cung
     const dcName = DIA_CHI[cungObj.ChiCung];
-    const cungCanName = THIEN_CAN[cungObj.CanCung];
+    const cungCanName = getCungCanName(tcIdx, cungObj.ChiCung);
     const displayCanChi = `${cungCanName.charAt(0)}.${dcName}`;
     const hanhDC = DC_HANH[cungObj.ChiCung];
     const amDuongCung = DC_AM_DUONG[cungObj.ChiCung];
@@ -271,6 +301,7 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
       daiHan,
       thangHan,
       canChi: displayCanChi,
+      canName: cungCanName,
       hanhDisplay: `${amDuongCung}${hanhDC}`,
       hanhColor: HANH_COLOR[hanhDC] || '#666',
       hanhDC,
@@ -281,6 +312,7 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
       hoaTinhList,
       namXemHoaTinh: [],
       rating,
+      trangSinh: cungObj.TrangSinh ? capitalize(cungObj.TrangSinh) : '',
       interpretation: ''
     });
   }
@@ -358,6 +390,33 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
     cung.interpretation = textParts.join('\n');
   });
 
+  // 1. Calculate Đại Vận & Lưu Niên labels
+  const dvMenhIdx = cungResults.findIndex(c => tuoi >= c.daiHan && tuoi < c.daiHan + 10);
+  const dvMenhGridIdx = dvMenhIdx !== -1 ? cungResults[dvMenhIdx].gridIdx : 0;
+  const birthHourIdx = GIO_CHI[gioSinh]?.index || 0;
+  const lnMenhGridIdx = (dvMenhGridIdx - birthHourIdx + 12) % 12;
+  const lnMenhIdx = cungResults.findIndex(c => c.gridIdx === lnMenhGridIdx);
+
+  const DV_NAMES = ['MỆNH', 'PHU', 'PHÚC', 'ĐIỀN', 'QUAN', 'NÔ', 'DI', 'TẬT', 'TÀI', 'TỬ', 'PHỐI', 'HUYNH'];
+  const LN_NAMES = ['MỆNH', 'QUAN', 'NÔ', 'DI', 'TẬT', 'TÀI', 'TỬ', 'PHỐI', 'HUYNH', 'PHỤ', 'PHÚC', 'ĐIỀN'];
+
+  for (let idx = 0; idx < 12; idx++) {
+    const dvDist = (idx - (dvMenhIdx !== -1 ? dvMenhIdx : 0) + 12) % 12;
+    cungResults[idx].dvLabel = `ĐV.${DV_NAMES[dvDist]}`;
+
+    const lnDist = (idx - (lnMenhIdx !== -1 ? lnMenhIdx : 0) + 12) % 12;
+    cungResults[idx].lnLabel = `LN.${LN_NAMES[lnDist]}`;
+  }
+
+  // 2. Find Lai nhân cung
+  const laiNhanCungObj = cungResults.find(c => c.canName === tc);
+  const laiNhanCung = laiNhanCungObj ? laiNhanCungObj.name : 'Mệnh';
+
+  // 3. Elements and Lunar Info
+  const lunarDay = laso.Info.Ngay;
+  const lunarMonth = laso.Info.Thang;
+  const menhCucRelation = getMenhCucQuanHe(nguHanh, laso.Info.Cuc);
+
   return {
     hoTen,
     gioiTinh,
@@ -368,6 +427,9 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
     isLunar: !!isLunar,
     namXem: namXemInt,
     thangXem: thangXem ? parseInt(thangXem) : month,
+    lunarDay,
+    lunarMonth,
+    menhCucRelation,
     canChi: `${tc} ${dc}`,
     thienCan: tc,
     diaChi: dc,
@@ -385,7 +447,7 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
     tuoi,
     chuMenh,
     chuThan,
-    laiNhanCung: 'Điền Trạch', // fallback
+    laiNhanCung,
     canXuong,
     tenCungThan,
     cungMenhDCIdx,

@@ -42,7 +42,7 @@ export const getDiscussions = async (req, res, next) => {
 // @access  Public (or Private if logged in, but let's make it easy to write posts)
 export const createDiscussion = async (req, res, next) => {
   try {
-    const { title, content, author } = req.body;
+    const { title, content, author, imageUrl } = req.body;
 
     if (!title || !content) {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập tiêu đề và nội dung bài viết.' });
@@ -53,7 +53,8 @@ export const createDiscussion = async (req, res, next) => {
       content,
       author: author || 'Thành viên ẩn danh',
       avatar: (author || 'TV').substring(0, 2).toUpperCase(),
-      source: 'user'
+      source: 'user',
+      imageUrl: imageUrl || ''
     });
 
     res.status(201).json({

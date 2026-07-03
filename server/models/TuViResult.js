@@ -37,6 +37,8 @@ const cungResultSchema = new mongoose.Schema({
   label: String,
   labelColor: String,
   interpretation: String,
+  dvLabel: { type: String, default: '' },
+  lnLabel: { type: String, default: '' },
 }, { _id: false });
 
 // Schema chính của lá số
@@ -58,6 +60,9 @@ const tuViResultSchema = new mongoose.Schema({
   isLunar: { type: Boolean, default: false },
   namXem: Number,
   thangXem: Number,
+  lunarDay: Number,
+  lunarMonth: Number,
+  menhCucRelation: String,
 
   // Can Chi & Nạp Âm
   canChi: String,
