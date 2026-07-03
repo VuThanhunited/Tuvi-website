@@ -1,4 +1,5 @@
 import { generateLaSo } from 'tuvi-neo';
+import { getLunarDate, getSolarDate, getDayCanChi } from '@dqcai/vn-lunar';
 import TuViResult from '../models/TuViResult.js';
 import TuViDatabase from '../models/TuViDatabase.js';
 import Interpretation from '../models/Interpretation.js';
@@ -70,8 +71,8 @@ function tinhCanXuong(tcIdx, thang, ngay, gioChiIdx) {
 
 function getMenhCucQuanHe(menh, cucName) {
   if (!menh || !cucName) return '';
-  const cuc = cucName.replace(/Nhị|Tam|Tứ|Ngũ|Lục|Cục/g, '').trim();
-  const m = menh.replace(/Mạng|Mệnh/g, '').trim();
+  const cuc = cucName.replace(/Nhị|Tam|Tứ|Ngũ|Lục|Cục/gi, '').trim();
+  const m = menh.replace(/Mạng|Mệnh/gi, '').trim();
   const c = cuc.trim();
 
   if (m === c) return 'Cục Mệnh bình hòa';
@@ -145,8 +146,188 @@ function getSaoPhuMau(name) {
   return 'xam';
 }
 
+// ===== CÂN LƯỢNG & CAN CHI HELPERS =====
+const NAP_AM_MAP = {
+  'Giáp Tý': 'Hải Trung Kim', 'Ất Sửu': 'Hải Trung Kim',
+  'Bính Dần': 'Lư Trung Hỏa', 'Đinh Mão': 'Lư Trung Hỏa',
+  'Mậu Thìn': 'Đại Lâm Mộc', 'Kỷ Tỵ': 'Đại Lâm Mộc',
+  'Canh Ngọ': 'Lộ Bàng Thổ', 'Tân Mùi': 'Lộ Bàng Thổ',
+  'Nhâm Thân': 'Kiếm Phong Kim', 'Quý Dậu': 'Kiếm Phong Kim',
+  'Giáp Tuất': 'Sơn Đầu Hỏa', 'Ất Hợi': 'Sơn Đầu Hỏa',
+  'Bính Tý': 'Giản Hạ Thủy', 'Đinh Sửu': 'Giản Hạ Thủy',
+  'Mậu Dần': 'Thành Đầu Thổ', 'Kỷ Mão': 'Thành Đầu Thổ',
+  'Canh Thìn': 'Bạch Lạp Kim', 'Tân Tỵ': 'Bạch Lạp Kim',
+  'Nhâm Ngọ': 'Dương Liễu Mộc', 'Quý Mùi': 'Dương Liễu Mộc',
+  'Giáp Thân': 'Tuyền Trung Thủy', 'Ất Dậu': 'Tuyền Trung Thủy',
+  'Bính Tuất': 'Ốc Thượng Thổ', 'Đinh Hợi': 'Ốc Thượng Thổ',
+  'Mậu Tý': 'Tích Lịch Hỏa', 'Kỷ Sửu': 'Tích Lịch Hỏa',
+  'Canh Dần': 'Tùng Bách Mộc', 'Tân Mão': 'Tùng Bách Mộc',
+  'Nhâm Thìn': 'Trường Lưu Thủy', 'Quý Tỵ': 'Trường Lưu Thủy',
+  'Giáp Ngọ': 'Sa Trung Kim', 'Ất Mùi': 'Sa Trung Kim',
+  'Bính Thân': 'Sơn Hạ Hỏa', 'Đinh Dậu': 'Sơn Hạ Hỏa',
+  'Mậu Tuất': 'Bình Địa Mộc', 'Kỷ Hợi': 'Bình Địa Mộc',
+  'Canh Tý': 'Bích Thượng Thổ', 'Tân Sửu': 'Bích Thượng Thổ',
+  'Nhâm Dần': 'Kim Bạch Kim', 'Quý Mão': 'Kim Bạch Kim',
+  'Giáp Thìn': 'Phú Đăng Hỏa', 'Ất Tỵ': 'Phú Đăng Hỏa',
+  'Bính Ngọ': 'Sa Trung Thổ', 'Đinh Mùi': 'Sa Trung Thổ',
+  'Mậu Thân': 'Đại Trạch Thổ', 'Kỷ Dậu': 'Đại Trạch Thổ',
+  'Canh Tuất': 'Thoa Xuyến Kim', 'Tân Hợi': 'Thoa Xuyến Kim',
+  'Nhâm Tý': 'Tang Đố Mộc', 'Quý Sửu': 'Tang Đố Mộc',
+  'Giáp Dần': 'Đại Khê Thủy', 'Ất Mão': 'Đại Khê Thủy',
+  'Bính Thìn': 'Sa Trung Thổ', 'Đinh Tỵ': 'Sa Trung Thổ',
+  'Mậu Ngọ': 'Thiên Thượng Hỏa', 'Kỷ Mùi': 'Thiên Thượng Hỏa',
+  'Canh Thân': 'Thạch Lựu Mộc', 'Tân Dậu': 'Thạch Lựu Mộc',
+  'Nhâm Tuất': 'Đại Hải Thủy', 'Quý Hợi': 'Đại Hải Thủy'
+};
+
+const CAN_LUONG_YEAR = {
+  'Giáp Tý': 1.2, 'Ất Sửu': 0.9, 'Bính Dần': 0.6, 'Đinh Mão': 0.7, 'Mậu Thìn': 1.2,
+  'Kỷ Tỵ': 0.4, 'Canh Ngọ': 0.9, 'Tân Mùi': 0.8, 'Nhâm Thân': 0.7, 'Quý Dậu': 0.8,
+  'Giáp Tuất': 1.5, 'Ất Hợi': 0.9, 'Bính Tý': 1.6, 'Đinh Sửu': 0.8, 'Mậu Dần': 0.8,
+  'Kỷ Mão': 1.9, 'Canh Thìn': 1.2, 'Tân Tỵ': 0.6, 'Nhâm Ngọ': 0.8, 'Quý Mùi': 1.9,
+  'Giáp Thân': 0.5, 'Ất Dậu': 1.5, 'Bính Tuất': 0.6, 'Đinh Hợi': 1.6, 'Mậu Tý': 1.5,
+  'Kỷ Sửu': 0.8, 'Canh Dần': 0.9, 'Tân Mão': 1.2, 'Nhâm Thìn': 1.0, 'Quý Tỵ': 0.7,
+  'Giáp Ngọ': 1.5, 'Ất Mùi': 0.5, 'Bính Thân': 0.5, 'Đinh Dậu': 1.4, 'Mậu Tuất': 1.4,
+  'Kỷ Hợi': 0.9, 'Canh Tý': 0.7, 'Tân Sửu': 0.7, 'Nhâm Dần': 0.9, 'Quý Mão': 1.2,
+  'Giáp Thìn': 1.2, 'Ất Tỵ': 0.7, 'Bính Ngọ': 1.3, 'Đinh Mùi': 0.5, 'Mậu Thân': 1.4,
+  'Kỷ Dậu': 0.5, 'Canh Tuất': 0.9, 'Tân Hợi': 1.7, 'Nhâm Tý': 0.5, 'Quý Sửu': 0.8,
+  'Giáp Dần': 1.5, 'Ất Mão': 0.8, 'Bính Thìn': 0.8, 'Đinh Tỵ': 0.6, 'Mậu Ngọ': 1.9,
+  'Kỷ Mùi': 0.6, 'Canh Thân': 0.8, 'Tân Dậu': 0.8, 'Nhâm Tuất': 1.0, 'Quý Hợi': 0.7
+};
+
+const CAN_LUONG_MONTH = [0.6, 0.7, 1.8, 0.9, 0.5, 1.6, 0.9, 1.5, 1.8, 0.8, 0.9, 0.5];
+
+const CAN_LUONG_DAY = [
+  0.5, 1.0, 0.8, 1.5, 1.6, 1.5, 0.8, 1.6, 0.8, 1.6,
+  0.9, 1.7, 0.8, 1.7, 1.0, 0.8, 0.9, 1.8, 0.5, 1.5,
+  1.0, 0.9, 0.8, 0.9, 1.5, 1.8, 0.7, 0.8, 1.6, 0.6
+];
+
+const CAN_LUONG_HOUR = {
+  'Tý': 1.6, 'Sửu': 0.6, 'Dần': 0.7, 'Mão': 1.0, 'Thìn': 0.9, 'Tỵ': 1.6,
+  'Ngọ': 1.0, 'Mùi': 0.8, 'Thân': 0.8, 'Dậu': 0.9, 'Tuất': 0.6, 'Hợi': 0.6
+};
+
+function calculateCanXuong(canChiNam, lunarMonth, lunarDay, gioChiName) {
+  const yVal = CAN_LUONG_YEAR[canChiNam] || 1.0;
+  const mVal = CAN_LUONG_MONTH[lunarMonth - 1] || 1.0;
+  const dVal = CAN_LUONG_DAY[lunarDay - 1] || 1.0;
+  const hVal = CAN_LUONG_HOUR[gioChiName] || 1.0;
+  const total = Math.round((yVal + mVal + dVal + hVal) * 10) / 10;
+  const luong = Math.floor(total);
+  const chi = Math.round((total - luong) * 10);
+  return `${luong} lượng ${chi} chỉ`;
+}
+
+function getCanChiGio(dayCan, gioChiIdx) {
+  const dayCanIdx = THIEN_CAN.indexOf(dayCan);
+  if (dayCanIdx === -1) return '';
+  const startCanIdx = (dayCanIdx % 5 * 2) % 10;
+  const hourCanIdx = (startCanIdx + gioChiIdx) % 10;
+  return `${THIEN_CAN[hourCanIdx]} ${DIA_CHI[gioChiIdx]}`;
+}
+
+function getCanChiThang(yearCan, lunarMonth) {
+  const tcIdx = THIEN_CAN.indexOf(yearCan);
+  if (tcIdx === -1) return '';
+  const startCanIdx = (tcIdx % 5 * 2 + 2) % 10;
+  const monthCanIdx = (startCanIdx + (lunarMonth - 1)) % 10;
+  const monthChiIdx = (lunarMonth + 1) % 12; // Month 1 is Dần (index 2)
+  return `${THIEN_CAN[monthCanIdx]} ${DIA_CHI[monthChiIdx]}`;
+}
+
+function addLuuStars(cungResults, namXem) {
+  const tcIdx = ((namXem - 4) % 10 + 10) % 10;
+  const dcIdx = ((namXem - 4) % 12 + 12) % 12;
+
+  // Placements
+  const luuThaiTueChi = dcIdx;
+  const luuTangMonChi = (dcIdx + 2) % 12;
+  const luuBachHoChi = (dcIdx + 8) % 12;
+  const L_LOC_TON_MAP = [2, 3, 5, 6, 5, 6, 8, 9, 11, 0];
+  const luuLocTonChi = L_LOC_TON_MAP[tcIdx];
+  const luuKinhDuongChi = (luuLocTonChi + 1) % 12;
+  const luuDaLaChi = (luuLocTonChi + 11) % 12;
+  const luuThienKhocChi = (6 - dcIdx + 12) % 12;
+  const luuThienHuChi = (6 + dcIdx) % 12;
+  
+  const L_THIEN_MA_MAP = {
+    2: 8, 6: 8, 10: 8,
+    8: 2, 0: 2, 4: 2,
+    5: 11, 9: 11, 1: 11,
+    11: 5, 3: 5, 7: 5
+  };
+  const luuThienMaChi = L_THIEN_MA_MAP[dcIdx] || 8;
+
+  const addLuuStar = (chiIdx, name) => {
+    const cung = cungResults.find(c => {
+      const DC_TO_GRID_MAP = { 2:0, 3:1, 4:2, 5:3, 6:4, 7:5, 8:6, 9:7, 10:8, 11:9, 0:10, 1:11 };
+      return c.gridIdx === DC_TO_GRID_MAP[chiIdx];
+    });
+    if (cung) {
+      cung.saoPhuList.push({
+        ten: name,
+        trangThai: '',
+        mau: 'do',
+        loai: 'tro',
+        amDuong: '',
+        isLuu: true
+      });
+    }
+  };
+
+  addLuuStar(luuThaiTueChi, 'L.Thái Tuế');
+  addLuuStar(luuTangMonChi, 'L.Tang Môn');
+  addLuuStar(luuBachHoChi, 'L.Bạch Hổ');
+  addLuuStar(luuLocTonChi, 'L.Lộc Tồn');
+  addLuuStar(luuKinhDuongChi, 'L.Kình Dương');
+  addLuuStar(luuDaLaChi, 'L.Đà La');
+  addLuuStar(luuThienKhocChi, 'L.Thiên Khốc');
+  addLuuStar(luuThienHuChi, 'L.Thiên Hư');
+  addLuuStar(luuThienMaChi, 'L.Thiên Mã');
+
+  // L.Hóa Lộc, L.Hóa Quyền, L.Hóa Khoa, L.Hóa Kỵ
+  const TU_HOA_MAP = {
+    0: { loc: 'Liêm Trinh', quyen: 'Phá Quân', khoa: 'Vũ Khúc', ky: 'Thái Dương' },
+    1: { loc: 'Thiên Cơ', quyen: 'Thiên Lương', khoa: 'Tử Vi', ky: 'Thái Âm' },
+    2: { loc: 'Thiên Đồng', quyen: 'Thiên Cơ', khoa: 'Văn Xương', ky: 'Liêm Trinh' },
+    3: { loc: 'Thái Âm', quyen: 'Thiên Đồng', khoa: 'Thiên Cơ', ky: 'Cự Môn' },
+    4: { loc: 'Tham Lang', quyen: 'Thái Âm', khoa: 'Hữu Bật', ky: 'Thiên Cơ' },
+    5: { loc: 'Vũ Khúc', quyen: 'Tham Lang', khoa: 'Thiên Lương', ky: 'Văn Khúc' },
+    6: { loc: 'Thái Dương', quyen: 'Vũ Khúc', khoa: 'Thái Âm', ky: 'Thiên Đồng' },
+    7: { loc: 'Cự Môn', quyen: 'Thái Dương', khoa: 'Văn Khúc', ky: 'Văn Xương' },
+    8: { loc: 'Thiên Lương', quyen: 'Tử Vi', khoa: 'Tả Phù', ky: 'Vũ Khúc' },
+    9: { loc: 'Phá Quân', quyen: 'Cự Môn', khoa: 'Thái Âm', ky: 'Tham Lang' }
+  };
+
+  const tuHoa = TU_HOA_MAP[tcIdx];
+  if (tuHoa) {
+    const addLuuHoa = (starName, label) => {
+      const targetCung = cungResults.find(c => {
+        const hasChinh = c.saoChinhList.some(s => s.ten.toLowerCase() === starName.toLowerCase());
+        const hasPhu = c.saoPhuList.some(s => s.ten.toLowerCase() === starName.toLowerCase());
+        return hasChinh || hasPhu;
+      });
+      if (targetCung) {
+        targetCung.hoaTinhList.push({
+          ten: label,
+          loai: label.toLowerCase().includes('lộc') ? 'hoa-loc' :
+                label.toLowerCase().includes('quyền') ? 'hoa-quyen' :
+                label.toLowerCase().includes('khoa') ? 'hoa-khoa' : 'hoa-ky',
+          isLuu: true
+        });
+      }
+    };
+
+    addLuuHoa(tuHoa.loc, 'L.Hóa Lộc');
+    addLuuHoa(tuHoa.quyen, 'L.Hóa Quyền');
+    addLuuHoa(tuHoa.khoa, 'L.Hóa Khoa');
+    addLuuHoa(tuHoa.ky, 'L.Hóa Kỵ');
+  }
+}
+
 // ===== MAIN CALCULATION WRAPPER =====
-async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem }) {
+async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem, birthHour: preciseHour, birthMin: preciseMin }) {
   const year = parseInt(namSinh);
   const month = parseInt(thangSinh);
   const day = parseInt(ngaySinh);
@@ -172,12 +353,48 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
   const tcIdx = THIEN_CAN.indexOf(tc);
   const dcIdx = DIA_CHI.indexOf(dc);
 
-  const napAm = laso.Info.NapAm;
+  // Get Solar & Lunar conversion & Can Chi details using @dqcai/vn-lunar
+  let sDay = day, sMonth = month, sYear = year;
+  let lDay = day, lMonth = month, lYear = year;
+  let jdValue = 2448058; // fallback
+
+  try {
+    if (isLunar) {
+      const sDate = getSolarDate(day, month, year, false);
+      sDay = sDate.day;
+      sMonth = sDate.month;
+      sYear = sDate.year;
+      jdValue = sDate.jd;
+    } else {
+      const lDate = getLunarDate(day, month, year);
+      lDay = lDate.day;
+      lMonth = lDate.month;
+      lYear = lDate.year;
+      jdValue = lDate.jd;
+    }
+  } catch (e) {
+    console.error('Error during Lunar/Solar conversion:', e);
+  }
+
+  const birthCanChi = `${tc} ${dc}`;
+  const napAm = NAP_AM_MAP[birthCanChi] || 'Lộ Bàng Thổ';
   const nguHanh = getNguHanh(napAm);
   const cuc = { name: laso.Info.Cuc, value: laso.Info.CucNH };
 
   const gioChiName = laso.Info.Gio;
-  const gioHour = gioSinh;
+  const gioChiIdx = GIO_CHI[gioSinh]?.index || 0;
+
+  // Can Chi calculations for Month, Day, Hour
+  const lunarMonthCanChi = getCanChiThang(tc, lMonth);
+  const lunarDayCanChi = getDayCanChi(jdValue);
+  const dayCan = lunarDayCanChi.split(' ')[0];
+  const gioCanChiName = getCanChiGio(dayCan, gioChiIdx);
+
+  // Accurate display time string
+  const displayHour = preciseHour !== undefined ? parseInt(preciseHour) : birthHour;
+  const displayMin = preciseMin !== undefined ? parseInt(preciseMin) : 0;
+  const gioHour = `${displayHour} giờ ${displayMin} phút ${gioCanChiName}`;
+
   const amDuong = laso.Info.AmDuong;
   const tuoi = namXemInt - year + 1;
   const namXemCanChi = `${getCanChiNam(namXemInt)} (${namXemInt})`;
@@ -185,7 +402,7 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
   const chuMenh = capitalize(laso.Info.ChuMenh);
   const chuThan = capitalize(laso.Info.ChuThan);
   const tenCungThan = laso.Info.ThanCu ? capitalize(laso.Info.ThanCu.replace("Thân cư ", "")) : "";
-  const canXuong = tinhCanXuong(tcIdx, month, day, GIO_CHI[gioSinh]?.index || 0);
+  const canXuong = calculateCanXuong(birthCanChi, lMonth, lDay, gioChiName);
 
   const cungs = laso.Cac_cung;
   const cungMenh = cungs.find(c => c.Name.toLowerCase() === 'mệnh');
@@ -207,7 +424,9 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
     const icon = CUNG_ICONS[i];
     const gridIdx = DC_TO_GRID_MAP[cungObj.ChiCung];
     const daiHan = cungObj.SoCuc;
-    const thangHan = cungObj.ThangHan;
+    
+    // Shift Tháng Hạn by exactly 6 months to match tuvi.vn
+    const thangHan = (cungObj.ThangHan + 5) % 12 + 1;
 
     // Thiên can / Địa chi của cung
     const dcName = DIA_CHI[cungObj.ChiCung];
@@ -317,6 +536,9 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
     });
   }
 
+  // 1.5 Calculate & Inject 13 dynamic Lưu stars for Year of Query (namXem)
+  addLuuStars(cungResults, namXemInt);
+
   // 2. Fetch and compile CMS interpretations in 1 single optimized DB query
   const allStarNames = [];
   cungResults.forEach(c => {
@@ -346,7 +568,6 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
 
     // Main stars in cung
     cung.saoChinhList.forEach(sao => {
-      // Find matching sao_cung with same trangThai
       let starCungInterp = interpList.find(item => 
         item.type === 'sao_cung' && 
         item.cung.toLowerCase() === cungName.toLowerCase() && 
@@ -354,7 +575,6 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
         item.trangThai === sao.trangThai
       );
       
-      // Fallback without trangThai
       if (!starCungInterp) {
         starCungInterp = interpList.find(item => 
           item.type === 'sao_cung' && 
@@ -367,7 +587,6 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
       if (starCungInterp) {
         textParts.push(`<h4>Sao ${sao.ten} tại cung ${cungName} (${sao.trangThai || 'Bình hòa'})</h4><p>${starCungInterp.content}</p>`);
       } else {
-        // Fallback to general star meaning
         const starInterp = interpList.find(item => item.type === 'sao' && item.sao.toLowerCase() === sao.ten.toLowerCase());
         if (starInterp) {
           textParts.push(`<h4>Ý nghĩa sao ${sao.ten}</h4><p>${starInterp.content}</p>`);
@@ -390,45 +609,51 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
     cung.interpretation = textParts.join('\n');
   });
 
-  // 1. Calculate Đại Vận & Lưu Niên labels
+  // Calculate Đại Vận & Lưu Niên labels
   const dvMenhIdx = cungResults.findIndex(c => tuoi >= c.daiHan && tuoi < c.daiHan + 10);
   const dvMenhGridIdx = dvMenhIdx !== -1 ? cungResults[dvMenhIdx].gridIdx : 0;
   const birthHourIdx = GIO_CHI[gioSinh]?.index || 0;
   const lnMenhGridIdx = (dvMenhGridIdx - birthHourIdx + 12) % 12;
   const lnMenhIdx = cungResults.findIndex(c => c.gridIdx === lnMenhGridIdx);
 
-  const DV_NAMES = ['MỆNH', 'PHU', 'PHÚC', 'ĐIỀN', 'QUAN', 'NÔ', 'DI', 'TẬT', 'TÀI', 'TỬ', 'PHỐI', 'HUYNH'];
-  const LN_NAMES = ['MỆNH', 'QUAN', 'NÔ', 'DI', 'TẬT', 'TÀI', 'TỬ', 'PHỐI', 'HUYNH', 'PHỤ', 'PHÚC', 'ĐIỀN'];
+  const DV_NAMES = ['MỆNH', 'PHỤ', 'PHÚC', 'ĐIỀN', 'QUAN', 'NÔ', 'DI', 'TẬT', 'TÀI', 'TỬ', 'PHỐI', 'HUYNH'];
+  const LN_NAMES = ['MỆNH', 'PHỤ', 'PHÚC', 'ĐIỀN', 'QUAN', 'NÔ', 'DI', 'TẬT', 'TÀI', 'TỬ', 'PHỐI', 'HUYNH'];
+
+  const isClockwise = amDuong.includes('Dương Nam') || amDuong.includes('Âm Nữ');
 
   for (let idx = 0; idx < 12; idx++) {
-    const dvDist = (idx - (dvMenhIdx !== -1 ? dvMenhIdx : 0) + 12) % 12;
+    let dvDist;
+    if (isClockwise) {
+      dvDist = (idx - (dvMenhIdx !== -1 ? dvMenhIdx : 0) + 12) % 12;
+    } else {
+      dvDist = ((dvMenhIdx !== -1 ? dvMenhIdx : 0) - idx + 12) % 12;
+    }
     cungResults[idx].dvLabel = `ĐV.${DV_NAMES[dvDist]}`;
 
     const lnDist = (idx - (lnMenhIdx !== -1 ? lnMenhIdx : 0) + 12) % 12;
     cungResults[idx].lnLabel = `LN.${LN_NAMES[lnDist]}`;
   }
 
-  // 2. Find Lai nhân cung
+  // Find Lai nhân cung
   const laiNhanCungObj = cungResults.find(c => c.canName === tc);
   const laiNhanCung = laiNhanCungObj ? laiNhanCungObj.name : 'Mệnh';
 
-  // 3. Elements and Lunar Info
-  const lunarDay = laso.Info.Ngay;
-  const lunarMonth = laso.Info.Thang;
   const menhCucRelation = getMenhCucQuanHe(nguHanh, laso.Info.Cuc);
 
   return {
     hoTen,
     gioiTinh,
-    ngaySinh: day,
-    thangSinh: month,
-    namSinh: year,
+    ngaySinh: sDay,
+    thangSinh: sMonth,
+    namSinh: sYear,
     gioSinh,
     isLunar: !!isLunar,
     namXem: namXemInt,
     thangXem: thangXem ? parseInt(thangXem) : month,
-    lunarDay,
-    lunarMonth,
+    lunarDay: lDay,
+    lunarMonth: lMonth,
+    lunarMonthCanChi,
+    lunarDayCanChi,
     menhCucRelation,
     canChi: `${tc} ${dc}`,
     thienCan: tc,
@@ -463,13 +688,13 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
 /** POST /api/tuvi/calculate - Tính tử vi */
 export const calculate = async (req, res, next) => {
   try {
-    const { hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem } = req.body;
+    const { hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem, birthHour, birthMin } = req.body;
 
     if (!hoTen || !gioiTinh || !ngaySinh || !thangSinh || !namSinh || !gioSinh)
       return res.status(400).json({ success: false, message: 'Vui lòng nhập đầy đủ thông tin.' });
 
     // 1. Tính toán lá số chuẩn & ghép luận giải CMS
-    const result = await calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem });
+    const result = await calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem, birthHour, birthMin });
 
     // 2. Lấy dữ liệu chi tiết từ Database
     const db = await TuViDatabase.findOne();

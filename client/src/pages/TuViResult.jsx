@@ -69,7 +69,7 @@ function SaoChinhItem({ sao }) {
       className={`sao-chinh ${isTot ? 'sao-tot' : isHam ? 'sao-ham' : 'sao-binh'}`}
       title={`${sao.ten} - ${sao.trangThai === 'M' ? 'Miếu' : sao.trangThai === 'V' ? 'Vượng' : sao.trangThai === 'Đ' ? 'Đắc' : sao.trangThai === 'B' ? 'Bình hòa' : 'Hãm'}`}
     >
-      {sao.amDuong}{sao.ten} ({sao.trangThai})
+      {sao.ten}{sao.trangThai ? ` (${sao.trangThai})` : ''}
     </span>
   );
 }
@@ -731,15 +731,21 @@ export default function TuViResult() {
                         </div>
                         <div className="info-row">
                           <span className="info-label">Tháng:</span>
-                          <span className="info-value">{result.thangSinh} ({result.lunarMonth || result.thangSinh})</span>
+                          <span className="info-value">
+                            {result.thangSinh} ({result.lunarMonth || result.thangSinh}) {result.lunarMonthCanChi || ''}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="info-label">Ngày:</span>
-                          <span className="info-value">{result.ngaySinh} ({result.lunarDay || result.ngaySinh})</span>
+                          <span className="info-value">
+                            {result.ngaySinh} ({result.lunarDay || result.ngaySinh}) {result.lunarDayCanChi || ''}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="info-label">Giờ:</span>
-                          <span className="info-value">{result.gioHour} ({result.gioChiName})</span>
+                          <span className="info-value">
+                            {result.gioHour} {result.gioHour?.includes('giờ') ? '' : `(${result.gioChiName || ''})`}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="info-label">Năm xem:</span>
@@ -751,10 +757,14 @@ export default function TuViResult() {
                           <span className="info-label">Âm dương:</span>
                           <span className="info-value">{result.amDuong || (result.gioiTinh === 'nam' ? 'Dương Nam' : 'Âm Nữ')}</span>
                         </div>
+                        <div className="info-row">
+                          <span className="info-label">Bản mệnh:</span>
+                          <span className="info-value">{result.napAm || ''}</span>
+                        </div>
                         <div className="info-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
                           <div style={{ display: 'flex', width: '100%' }}>
-                            <span className="info-label">Bản mệnh:</span>
-                            <span className="info-value">{result.napAm} - {result.cuc?.name}</span>
+                            <span className="info-label">Cục:</span>
+                            <span className="info-value">{result.cuc?.name || ''}</span>
                           </div>
                           {result.menhCucRelation && (
                             <div style={{ fontSize: '0.8rem', color: '#ffda75', paddingLeft: '80px', marginTop: '-2px', fontStyle: 'italic' }}>

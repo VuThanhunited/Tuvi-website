@@ -87,6 +87,9 @@ export default function TuViForm() {
           isLunar,
           namXem,
           thangXem,
+          birthHour,
+          birthMin,
+          timezone,
         }),
       });
 
