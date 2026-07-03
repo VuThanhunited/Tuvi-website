@@ -201,7 +201,7 @@
   padding: 0 4px;
 }
 .cung-name {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 800;
   color: #7a1618;
   letter-spacing: 0.02em;
@@ -209,13 +209,13 @@
 
 .cung-top-right {
   text-align: right;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: #666;
   line-height: 1.3;
   min-width: 32px;
 }
-.cung-daihan { font-weight: 700; color: #333; font-size: 0.75rem; }
-.cung-thanghan { color: #888; font-size: 0.65rem; }
+.cung-daihan { font-weight: 700; color: #333; font-size: 0.7rem; }
+.cung-thanghan { color: #888; font-size: 0.6rem; }
 
 /* ── Sao chính ── */
 .cung-sao-chinh-area {
@@ -226,7 +226,7 @@
 }
 .sao-chinh {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-align: center;
   line-height: 1.4;
@@ -251,7 +251,7 @@
 }
 .sao-phu {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
@@ -266,15 +266,15 @@
   padding-top: 2px;
 }
 .hoa-tinh-row {
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   line-height: 1.4;
   display: flex;
   align-items: center;
   gap: 2px;
 }
 .hoa-ten { font-weight: 600; }
-.hoa-cung { font-size: 0.6rem; opacity: 0.85; }
-.hoa-prefix { color: #999; font-size: 0.58rem; }
+.hoa-cung { font-size: 0.55rem; opacity: 0.85; }
+.hoa-prefix { color: #999; font-size: 0.55rem; }
 
 /* ──────────────────────────────────────
    CENTER PANEL
