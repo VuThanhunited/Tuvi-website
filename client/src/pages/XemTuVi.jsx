@@ -140,11 +140,10 @@ export default function XemTuVi() {
             {/* Scroll Wrapper Container */}
             <div className="scroll-wrapper-container">
               {/* Left rod */}
-              <div className="scroll-rod rod-left">
-                <div className="rod-cap cap-top"></div>
-                <div className="rod-shaft"></div>
-                <div className="rod-cap cap-bottom"></div>
-              </div>
+              <img className="scroll-edge-left" src="/images/page-edge.png" alt="Scroll Handle Left" />
+
+              {/* Right rod */}
+              <img className="scroll-edge-right" src="/images/page-edge.png" alt="Scroll Handle Right" />
 
               {/* Scroll Paper */}
               <div className="scroll-paper-body">
@@ -173,7 +172,7 @@ export default function XemTuVi() {
                         {error}
                       </div>
                     )}
-                    
+
                     {/* Họ Tên */}
                     <div className="scroll-form-row">
                       <label className="scroll-form-label" htmlFor="hoTen-xem">Họ Tên</label>
@@ -182,7 +181,7 @@ export default function XemTuVi() {
                         id="hoTen-xem"
                         name="hoTen"
                         className="scroll-form-input"
-                        placeholder="Vũ Đình Thành"
+                        placeholder="Nhập họ tên"
                         value={formData.hoTen}
                         onChange={handleChange}
                         required
@@ -439,7 +438,7 @@ export default function XemTuVi() {
             <div className="sidebar-decor-header">
               Danh mục
             </div>
-            
+
             <div className="sidebar-main-menu">
               {/* Xem Tử Vi Block */}
               <div className="sidebar-menu-section">

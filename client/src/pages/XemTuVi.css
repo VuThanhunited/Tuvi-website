@@ -533,72 +533,58 @@
 
 /* ====== SCROLL ROLL STYLING ====== */
 .scroll-wrapper-container {
-  position: relative;
-  padding: 0 24px;
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-
-.scroll-rod {
-  position: absolute;
-  top: -15px;
-  bottom: -15px;
-  width: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 10;
-}
-
-.rod-left {
-  left: 17px;
-}
-
-.rod-right {
-  right: 17px;
-}
-
-.rod-shaft {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #1f0f08, #57331c 50%, #1f0f08);
-  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-  border-radius: 2px;
+  padding: 0 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 506px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
 }
 
-.rod-cap {
+.scroll-edge-left {
   position: absolute;
-  width: 22px;
-  height: 14px;
-  background: linear-gradient(90deg, #a67c00, #ffdf7a 50%, #a67c00);
-  border: 1px solid #735700;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.cap-top {
-  top: -12px;
+.scroll-edge-right {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  transform: rotate(180deg);
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.cap-bottom {
-  bottom: -12px;
+@media (max-width: 768px) {
+  .scroll-edge-left,
+  .scroll-edge-right {
+    width: 32px !important;
+    height: 100%;
+  }
 }
 
 .scroll-paper-body {
-  flex: 1;
-  background: radial-gradient(circle, #fcfaf2 60%, #f0e2c3 100%);
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03" width="300" height="300"><circle cx="50" cy="50" r="48" fill="none" stroke="%233d2314" stroke-width="2"/><path d="M50,2 A24,24 0 0,0 50,50 A24,24 0 0,1 50,98 A48,48 0 0,1 50,2 Z" fill="%233d2314"/><circle cx="50" cy="26" r="6" fill="%23fcfaf2"/><circle cx="50" cy="74" r="6" fill="%233d2314"/></svg>');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 260px;
-  border-top: 2px solid #8e6c38;
-  border-bottom: 2px solid #8e6c38;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  width: 100%;
+  height: 457px;
+  background-image: url("/images/page-roll.png");
+  background-size: cover;
+  background-position: center center;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 6px;
   padding: 40px 35px 30px 35px;
   z-index: 5;
-  border-radius: 3px;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Red Title Capsule Banner */
@@ -606,7 +592,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: -58px auto 30px auto;
+  margin: -58px auto 20px auto;
   background: linear-gradient(135deg, #8b1c1c, #630c0c);
   border: 2px solid #ffda75;
   padding: 8px 30px;
