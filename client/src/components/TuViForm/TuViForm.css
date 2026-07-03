@@ -1,159 +1,236 @@
-/* TU VI FORM */
-.tuvi-form-section { position: relative; padding: var(--space-4xl) 0; z-index: 1; }
-
-.tuvi-form-card {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: var(--space-2xl);
-  background: var(--color-dark-card);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  box-shadow: 0 0 60px rgba(212, 175, 55, 0.06), 0 20px 60px rgba(0, 0, 0, 0.3);
+/* ====== SCROLL ROLL STYLING (COPIED FOR HOME PAGE FORM) ====== */
+.scroll-wrapper-container {
+  width: 100%;
+  padding: 0 10px;
   position: relative;
-  overflow: hidden;
-}
-
-.tuvi-form-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--color-gold-gradient);
-}
-
-.tuvi-form-header { text-align: center; margin-bottom: var(--space-2xl); }
-
-.tuvi-form-icon {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px; height: 64px;
-  border-radius: var(--border-radius-md);
-  background: rgba(212, 175, 55, 0.1);
-  font-size: 2rem;
-  margin-bottom: var(--space-md);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  height: 506px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
 }
 
-.tuvi-form-title {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  background: var(--color-gold-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: var(--space-sm);
-}
-
-.tuvi-form-desc { color: var(--color-text-muted); font-size: 0.95rem; }
-
-.tuvi-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-md) var(--space-lg);
-}
-
-.tuvi-form-grid .form-group.full-width { grid-column: 1 / -1; }
-
-.radio-group { display: flex; gap: var(--space-sm); }
-.radio-option { flex: 1; }
-.radio-option input[type="radio"] { display: none; }
-
-.radio-option label {
-  display: block;
-  padding: 0.65rem 1rem;
-  text-align: center;
-  background: var(--color-dark-surface);
-  border: 2px solid var(--color-dark-elevated);
-  border-radius: var(--border-radius-sm);
-  color: var(--color-text-light);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.radio-option input[type="radio"]:checked + label {
-  background: rgba(212, 175, 55, 0.15);
-  border-color: var(--color-gold);
-  color: var(--color-gold);
-}
-
-.calendar-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  background: var(--color-dark-surface);
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--color-dark-elevated);
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--color-text-light);
-}
-
-.toggle-label input[type="checkbox"] { display: none; }
-
-.toggle-switch {
-  width: 42px; height: 22px;
-  background: var(--color-dark-elevated);
-  border-radius: 11px;
-  position: relative;
-  transition: background var(--transition-normal);
-}
-
-.toggle-switch::before {
-  content: '';
+.scroll-edge-left {
   position: absolute;
-  top: 3px; left: 3px;
-  width: 16px; height: 16px;
-  background: var(--color-text-muted);
-  border-radius: 50%;
-  transition: all var(--transition-normal);
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.toggle-label input:checked + .toggle-switch { background: rgba(212, 175, 55, 0.3); }
-.toggle-label input:checked + .toggle-switch::before { left: 23px; background: var(--color-gold); }
-
-.tuvi-form-actions { display: flex; gap: var(--space-md); margin-top: var(--space-xl); }
-.tuvi-form-actions .btn { flex: 1; }
-
-.btn-reset {
-  background: var(--color-dark-surface);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-dark-elevated);
+.scroll-edge-right {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  transform: rotate(180deg);
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.btn-reset:hover {
-  background: var(--color-dark-elevated);
-  color: var(--color-text-light);
+@media (max-width: 768px) {
+  .scroll-edge-left,
+  .scroll-edge-right {
+    width: 32px !important;
+    height: 100%;
+  }
+}
+
+.scroll-paper-body {
+  width: 100%;
+  height: 457px;
+  background-image: url("/images/page-roll.png");
+  background-size: cover;
+  background-position: center center;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 6px;
+  padding: 40px 35px 30px 35px;
+  z-index: 5;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Red Title Capsule Banner */
+.scroll-title-capsule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -58px auto 20px auto;
+  background: linear-gradient(135deg, #8b1c1c, #630c0c);
+  border: 2px solid #ffda75;
+  padding: 8px 30px;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  max-width: 280px;
+  position: relative;
+  z-index: 10;
+}
+
+.scroll-title-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffda75;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Form Fields */
+.scroll-form-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.scroll-form-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.scroll-form-label {
+  width: 90px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #3d2314;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.scroll-form-input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.scroll-form-input:focus {
+  border-color: #8b1c1c;
+  box-shadow: 0 0 0 2px rgba(139, 28, 28, 0.1);
+}
+
+.scroll-form-input::placeholder {
+  color: #aaa;
+}
+
+.scroll-form-select {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.scroll-form-select:focus {
+  border-color: #8b1c1c;
+}
+
+.scroll-form-date-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.scroll-form-date-group--half {
+  flex: 1;
+  max-width: 100%;
+}
+
+.scroll-input--year {
+  max-width: 120px;
+}
+
+.scroll-inline-label {
+  font-size: 0.85rem;
+  color: #555;
+  white-space: nowrap;
+}
+
+/* Radio buttons */
+.scroll-form-radio-group {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.scroll-radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+  user-select: none;
+}
+
+.scroll-radio-label input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #8b1c1c;
+  cursor: pointer;
+}
+
+/* Olive Green Button */
+.scroll-submit-row {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.scroll-submit-btn {
+  background-color: #8c731f;
+  background-image: linear-gradient(180deg, #997e23, #7d6519);
+  color: #fff;
+  border: 1px solid #6b5511;
+  border-radius: 4px;
+  padding: 8px 35px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.scroll-submit-btn:hover {
+  background-image: linear-gradient(180deg, #ab8d29, #8c731f);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .tuvi-form-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-2xl);
+  gap: 15px;
+  padding: 30px;
 }
 
-.tuvi-form-loading p { color: var(--color-gold); font-weight: 500; }
-
-@media (max-width: 640px) {
-  .tuvi-form-card { padding: var(--space-lg); margin: 0 var(--space-md); }
-  .tuvi-form-grid { grid-template-columns: 1fr; }
-  .tuvi-form-actions { flex-direction: column; }
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(139, 28, 28, 0.1);
+  border-top-color: #8b1c1c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-@media (max-width: 480px) {
-  .tuvi-form-card { padding: var(--space-md); margin: 0 var(--space-sm); }
-  .tuvi-form-title { font-size: 1.4rem; }
-  .tuvi-form-icon { width: 48px; height: 48px; font-size: 1.5rem; }
-  .radio-group { flex-direction: column; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
