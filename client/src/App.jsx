@@ -24,6 +24,8 @@ import ContactPage from './pages/ContactPage.jsx';
 import FAQPage from './pages/FAQPage.jsx';
 import TermsPage from './pages/TermsPage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
+import DanhSachThayPage from './pages/DanhSachThayPage.jsx';
+import HuongDanPage from './pages/HuongDanPage.jsx';
 
 export default function App() {
   return (
@@ -52,9 +54,17 @@ export default function App() {
                   <Route path="/bao-mat" element={<PrivacyPage />} />
                   <Route path="/faq" element={<FAQPage />} />
                   <Route path="/cong-dong" element={<CommunityPage />} />
+                  <Route path="/mxh" element={<CommunityPage />} />
+                  <Route path="/danh-sach-thay" element={<DanhSachThayPage />} />
+                  <Route path="/huong-dan" element={<HuongDanPage />} />
 
                   {/* ── AUTHENTICATED ROUTES (cần đăng nhập) ── */}
                   <Route path="/lich-su" element={
+                    <ProtectedRoute>
+                      <HistoryPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/la-so-cua-ban" element={
                     <ProtectedRoute>
                       <HistoryPage />
                     </ProtectedRoute>
