@@ -18,21 +18,21 @@
   --color-red-bg: #9a1b1e;
   --color-red-gradient: linear-gradient(135deg, #9a1b1e 0%, #c62828 50%, #9a1b1e 100%);
   
-  /* Light Theme Colors (Overriding Dark names to keep classes working) */
-  --color-dark-blue: #003366;
-  --color-dark-navy: #001A33;
-  --color-dark-bg: #f4f5f7; /* Nền xám nhạt */
-  --color-dark-card: #ffffff; /* Nền thẻ trắng */
-  --color-dark-surface: #f9fafb;
-  --color-dark-elevated: #e5e7eb;
+  /* Dark Theme Colors */
+  --color-dark-blue: #0f0a1e;
+  --color-dark-navy: #090514;
+  --color-dark-bg: #0f0a1e; /* Nền tím đen tối huyền bí */
+  --color-dark-card: #161228; /* Nền thẻ tím tối */
+  --color-dark-surface: #1d1833; /* Bề mặt tối */
+  --color-dark-elevated: #241e3d; /* Bề mặt nâng lên */
   
   /* Text Colors */
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #4b5563;
-  --color-text-muted: #6b7280;
-  --color-text-light: #111827;
-  --color-text-on-dark: #111827;
-  --color-text-on-gold: #ffffff;
+  --color-text-primary: #cbd5e1; /* Chữ xám trắng sáng */
+  --color-text-secondary: #94a3b8; /* Chữ phụ xám xanh */
+  --color-text-muted: #64748b; /* Chữ tắt */
+  --color-text-light: #f8fafc; /* Chữ sáng trắng */
+  --color-text-on-dark: #f8fafc; /* Chữ trên nền tối */
+  --color-text-on-gold: #1a0a2e; /* Chữ đen trên nền vàng */
   
   /* Semantic Colors */
   --color-success: #27AE60;
@@ -44,7 +44,7 @@
   --color-info: #3498DB;
   
   /* Border & Shadow */
-  --color-border: #E0E0E0;
+  --color-border: rgba(255, 255, 255, 0.08);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);

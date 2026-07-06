@@ -5,7 +5,7 @@
 .xemtuvi-page {
   padding-top: var(--header-height);
   min-height: 100vh;
-  background: #fbf8f3;
+  background: var(--color-dark-bg);
 }
 
 /* ── Breadcrumb ── */

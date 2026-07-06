@@ -7,7 +7,7 @@
   padding-top: calc(var(--header-height) + var(--space-2xl));
   padding-bottom: var(--space-4xl);
   min-height: 100vh;
-  background: #fbf8f3;
+  background: var(--color-dark-bg);
 }
 
 .tuvi-result-container {
@@ -40,8 +40,8 @@
    EXPERT SECTION
 ────────────────────────────────────── */
 .expert-section {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--color-dark-card);
+  border: 1px solid var(--color-border);
   margin-bottom: 16px;
   border-radius: 2px;
 }
