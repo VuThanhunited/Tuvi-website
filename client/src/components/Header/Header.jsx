@@ -91,7 +91,7 @@ export default function Header() {
           </Link>
 
           {/* Active state in mockup is Bài viết */}
-          <Link to="/" className={`nav-link nav-link-icon active`}>
+          <Link to="/" className={`nav-link nav-link-icon ${isActive('/') ? 'active' : ''}`}>
             <span className="nav-icon"><ArticleIcon size={20} /></span>
             <span className="nav-text">Bài viết</span>
           </Link>
