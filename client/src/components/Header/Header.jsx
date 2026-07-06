@@ -34,7 +34,10 @@ export default function Header() {
   }, [menuOpen]);
 
   const isActive = (path) => location.pathname === path;
-  const isGroupActive = (paths) => paths.some(p => location.pathname.startsWith(p));
+  const isGroupActive = (paths) => paths.some(p => {
+    if (location.pathname === p) return true;
+    return location.pathname.startsWith(p + '/');
+  });
 
   const toggleDropdown = (name) => {
     if (window.innerWidth <= 960) {
@@ -91,7 +94,7 @@ export default function Header() {
           </Link>
 
           {/* Active state in mockup is Bài viết */}
-          <Link to="/" className={`nav-link nav-link-icon ${isActive('/') ? 'active' : ''}`}>
+          <Link to="/bai-viet" className={`nav-link nav-link-icon ${isActive('/bai-viet') ? 'active' : ''}`}>
             <span className="nav-icon"><ArticleIcon size={20} /></span>
             <span className="nav-text">Bài viết</span>
           </Link>
