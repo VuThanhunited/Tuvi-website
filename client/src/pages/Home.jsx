@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import HomeBanner from '../components/HomeBanner/HomeBanner.jsx';
 import { HandshakeIcon, CalendarIcon, HeartsIcon, DiamondIcon, GoldMedalIcon, SilverMedalIcon, FilterIcon, VerifiedIcon, FacebookIcon, SunStarIcon, TempleIcon, TarotIcon, SearchIcon, EyeIcon, CommentIcon, ShareIcon, BookmarkIcon, MasterIcon, ArticleIcon, LikeIcon, StarChartIcon, RatingStarIcon, LocationPinIcon, PointsDiamondIcon, ProfileButtonIcon } from '../components/Icons.jsx';
@@ -119,6 +119,8 @@ export default function Home() {
   const [masters, setMasters] = useState(fallbackMasters);
   const [loadingMasters, setLoadingMasters] = useState(false);
   const [activeTab, setActiveTab] = useState('newest');
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const fetchMasters = async () => {
@@ -143,7 +145,7 @@ export default function Home() {
   return (
     <div className="home-wrapper">
       {/* Hero Banner */}
-      <HomeBanner />
+      {isHomePage && <HomeBanner />}
 
       {/* Main 3-column layout */}
       <div className="home-container">

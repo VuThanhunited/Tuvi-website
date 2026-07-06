@@ -36,7 +36,7 @@ export default function App() {
               <main>
                 <Routes>
                   {/* ── PUBLIC ROUTES ── */}
-                  <Route path="/" element={<XemTuVi />} />
+                  <Route path="/" element={<Home />} />
                   <Route path="/bai-viet" element={<Home />} />
                   <Route path="/xem-tu-vi" element={<XemTuVi />} />
                   <Route path="/la-so" element={<XemTuVi />} />
