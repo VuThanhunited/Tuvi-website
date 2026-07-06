@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import './StaticPages.css';
@@ -13,10 +13,11 @@ export default function LoginPage() {
 
   // If already logged in, redirect
   const from = location.state?.from?.pathname || '/';
-  if (isAuthenticated) {
-    navigate(from, { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, from, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
