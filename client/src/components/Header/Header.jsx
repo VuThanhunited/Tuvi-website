@@ -68,44 +68,44 @@ export default function Header() {
 
         {/* Navigation with icons matching mockup */}
         <nav className={`nav-menu ${menuOpen ? 'open' : ''}`} id="nav-menu">
-          <Link to="/la-so" className={`nav-link nav-link-icon ${isGroupActive(['/la-so']) ? 'active' : ''}`}>
-            <span className="nav-icon"><StarChartIcon size={20} /></span>
-            <span className="nav-text">Lập Lá Số</span>
+          <Link to="/la-so" className={`nav-link nav-link-icon nav-link-highlight ${isGroupActive(['/la-so']) ? 'active' : ''}`}>
+            <span className="nav-icon"><StarChartIcon size={40} /></span>
+            <span className="nav-text">Lập Lá Số <span className="highlight-sparkle">✦</span></span>
           </Link>
 
           <Link to="/kien-thuc" className={`nav-link nav-link-icon ${isGroupActive(['/kien-thuc']) ? 'active' : ''}`}>
-            <span className="nav-icon"><CoinIcon size={20} /></span>
+            <span className="nav-icon"><CoinIcon size={40} /></span>
             <span className="nav-text">Phú Tử Vi</span>
           </Link>
 
           <Link to="/ve-chung-toi" className={`nav-link nav-link-icon ${isGroupActive(['/ve-chung-toi']) ? 'active' : ''}`}>
-            <span className="nav-icon"><ScrollIcon size={20} /></span>
+            <span className="nav-icon"><ScrollIcon size={40} /></span>
             <span className="nav-text">Giới thiệu Tử Vi</span>
           </Link>
 
           <Link to="/huong-dan" className={`nav-link nav-link-icon ${isActive('/huong-dan') ? 'active' : ''}`}>
-            <span className="nav-icon"><CompassIcon size={20} /></span>
+            <span className="nav-icon"><CompassIcon size={40} /></span>
             <span className="nav-text">Hướng Dẫn Xem Tử Vi Cơ Bản</span>
           </Link>
 
           <Link to="/danh-sach-thay" className={`nav-link nav-link-icon ${isGroupActive(['/danh-sach-thay']) ? 'active' : ''}`}>
-            <span className="nav-icon"><MasterIcon size={20} /></span>
+            <span className="nav-icon"><MasterIcon size={40} /></span>
             <span className="nav-text">Danh sách Thầy Tử Vi</span>
           </Link>
 
           {/* Active state in mockup is Bài viết */}
           <Link to="/bai-viet" className={`nav-link nav-link-icon ${isActive('/bai-viet') ? 'active' : ''}`}>
-            <span className="nav-icon"><ArticleIcon size={20} /></span>
+            <span className="nav-icon"><ArticleIcon size={40} /></span>
             <span className="nav-text">Bài viết</span>
           </Link>
 
           <Link to="/la-so-cua-ban" className={`nav-link nav-link-icon ${isActive('/la-so-cua-ban') ? 'active' : ''}`}>
-            <span className="nav-icon"><HoroscopeIcon size={20} /></span>
+            <span className="nav-icon"><HoroscopeIcon size={40} /></span>
             <span className="nav-text">Lá số của bạn</span>
           </Link>
 
           <Link to="/mxh" className={`nav-link nav-link-icon ${isActive('/mxh') ? 'active' : ''}`}>
-            <span className="nav-icon"><GlobeIcon size={20} /></span>
+            <span className="nav-icon"><GlobeIcon size={40} /></span>
             <span className="nav-text">Giới thiệu MXH Tử Vi</span>
           </Link>
         </nav>

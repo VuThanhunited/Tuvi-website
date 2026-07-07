@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import HomeBanner from '../components/HomeBanner/HomeBanner.jsx';
 import { HandshakeIcon, CalendarIcon, HeartsIcon, DiamondIcon, GoldMedalIcon, SilverMedalIcon, FilterIcon, VerifiedIcon, FacebookIcon, SunStarIcon, TempleIcon, TarotIcon, SearchIcon, EyeIcon, CommentIcon, ShareIcon, BookmarkIcon, MasterIcon, ArticleIcon, LikeIcon, StarChartIcon, RatingStarIcon, LocationPinIcon, PointsDiamondIcon, ProfileButtonIcon } from '../components/Icons.jsx';
+import teaCornerImg from '../data/tea_corner.png';
+import meditationCornerImg from '../data/meditation_corner.png';
 import './Home.css';
 
 // Sample articles data with thumbnail URLs matching the mockup
@@ -142,6 +144,39 @@ export default function Home() {
 
   const topMasters = masters.slice(0, 3);
 
+  const [articles, setArticles] = useState(sampleArticles);
+  const handleLoadMore = () => {
+    const extraArticles = [
+      {
+        id: articles.length + 1,
+        author: 'Phong Thủy Cát Tường',
+        authorVerified: true,
+        time: '3 ngày trước',
+        title: 'Bí quyết chọn hướng nhà chung cư hợp tuổi gia chủ',
+        excerpt: 'Chọn căn hộ chung cư đúng hướng sinh khí giúp gia đạo bình an, công việc hanh thông, thu hút tài lộc.',
+        views: '640',
+        comments: 42,
+        shares: 31,
+        thumbnail: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=200',
+        category: 'Phong Thủy'
+      },
+      {
+        id: articles.length + 2,
+        author: 'Tử Vi Đại Việt',
+        authorVerified: false,
+        time: '5 ngày trước',
+        title: 'Luận giải chi tiết hạn Tam Tai tuổi Thân, Tý, Thìn năm 2026',
+        excerpt: 'Cách phòng tránh và hóa giải hạn Tam Tai hiệu quả nhất trong năm Bính Ngọ cho ba con giáp Thân - Tý - Thìn.',
+        views: '1.5K',
+        comments: 512,
+        shares: 289,
+        thumbnail: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=200',
+        category: 'Tử Vi & Cuộc Sống'
+      }
+    ];
+    setArticles(prev => [...prev, ...extraArticles]);
+  };
+
   return (
     <div className="home-wrapper">
       {/* Hero Banner */}
@@ -248,6 +283,22 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Góc Trà Widget */}
+          <div className="sidebar-widget-card tea-corner-widget">
+            <div className="widget-header-accent">GÓC TRÀ</div>
+            <div className="widget-body-new">
+              <div className="widget-img-wrapper">
+                <img src={teaCornerImg} alt="Góc Trà" />
+              </div>
+              <p className="widget-desc-new">
+                Nơi đàm đạo, thưởng trà và chiêm nghiệm về triết lý nhân sinh cuộc sống.
+              </p>
+              <Link to="/kien-thuc" className="widget-btn-new">
+                Ghé thăm Góc Trà
+              </Link>
+            </div>
+          </div>
         </aside>
 
         {/* ========== CỘT GIỮA - BÀI VIẾT FEED ========== */}
@@ -291,7 +342,7 @@ export default function Home() {
 
           {/* Articles Feed */}
           <div className="articles-feed">
-            {sampleArticles.map((article) => (
+            {articles.map((article) => (
               <article className="article-card" key={article.id}>
                 <div className="article-body">
                   {article.thumbnail && (
@@ -344,6 +395,16 @@ export default function Home() {
                 </div>
               </article>
             ))}
+
+            {/* Load More Button */}
+            <div className="feed-load-more-container">
+              <button 
+                className="feed-load-more-btn"
+                onClick={handleLoadMore}
+              >
+                Xem thêm bài viết
+              </button>
+            </div>
           </div>
         </main>
 
@@ -469,6 +530,22 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Góc Thiền Widget */}
+          <div className="sidebar-widget-card meditation-corner-widget">
+            <div className="widget-header-accent">GÓC THIỀN</div>
+            <div className="widget-body-new">
+              <div className="widget-img-wrapper">
+                <img src={meditationCornerImg} alt="Góc Thiền" />
+              </div>
+              <p className="widget-desc-new">
+                Lắng đọng tâm hồn, tìm lại sự bình yên trong chánh niệm và tĩnh lặng.
+              </p>
+              <Link to="/kien-thuc" className="widget-btn-new">
+                Ghé thăm Góc Thiền
+              </Link>
             </div>
           </div>
         </aside>

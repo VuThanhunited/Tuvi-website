@@ -63,21 +63,21 @@
 }
 
 .header-logo-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Cinzel', Georgia, serif;
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: #ffd700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   line-height: 1.1;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.25);
 }
 
 .header-logo-subtitle {
   font-family: 'Inter', sans-serif;
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   color: #ffd700;
-  opacity: 0.75;
-  letter-spacing: 0.02em;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
 }
 
 /* Nav Menu */
@@ -102,8 +102,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 6px 10px;
+  gap: 4px;
+  padding: 4px 8px;
   min-width: 80px;
 }
 
@@ -128,6 +128,38 @@
   background: #24164b;
   border-color: #ffd700;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+}
+
+/* Highlighted Nav Link (Lập Lá Số) */
+.nav-link.nav-link-highlight {
+  color: #ffd700 !important;
+}
+
+.nav-link.nav-link-highlight:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+}
+
+.nav-link.nav-link-highlight.active {
+  color: #ffd700 !important;
+  background: #24164b !important;
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.15) !important;
+}
+
+.highlight-sparkle {
+  color: #ffd700;
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 0.72rem;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+  animation: sparkleGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes sparkleGlow {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 /* Dropdown */

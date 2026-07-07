@@ -123,9 +123,10 @@
   display: block;
   text-align: center;
   padding: 8px 0 12px 0;
-  font-size: 0.7rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -692,10 +693,11 @@
 }
 
 .ranking-title {
-  font-size: 0.82rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #d4af37;
-  letter-spacing: 0.03em;
+  color: #ffd700;
+  letter-spacing: 0.06em;
   margin: 0;
 }
 
@@ -921,10 +923,11 @@
 }
 
 .activity-title {
-  font-size: 0.82rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #d4af37;
-  letter-spacing: 0.03em;
+  color: #ffd700;
+  letter-spacing: 0.06em;
   margin: 0;
 }
 
@@ -1079,4 +1082,123 @@
 
 .activity-icon-fallback svg {
   stroke: #ffd700;
+}
+
+/* Sidebar Widget Cards (Góc Trà / Góc Thiền) */
+.sidebar-widget-card {
+  background: #161228;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+
+.sidebar-widget-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.1);
+}
+
+.widget-header-accent {
+  background: linear-gradient(90deg, #1f143d, #110928);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.15);
+}
+
+.widget-body-new {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.widget-img-wrapper {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.widget-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.sidebar-widget-card:hover .widget-img-wrapper img {
+  transform: scale(1.08);
+}
+
+.widget-desc-new {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  text-align: center;
+  margin: 0;
+}
+
+.widget-btn-new {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #ffd700;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.widget-btn-new:hover {
+  background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%);
+  color: #110928;
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Feed Load More Button */
+.feed-load-more-container {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0 10px;
+}
+
+.feed-load-more-btn {
+  background: #161228;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: #ffd700;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.feed-load-more-btn:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.feed-load-more-btn:active {
+  transform: translateY(0);
 }
