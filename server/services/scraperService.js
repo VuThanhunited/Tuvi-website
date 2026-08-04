@@ -129,11 +129,82 @@ const FACEBOOK_POSTS = [
 
 class ScraperService {
   /**
-   * Simulated Facebook group cloner/crawling
+   * Simulated Facebook group cloner/crawling (fallback)
    */
   crawlFacebookGroup() {
     console.log('🤖 Đang giả lập cào dữ liệu từ Facebook Group 1353837944687586 (Tử Vi Việt Nam)...');
     return FACEBOOK_POSTS;
+  }
+
+  /**
+   * Fetch posts from a Facebook Page using Graph API
+   * @param {string} pageId - Facebook Page ID or username
+   * @param {string} accessToken - Facebook Page Access Token
+   * @param {number} limit - Number of posts to fetch
+   */
+  async fetchFacebookPagePosts(pageId, accessToken, limit = 10) {
+    const posts = [];
+    try {
+      console.log(`📘 Đang gọi Facebook Graph API để lấy bài từ page: ${pageId}...`);
+      const fields = 'id,message,story,full_picture,permalink_url,created_time,from,likes.summary(true),comments.summary(true)';
+      const url = `https://graph.facebook.com/v19.0/${pageId}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
+
+      const response = await axios.get(url, { timeout: 15000 });
+      const data = response.data;
+
+      if (!data || !data.data) {
+        throw new Error('Không nhận được dữ liệu từ Facebook API');
+      }
+
+      for (const fbPost of data.data) {
+        const content = fbPost.message || fbPost.story || '';
+        if (!content) continue;
+
+        // Tạo tiêu đề từ 2 dòng đầu của content
+        const lines = content.split('\n').filter(l => l.trim());
+        const title = lines[0]?.substring(0, 120) || 'Bài viết từ Facebook';
+        const authorName = fbPost.from?.name || 'Trang Facebook';
+
+        posts.push({
+          title,
+          content,
+          author: authorName,
+          avatar: authorName.substring(0, 2).toUpperCase(),
+          time: new Date(fbPost.created_time).toLocaleString('vi-VN'),
+          source: 'facebook',
+          imageUrl: fbPost.full_picture || '',
+          originalUrl: fbPost.permalink_url || `https://www.facebook.com/${pageId}`,
+          facebookPostId: fbPost.id,
+          likesCount: fbPost.likes?.summary?.total_count || 0,
+          commentsCount: fbPost.comments?.summary?.total_count || 0,
+          comments: [],
+        });
+      }
+      console.log(`✅ Đã lấy ${posts.length} bài từ Facebook Graph API`);
+    } catch (error) {
+      console.error('❌ Lỗi Facebook Graph API:', error.response?.data?.error?.message || error.message);
+      throw new Error(error.response?.data?.error?.message || error.message);
+    }
+    return posts;
+  }
+
+  /**
+   * Import a single Facebook post manually (copy-paste)
+   */
+  buildManualFacebookPost({ title, content, author, imageUrl, originalUrl, likesCount, commentsCount }) {
+    return {
+      title: title || content?.substring(0, 100) || 'Bài viết Facebook',
+      content: content || '',
+      author: author || 'Ẩn danh',
+      avatar: (author || 'AN').substring(0, 2).toUpperCase(),
+      time: new Date().toLocaleString('vi-VN'),
+      source: 'facebook',
+      imageUrl: imageUrl || '',
+      originalUrl: originalUrl || '',
+      likesCount: parseInt(likesCount) || 0,
+      commentsCount: parseInt(commentsCount) || 0,
+      comments: [],
+    };
   }
 
   /**
@@ -249,25 +320,46 @@ class ScraperService {
   async runCrawl() {
     let posts = [];
     
-    // 1. Try real crawlers
+    // 1. Try real crawlers for forums
     const tvvnPosts = await this.crawlTuViVietnam();
     const lsPosts = await this.crawlLySo();
+
+    // 2. Try automatic Facebook Page crawl via Graph API if configured in .env
+    let fbPagePosts = [];
+    if (process.env.FB_PAGE_ID && process.env.FB_ACCESS_TOKEN) {
+      try {
+        console.log(`📘 [Auto Cron] Đang tự động kéo bài từ Facebook Page ID: ${process.env.FB_PAGE_ID}...`);
+        fbPagePosts = await this.fetchFacebookPagePosts(
+          process.env.FB_PAGE_ID,
+          process.env.FB_ACCESS_TOKEN,
+          parseInt(process.env.FB_POST_LIMIT) || 10
+        );
+      } catch (err) {
+        console.warn('⚠️ [Auto Cron] Lỗi kéo bài Facebook Page tự động:', err.message);
+      }
+    }
     
-    // 2. Simulated Facebook posts
+    // 3. Fallback simulated Facebook posts
     const fbPosts = this.crawlFacebookGroup();
     
-    posts = [...tvvnPosts, ...lsPosts, ...fbPosts];
+    posts = [...tvvnPosts, ...lsPosts, ...fbPagePosts, ...fbPosts];
 
-    // 3. Fallback if blocked or no results crawled from forums
+    // 4. Fallback if blocked or no results crawled from forums
     if (tvvnPosts.length === 0 && lsPosts.length === 0) {
       console.log('ℹ️ Không cào được dữ liệu diễn đàn thực tế. Kích hoạt nạp bộ dữ liệu diễn đàn chuẩn mẫu.');
       posts = [...posts, ...FALLBACK_POSTS];
     }
 
-    // 4. Save unique posts to database (check by title)
+    // 5. Save unique posts to database (check by title, originalUrl, or facebookPostId)
     let savedCount = 0;
     for (const post of posts) {
-      const exists = await Discussion.findOne({ title: post.title });
+      const exists = await Discussion.findOne({
+        $or: [
+          { title: post.title },
+          { originalUrl: post.originalUrl },
+          ...(post.facebookPostId ? [{ facebookPostId: post.facebookPostId }] : [])
+        ]
+      });
       if (!exists) {
         await Discussion.create(post);
         savedCount++;
@@ -278,7 +370,7 @@ class ScraperService {
       success: true,
       totalCrawled: posts.length,
       savedToDb: savedCount,
-      source: tvvnPosts.length || lsPosts.length ? 'real_forum_and_facebook' : 'fallback_and_facebook'
+      source: (tvvnPosts.length || lsPosts.length || fbPagePosts.length) ? 'real_crawled_data' : 'fallback_data'
     };
   }
 }

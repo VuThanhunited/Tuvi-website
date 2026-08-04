@@ -7,6 +7,13 @@ import {
   getDashboardStats,
   addCredits,
   crawlForum,
+  importFacebookPost,
+  fetchFacebookPage,
+  getFacebookPosts,
+  deleteFacebookPost,
+  adminCreateLaSo,
+  getLaSoList,
+  deleteLaSo,
 } from '../controllers/adminController.js';
 import {
   getMasterProfiles,
@@ -29,6 +36,17 @@ router.put('/users/:id/role', updateUserRole);
 router.put('/users/:id/toggle-active', toggleUserActive);
 router.put('/users/:id/credits', addCredits);
 router.post('/crawl-forum', crawlForum);
+
+// ── Facebook Import Routes ──
+router.post('/import-facebook-post', importFacebookPost);
+router.post('/fetch-facebook-page', fetchFacebookPage);
+router.get('/facebook-posts', getFacebookPosts);
+router.delete('/facebook-posts/:id', deleteFacebookPost);
+
+// ── Lập Lá Số Routes ──
+router.post('/lap-la-so', adminCreateLaSo);
+router.get('/la-so-list', getLaSoList);
+router.delete('/la-so/:id', deleteLaSo);
 
 // Master CMS Routes
 router.get('/masters', getMasterProfiles);

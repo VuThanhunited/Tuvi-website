@@ -44,6 +44,11 @@ const discussionSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  facebookPostId: {
+    type: String,
+    default: '',
+    index: true,
+  },
   likesCount: {
     type: Number,
     default: 0,
