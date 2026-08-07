@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import TuViResult from '../models/TuViResult.js';
 import Discussion from '../models/Discussion.js';
+import Interpretation from '../models/Interpretation.js';
 import { generateLaSo } from 'tuvi-neo';
 import scraperService from '../services/scraperService.js';
 
@@ -128,11 +129,13 @@ export const toggleUserActive = async (req, res, next) => {
  */
 export const getDashboardStats = async (req, res, next) => {
   try {
-    const [totalUsers, totalMasters, totalLaSo, activeUsers] = await Promise.all([
+    const [totalUsers, totalMasters, totalLaSo, activeUsers, totalDiscussions, totalInterpretations] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ role: 'master' }),
       TuViResult.countDocuments(),
       User.countDocuments({ isActive: true }),
+      Discussion.countDocuments(),
+      Interpretation.countDocuments(),
     ]);
 
     // Users registered this month
@@ -143,6 +146,23 @@ export const getDashboardStats = async (req, res, next) => {
       createdAt: { $gte: startOfMonth },
     });
 
+    // Lá số mới trong tháng này
+    const newLaSoThisMonth = await TuViResult.countDocuments({
+      createdAt: { $gte: startOfMonth },
+    });
+
+    // Recent activity - 5 lá số mới nhất
+    const recentLaSo = await TuViResult.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('hoTen gioiTinh createdAt');
+
+    // Recent users - 5 users mới nhất
+    const recentUsers = await User.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('hoTen email role createdAt');
+
     res.status(200).json({
       success: true,
       data: {
@@ -151,6 +171,11 @@ export const getDashboardStats = async (req, res, next) => {
         totalLaSo,
         activeUsers,
         newUsersThisMonth,
+        newLaSoThisMonth,
+        totalDiscussions,
+        totalInterpretations,
+        recentLaSo,
+        recentUsers,
       },
     });
   } catch (error) {

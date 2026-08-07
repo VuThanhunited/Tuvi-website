@@ -7,7 +7,11 @@ import {
   Clock, 
   CheckCircle, 
   MessageSquare,
-  ArrowUpRight
+  ArrowUpRight,
+  Star,
+  Activity,
+  UserCheck,
+  FileText
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
@@ -15,9 +19,15 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.c
 export default function Dashboard() {
   const [stats, setStats] = useState({
     totalMasters: 0,
-    pendingMasters: 0,
+    totalUsers: 0,
+    totalLaSo: 0,
+    totalDiscussions: 0,
     totalInterpretations: 0,
-    totalUsers: 0
+    activeUsers: 0,
+    newUsersThisMonth: 0,
+    newLaSoThisMonth: 0,
+    recentLaSo: [],
+    recentUsers: [],
   });
   const [loading, setLoading] = useState(true);
   const [crawling, setCrawling] = useState(false);
@@ -63,9 +73,16 @@ export default function Dashboard() {
         });
         if (res.data.success) {
           setStats({
-            ...res.data.data,
             totalMasters: res.data.data.totalMasters || 0,
-            pendingMasters: 0, // We'll calculate this or get from another API
+            totalUsers: res.data.data.totalUsers || 0,
+            totalLaSo: res.data.data.totalLaSo || 0,
+            totalDiscussions: res.data.data.totalDiscussions || 0,
+            totalInterpretations: res.data.data.totalInterpretations || 0,
+            activeUsers: res.data.data.activeUsers || 0,
+            newUsersThisMonth: res.data.data.newUsersThisMonth || 0,
+            newLaSoThisMonth: res.data.data.newLaSoThisMonth || 0,
+            recentLaSo: res.data.data.recentLaSo || [],
+            recentUsers: res.data.data.recentUsers || [],
           });
         }
         setLoading(false);
@@ -77,6 +94,17 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
+  if (loading) {
+    return (
+      <div style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+          <p style={{ color: '#94a3b8' }}>Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '2rem' }}>
       <header style={{ marginBottom: '2.5rem' }}>
@@ -84,50 +112,125 @@ export default function Dashboard() {
         <p style={{ color: '#94a3b8' }}>Chào mừng trở lại, Admin. Đây là tổng quan hoạt động của hệ thống.</p>
       </header>
 
-      {/* Stats Cards */}
+      {/* Stats Cards Row 1 */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
-        gap: '1.5rem',
-        marginBottom: '3rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+        gap: '1.2rem',
+        marginBottom: '1.5rem'
       }}>
         <StatCard 
           icon={<Users size={24} color="#c5a059" />} 
-          label="Tổng Chuyên gia" 
-          value={stats.totalMasters} 
-          trend="+2 tháng này"
+          label="Tổng Người Dùng" 
+          value={stats.totalUsers.toLocaleString('vi-VN')} 
+          trend={`+${stats.newUsersThisMonth} tháng này`}
+          trendColor="#10b981"
         />
         <StatCard 
-          icon={<BookOpen size={24} color="#3b82f6" />} 
-          label="Luận giải" 
-          value={stats.totalInterpretations || 1240} 
-          trend="+15 bản ghi"
+          icon={<UserCheck size={24} color="#10b981" />} 
+          label="Đang Hoạt Động" 
+          value={stats.activeUsers.toLocaleString('vi-VN')} 
+          trend={`${stats.totalUsers > 0 ? Math.round(stats.activeUsers / stats.totalUsers * 100) : 0}% tổng số`}
+          trendColor="#10b981"
         />
         <StatCard 
-          icon={<MessageSquare size={24} color="#10b981" />} 
-          label="Lượt xem lá số" 
-          value={stats.totalLaSo || 854} 
-          trend="+12% so với tuần trước"
+          icon={<Star size={24} color="#f59e0b" />} 
+          label="Lá Số Đã Lập" 
+          value={stats.totalLaSo.toLocaleString('vi-VN')} 
+          trend={`+${stats.newLaSoThisMonth} tháng này`}
+          trendColor="#f59e0b"
         />
         <StatCard 
-          icon={<TrendingUp size={24} color="#f59e0b" />} 
-          label="Doanh thu (Coins)" 
-          value="45,200" 
-          trend="+8% tuần này"
+          icon={<Activity size={24} color="#8b5cf6" />} 
+          label="Bài Thảo Luận" 
+          value={stats.totalDiscussions.toLocaleString('vi-VN')} 
+          trend="Cộng đồng"
+          trendColor="#8b5cf6"
+        />
+      </div>
+
+      {/* Stats Cards Row 2 */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+        gap: '1.2rem',
+        marginBottom: '2.5rem'
+      }}>
+        <StatCard 
+          icon={<Users size={24} color="#3b82f6" />} 
+          label="Chuyên Gia Tử Vi" 
+          value={stats.totalMasters.toLocaleString('vi-VN')} 
+          trend="Thầy luận giải"
+          trendColor="#3b82f6"
+        />
+        <StatCard 
+          icon={<BookOpen size={24} color="#ec4899" />} 
+          label="Luận Giải" 
+          value={stats.totalInterpretations.toLocaleString('vi-VN')} 
+          trend="Kho tri thức"
+          trendColor="#ec4899"
+        />
+        <StatCard 
+          icon={<FileText size={24} color="#14b8a6" />} 
+          label="Người Dùng Mới" 
+          value={stats.newUsersThisMonth.toLocaleString('vi-VN')} 
+          trend="Tháng này"
+          trendColor="#14b8a6"
+        />
+        <StatCard 
+          icon={<TrendingUp size={24} color="#c5a059" />} 
+          label="Lá Số Mới" 
+          value={stats.newLaSoThisMonth.toLocaleString('vi-VN')} 
+          trend="Tháng này"
+          trendColor="#c5a059"
         />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
         {/* Recent Activity */}
-        <div style={cardStyle}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
-            <h3 style={{ margin: 0 }}>Hoạt động gần đây</h3>
-            <button style={textBtnStyle}>Xem tất cả <ArrowUpRight size={16} /></button>
+        <div>
+          {/* Recent LaSo */}
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>🔮 Lá Số Mới Nhất</h3>
+              <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>5 gần nhất</span>
+            </div>
+            {stats.recentLaSo.length === 0 ? (
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Chưa có lá số nào được lập.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                {stats.recentLaSo.map((ls, i) => (
+                  <ActivityItem 
+                    key={i}
+                    icon={<Star size={16} color="#c5a059" />} 
+                    text={`${ls.hoTen} (${ls.gioiTinh === 'nam' ? 'Nam' : 'Nữ'}) đã lập lá số`} 
+                    time={timeAgo(ls.createdAt)} 
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <ActivityItem icon={<CheckCircle size={16} color="#10b981" />} text="Admin đã duyệt hồ sơ Thầy Minh" time="2 giờ trước" />
-            <ActivityItem icon={<Clock size={16} color="#f59e0b" />} text="Có dữ liệu crawl mới từ TuVi.vn (12 chuyên gia)" time="5 giờ trước" />
-            <ActivityItem icon={<Users size={16} color="#3b82f6" />} text="Người dùng 'Nguyễn An' vừa nạp 500 coin" time="1 ngày trước" />
+
+          {/* Recent Users */}
+          <div style={{ ...cardStyle, marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>👥 Người Dùng Mới Nhất</h3>
+              <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>5 gần nhất</span>
+            </div>
+            {stats.recentUsers.length === 0 ? (
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Chưa có người dùng nào.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                {stats.recentUsers.map((u, i) => (
+                  <ActivityItem 
+                    key={i}
+                    icon={<Users size={16} color="#3b82f6" />} 
+                    text={`${u.hoTen} (${u.email}) — ${roleBadge(u.role)}`} 
+                    time={timeAgo(u.createdAt)} 
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -139,7 +242,8 @@ export default function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               <HealthItem label="Database" status="Ổn định" color="#10b981" />
               <HealthItem label="API Server" status="Hoạt động" color="#10b981" />
-              <HealthItem label="Storage (Images)" status="85% dung lượng" color="#f59e0b" />
+              <HealthItem label="Người dùng Active" status={`${stats.activeUsers} users`} color="#3b82f6" />
+              <HealthItem label="Lá số tháng này" status={`+${stats.newLaSoThisMonth}`} color="#f59e0b" />
             </div>
           </div>
 
@@ -195,14 +299,31 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ icon, label, value, trend }) {
+function timeAgo(dateStr) {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return `${diff} giây trước`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+  if (diff < 2592000) return `${Math.floor(diff / 86400)} ngày trước`;
+  return date.toLocaleDateString('vi-VN');
+}
+
+function roleBadge(role) {
+  if (role === 'admin') return '👑 Admin';
+  if (role === 'master') return '🔮 Chuyên gia';
+  return '👤 User';
+}
+
+function StatCard({ icon, label, value, trend, trendColor }) {
   return (
     <div style={cardStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div style={{ padding: '0.8rem', backgroundColor: 'rgba(197, 160, 89, 0.1)', borderRadius: '12px' }}>
           {icon}
         </div>
-        <span style={{ color: '#10b981', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+        <span style={{ color: trendColor || '#10b981', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.2rem', textAlign: 'right', maxWidth: '100px' }}>
           {trend}
         </span>
       </div>
@@ -242,15 +363,4 @@ const cardStyle = {
   borderRadius: '16px',
   border: '1px solid rgba(197, 160, 89, 0.2)',
   backdropFilter: 'blur(10px)'
-};
-
-const textBtnStyle = {
-  background: 'none',
-  border: 'none',
-  color: '#c5a059',
-  fontSize: '0.9rem',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.4rem'
 };
