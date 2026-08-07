@@ -316,8 +316,26 @@ class ScraperService {
 
   /**
    * Run the full crawl process and save to DB
+   * @param {boolean} skipIfEnough - Nếu DB đã có đủ dữ liệu thì bỏ qua crawl
    */
-  async runCrawl() {
+  async runCrawl({ skipIfEnough = false } = {}) {
+    // ── Kiểm tra DB trước ──────────────────────────────────────────────────
+    const existingCount = await Discussion.countDocuments();
+
+    if (skipIfEnough && existingCount >= 20) {
+      console.log(`📦 [Scraper] DB đã có ${existingCount} bài viết. Bỏ qua crawl lần này (dữ liệu đủ rồi).`);
+      return {
+        success: true,
+        totalCrawled: 0,
+        savedToDb: 0,
+        skipped: true,
+        existingInDb: existingCount,
+        source: 'database_cache',
+      };
+    }
+
+    console.log(`🔍 [Scraper] DB hiện có ${existingCount} bài. Bắt đầu crawl thêm...`);
+
     let posts = [];
     
     // 1. Try real crawlers for forums
@@ -366,10 +384,15 @@ class ScraperService {
       }
     }
 
+    const afterCount = await Discussion.countDocuments();
+    console.log(`✅ [Scraper] Crawl xong! Đã lưu mới: ${savedCount} bài. Tổng DB: ${afterCount} bài.`);
+
     return {
       success: true,
       totalCrawled: posts.length,
       savedToDb: savedCount,
+      skipped: false,
+      existingInDb: afterCount,
       source: (tvvnPosts.length || lsPosts.length || fbPagePosts.length) ? 'real_crawled_data' : 'fallback_data'
     };
   }

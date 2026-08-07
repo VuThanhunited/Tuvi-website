@@ -1,12 +1,16 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+// Fallback values nếu env vars chưa được set (tránh crash trên production)
+const JWT_SECRET = process.env.JWT_SECRET || 'tuvi_secret_key_2026_super_secure_jwt_token_fallback';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || (JWT_SECRET + '_refresh');
+
 /**
  * Helper: Generate JWT Token (short-lived access token)
  */
 const generateAccessToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '1h', // Short-lived: 1 hour
+  return jwt.sign({ id: userId }, JWT_SECRET, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '7d',
   });
 };
 
@@ -16,9 +20,9 @@ const generateAccessToken = (userId) => {
 const generateRefreshToken = (userId) => {
   return jwt.sign(
     { id: userId, type: 'refresh' },
-    process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET + '_refresh',
+    JWT_REFRESH_SECRET,
     {
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d', // Long-lived: 7 days
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
     }
   );
 };

@@ -19,18 +19,22 @@ app.listen(PORT, () => {
 
   // Start background crawl job after server starts (only in non-test env)
   if (process.env.NODE_ENV !== 'test') {
-    // Run once on startup (after 5 seconds to not block startup time)
+    // Run once on startup - chỉ crawl nếu DB chưa đủ dữ liệu (>= 20 bài thì bỏ qua)
     setTimeout(async () => {
       try {
-        console.log('⏰ [Background Job] Bắt đầu tự động cào bài viết diễn đàn & Facebook...');
-        const res = await scraperService.runCrawl();
-        console.log(`⏰ [Background Job] Hoàn tất cào bài viết! Đã lưu mới: ${res.savedToDb}`);
+        console.log('⏰ [Background Job] Kiểm tra DB và cào bài viết nếu cần...');
+        const res = await scraperService.runCrawl({ skipIfEnough: true });
+        if (res.skipped) {
+          console.log(`⏰ [Background Job] Đã bỏ qua crawl. DB sẵn có ${res.existingInDb} bài viết.`);
+        } else {
+          console.log(`⏰ [Background Job] Crawl xong! Đã lưu mới: ${res.savedToDb} bài.`);
+        }
       } catch (err) {
         console.error('⏰ [Background Job] Lỗi chạy tự động cào bài viết:', err.message);
       }
     }, 5000);
 
-    // Run periodically every 30 minutes
+    // Crawl định kỳ mỗi 30 phút để lấy bài MỚI (không skip, sẽ lọc duplicate)
     const CRAWL_INTERVAL = 30 * 60 * 1000; // 30 mins
     setInterval(async () => {
       try {
