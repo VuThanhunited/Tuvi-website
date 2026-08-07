@@ -351,6 +351,26 @@ export const deleteFacebookPost = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Cập nhật bài viết Facebook
+ * @route   PUT /api/admin/facebook-posts/:id
+ * @access  Admin only
+ */
+export const updateFacebookPost = async (req, res, next) => {
+  try {
+    const { title, content, author, imageUrl, originalUrl, likesCount, commentsCount } = req.body;
+    const post = await Discussion.findByIdAndUpdate(
+      req.params.id,
+      { title, content, author, imageUrl, originalUrl, likesCount, commentsCount },
+      { new: true, runValidators: true }
+    );
+    if (!post) return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết.' });
+    res.status(200).json({ success: true, message: 'Đã cập nhật bài viết.', data: post });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ─────────────────────────────────────────────────────────
 // LẬP LÁ SỐ
 // ─────────────────────────────────────────────────────────
@@ -483,6 +503,26 @@ export const deleteLaSo = async (req, res, next) => {
     const record = await TuViResult.findByIdAndDelete(req.params.id);
     if (!record) return res.status(404).json({ success: false, message: 'Không tìm thấy lá số.' });
     res.status(200).json({ success: true, message: 'Đã xóa lá số.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Cập nhật thông tin lá số đã lưu
+ * @route   PUT /api/admin/la-so/:id
+ * @access  Admin only
+ */
+export const updateLaSo = async (req, res, next) => {
+  try {
+    const { hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar } = req.body;
+    const record = await TuViResult.findByIdAndUpdate(
+      req.params.id,
+      { hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar },
+      { new: true, runValidators: true }
+    );
+    if (!record) return res.status(404).json({ success: false, message: 'Không tìm thấy lá số.' });
+    res.status(200).json({ success: true, message: 'Đã cập nhật thông tin lá số.', data: record });
   } catch (error) {
     next(error);
   }

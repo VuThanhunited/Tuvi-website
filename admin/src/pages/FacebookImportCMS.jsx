@@ -1,9 +1,11 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './FacebookImportCMS.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 const getToken = () => localStorage.getItem('token');
+
+const emptyForm = { title:'', content:'', author:'', imageUrl:'', originalUrl:'', likesCount:0, commentsCount:0 };
 
 export default function FacebookImportCMS() {
   const [activeTab, setActiveTab] = useState('manual');
@@ -12,10 +14,19 @@ export default function FacebookImportCMS() {
   const [posts, setPosts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
   const [fetchingList, setFetchingList] = useState(false);
-  const [manualForm, setManualForm] = useState({ title:'',content:'',author:'',imageUrl:'',originalUrl:'',likesCount:0,commentsCount:0 });
+  const [manualForm, setManualForm] = useState(emptyForm);
   const [apiForm, setApiForm] = useState({ pageId: '', accessToken: '', limit: 10 });
 
+  // Edit modal state
+  const [editPost, setEditPost] = useState(null); // null = đóng, object = đang edit
+  const [editLoading, setEditLoading] = useState(false);
+
   useEffect(() => { if (activeTab === 'list') fetchPosts(1); }, [activeTab]);
+
+  const showStatus = (success, message) => {
+    setStatus({ success, message });
+    setTimeout(() => setStatus(null), 4000);
+  };
 
   const fetchPosts = async (page = 1) => {
     setFetchingList(true);
@@ -33,10 +44,10 @@ export default function FacebookImportCMS() {
       const res = await axios.post(API_URL + '/admin/import-facebook-post', manualForm, {
         headers: { Authorization: 'Bearer ' + getToken() }
       });
-      setStatus({ success: res.data.success, message: res.data.message });
-      if (res.data.success) setManualForm({ title:'',content:'',author:'',imageUrl:'',originalUrl:'',likesCount:0,commentsCount:0 });
+      showStatus(res.data.success, res.data.message);
+      if (res.data.success) setManualForm(emptyForm);
     } catch (err) {
-      setStatus({ success: false, message: err.response?.data?.message || 'Loi ket noi!' });
+      showStatus(false, err.response?.data?.message || 'Lỗi kết nối!');
     } finally { setLoading(false); }
   };
 
@@ -46,18 +57,52 @@ export default function FacebookImportCMS() {
       const res = await axios.post(API_URL + '/admin/fetch-facebook-page', apiForm, {
         headers: { Authorization: 'Bearer ' + getToken() }
       });
-      setStatus({ success: res.data.success, message: res.data.message });
+      showStatus(res.data.success, res.data.message);
     } catch (err) {
-      setStatus({ success: false, message: err.response?.data?.message || 'Loi ket noi!' });
+      showStatus(false, err.response?.data?.message || 'Lỗi kết nối!');
     } finally { setLoading(false); }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Xoa bai viet nay?')) return;
+    if (!window.confirm('Xóa bài viết này?')) return;
     try {
       await axios.delete(API_URL + '/admin/facebook-posts/' + id, { headers: { Authorization: 'Bearer ' + getToken() } });
       fetchPosts(pagination.page);
-    } catch (err) { alert('Loi xoa bai viet'); }
+    } catch (err) { alert('Lỗi xóa bài viết'); }
+  };
+
+  // ── Edit handlers ──
+  const openEdit = (post) => {
+    setEditPost({
+      _id: post._id,
+      title: post.title || '',
+      content: post.content || '',
+      author: post.author || '',
+      imageUrl: post.imageUrl || '',
+      originalUrl: post.originalUrl || '',
+      likesCount: post.likesCount || 0,
+      commentsCount: post.commentsCount || 0,
+    });
+  };
+
+  const handleEditSave = async () => {
+    setEditLoading(true);
+    try {
+      const res = await axios.put(API_URL + '/admin/facebook-posts/' + editPost._id, editPost, {
+        headers: { Authorization: 'Bearer ' + getToken() }
+      });
+      if (res.data.success) {
+        showStatus(true, 'Đã cập nhật bài viết thành công!');
+        setPosts(prev => prev.map(p => p._id === editPost._id ? res.data.data : p));
+        setEditPost(null);
+      } else {
+        showStatus(false, res.data.message);
+      }
+    } catch (err) {
+      showStatus(false, err.response?.data?.message || 'Lỗi cập nhật!');
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   return (
@@ -69,6 +114,7 @@ export default function FacebookImportCMS() {
           <p className="fb-cms__subtitle">Nhập thủ công hoặc kéo tự động bài từ trang Facebook</p>
         </div>
       </header>
+
       <div className="fb-cms__tabs">
         {[
           { key: 'manual', label: 'Nhập Thủ Công' },
@@ -80,11 +126,13 @@ export default function FacebookImportCMS() {
           </button>
         ))}
       </div>
+
       {status && (
         <div className={'fb-cms__status ' + (status.success ? 'success' : 'error')}>
-          {status.success ? 'OK: ' : 'Loi: '}{status.message}
+          {status.success ? '✅ ' : '❌ '}{status.message}
         </div>
       )}
+
       {activeTab === 'manual' && (
         <div className="fb-cms__card">
           <div className="fb-cms__card-header">
@@ -137,6 +185,7 @@ export default function FacebookImportCMS() {
           </form>
         </div>
       )}
+
       {activeTab === 'api' && (
         <div className="fb-cms__card">
           <div className="fb-cms__card-header">
@@ -176,6 +225,7 @@ export default function FacebookImportCMS() {
           </form>
         </div>
       )}
+
       {activeTab === 'list' && (
         <div className="fb-cms__card">
           <div className="fb-cms__card-header">
@@ -205,7 +255,10 @@ export default function FacebookImportCMS() {
                         <a href={post.originalUrl} target="_blank" rel="noreferrer" className="fb-cms__post-link">Xem bài gốc</a>
                       )}
                     </div>
-                    <button className="fb-cms__btn-delete" onClick={() => handleDelete(post._id)}>Xóa</button>
+                    <div className="fb-cms__post-actions">
+                      <button className="fb-cms__btn-edit" onClick={() => openEdit(post)}>✏️ Sửa</button>
+                      <button className="fb-cms__btn-delete" onClick={() => handleDelete(post._id)}>🗑️ Xóa</button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -218,6 +271,70 @@ export default function FacebookImportCMS() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {editPost && (
+        <div className="fb-cms__modal-overlay" onClick={() => setEditPost(null)}>
+          <div className="fb-cms__modal" onClick={e => e.stopPropagation()}>
+            <div className="fb-cms__modal-header">
+              <h3>✏️ Chỉnh Sửa Bài Viết</h3>
+              <button className="fb-cms__modal-close" onClick={() => setEditPost(null)}>✕</button>
+            </div>
+
+            <div className="fb-cms__modal-body">
+              <div className="fb-cms__form-group full">
+                <label>Nội dung bài viết *</label>
+                <textarea rows={6} value={editPost.content}
+                  onChange={e => setEditPost(p => ({ ...p, content: e.target.value }))}
+                  placeholder="Nội dung bài viết..." />
+              </div>
+              <div className="fb-cms__form-row">
+                <div className="fb-cms__form-group">
+                  <label>Tiêu đề</label>
+                  <input type="text" value={editPost.title}
+                    onChange={e => setEditPost(p => ({ ...p, title: e.target.value }))} />
+                </div>
+                <div className="fb-cms__form-group">
+                  <label>Tác giả</label>
+                  <input type="text" value={editPost.author}
+                    onChange={e => setEditPost(p => ({ ...p, author: e.target.value }))} />
+                </div>
+              </div>
+              <div className="fb-cms__form-group full">
+                <label>URL ảnh đính kèm</label>
+                <input type="url" value={editPost.imageUrl}
+                  onChange={e => setEditPost(p => ({ ...p, imageUrl: e.target.value }))}
+                  placeholder="https://..." />
+              </div>
+              <div className="fb-cms__form-group full">
+                <label>Link bài viết gốc (Facebook)</label>
+                <input type="url" value={editPost.originalUrl}
+                  onChange={e => setEditPost(p => ({ ...p, originalUrl: e.target.value }))}
+                  placeholder="https://www.facebook.com/..." />
+              </div>
+              <div className="fb-cms__form-row">
+                <div className="fb-cms__form-group">
+                  <label>Số lượt thích</label>
+                  <input type="number" min={0} value={editPost.likesCount}
+                    onChange={e => setEditPost(p => ({ ...p, likesCount: parseInt(e.target.value) || 0 }))} />
+                </div>
+                <div className="fb-cms__form-group">
+                  <label>Số bình luận</label>
+                  <input type="number" min={0} value={editPost.commentsCount}
+                    onChange={e => setEditPost(p => ({ ...p, commentsCount: parseInt(e.target.value) || 0 }))} />
+                </div>
+              </div>
+            </div>
+
+            <div className="fb-cms__modal-footer">
+              <button className="fb-cms__btn-cancel" onClick={() => setEditPost(null)}>Hủy</button>
+              <button className="fb-cms__btn-save" onClick={handleEditSave} disabled={editLoading}>
+                {editLoading ? 'Đang lưu...' : '💾 Lưu Thay Đổi'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

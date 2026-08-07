@@ -1,4 +1,4 @@
-﻿/* ===== LapLaSoCMS.css ===== */
+/* ===== LapLaSoCMS.css ===== */
 .laso-cms {
   padding: 2rem;
   color: #e2e8f0;
@@ -545,6 +545,127 @@
   font-size: 0.9rem;
 }
 
+/* ── Edit button ── */
+.laso-cms__btn-edit-sm {
+  background: rgba(197, 160, 89, 0.12);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  color: #c5a059;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.laso-cms__btn-edit-sm:hover {
+  background: rgba(197, 160, 89, 0.25);
+}
+
+/* ── Edit Modal ── */
+.laso-cms__modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: lasoFadeIn 0.2s ease;
+}
+
+@keyframes lasoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.laso-cms__modal {
+  background: #1e293b;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  animation: lasoSlideUp 0.25s ease;
+}
+
+@keyframes lasoSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.laso-cms__modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem 1.8rem;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+}
+
+.laso-cms__modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.laso-cms__modal-close {
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  color: #94a3b8;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.laso-cms__modal-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.laso-cms__modal-body {
+  padding: 1.5rem 1.8rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.laso-cms__modal-body input,
+.laso-cms__modal-body select {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  color: #e0e0e0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.laso-cms__modal-body input:focus,
+.laso-cms__modal-body select:focus {
+  border-color: #c5a059;
+}
+
+.laso-cms__modal-footer {
+  display: flex;
+  gap: 0.8rem;
+  padding: 1.2rem 1.8rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.1);
+}
+
 @media (max-width: 768px) {
   .laso-cms { padding: 1rem; }
   .laso-cms__form-row { grid-template-columns: 1fr 1fr; }
@@ -559,3 +680,4 @@
   .laso-cms__result-name, .laso-cms__cung-name { color: black; }
   .laso-cms__info-value { color: #333; }
 }
+

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './LapLaSoCMS.css';
 
@@ -18,6 +18,9 @@ export default function LapLaSoCMS() {
   const [fetchingList, setFetchingList] = useState(false);
   const [search, setSearch] = useState('');
   const [saveToDb, setSaveToDb] = useState(false);
+  // Edit modal state
+  const [editLaSo, setEditLaSo] = useState(null);
+  const [editLoading, setEditLoading] = useState(false);
   const [form, setForm] = useState({
     hoTen: '', gioiTinh: 'nam', ngaySinh: 1, thangSinh: 1,
     namSinh: 1990, gioSinh: 'Ngo', isLunar: false, namXem: new Date().getFullYear(),
@@ -55,11 +58,45 @@ export default function LapLaSoCMS() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Xoa la so nay?')) return;
+    if (!window.confirm('Xóa lá số này?')) return;
     try {
       await axios.delete(API_URL + '/admin/la-so/' + id, { headers: { Authorization: 'Bearer ' + getToken() } });
       fetchList(pagination.page);
-    } catch (err) { alert('Loi xoa la so'); }
+    } catch (err) { alert('Lỗi xóa lá số'); }
+  };
+
+  const openEditLaSo = (ls) => {
+    setEditLaSo({
+      _id: ls._id,
+      hoTen: ls.hoTen || '',
+      gioiTinh: ls.gioiTinh || 'nam',
+      ngaySinh: ls.ngaySinh || 1,
+      thangSinh: ls.thangSinh || 1,
+      namSinh: ls.namSinh || 1990,
+      gioSinh: ls.gioSinh || 'Ngo',
+      isLunar: ls.isLunar || false,
+    });
+  };
+
+  const handleEditSave = async () => {
+    setEditLoading(true);
+    try {
+      const res = await axios.put(API_URL + '/admin/la-so/' + editLaSo._id, editLaSo, {
+        headers: { Authorization: 'Bearer ' + getToken() }
+      });
+      if (res.data.success) {
+        setStatus({ success: true, message: 'Đã cập nhật lá số thành công!' });
+        setLaSoList(prev => prev.map(l => l._id === editLaSo._id ? { ...l, ...editLaSo } : l));
+        setEditLaSo(null);
+        setTimeout(() => setStatus(null), 3000);
+      } else {
+        setStatus({ success: false, message: res.data.message });
+      }
+    } catch (err) {
+      setStatus({ success: false, message: err.response?.data?.message || 'Lỗi cập nhật!' });
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const getRatingStars = (r) => {
@@ -300,7 +337,8 @@ export default function LapLaSoCMS() {
                       <td>{getRatingStars(ls.overallRating)}</td>
                       <td>{new Date(ls.createdAt).toLocaleDateString('vi-VN')}</td>
                       <td>
-                        <button className="laso-cms__btn-delete-sm" onClick={() => handleDelete(ls._id)}>Xóa</button>
+                        <button className="laso-cms__btn-edit-sm" onClick={() => openEditLaSo(ls)}>✏️ Sửa</button>
+                        <button className="laso-cms__btn-delete-sm" onClick={() => handleDelete(ls._id)}>🗑️ Xóa</button>
                       </td>
                     </tr>
                   ))}
@@ -315,6 +353,76 @@ export default function LapLaSoCMS() {
               )}
             </>
           )}
+        </div>
+      )}
+      {editLaSo && (
+        <div className="laso-cms__modal-overlay" onClick={() => setEditLaSo(null)}>
+          <div className="laso-cms__modal" onClick={e => e.stopPropagation()}>
+            <div className="laso-cms__modal-header">
+              <h3>✏️ Chỉnh Sửa Lá Số</h3>
+              <button className="laso-cms__modal-close" onClick={() => setEditLaSo(null)}>✕</button>
+            </div>
+            <div className="laso-cms__modal-body">
+              <div className="laso-cms__form-row">
+                <div className="laso-cms__form-group span2">
+                  <label>Họ và Tên *</label>
+                  <input type="text" value={editLaSo.hoTen}
+                    onChange={e => setEditLaSo(p => ({ ...p, hoTen: e.target.value }))} />
+                </div>
+                <div className="laso-cms__form-group">
+                  <label>Giới Tính</label>
+                  <select value={editLaSo.gioiTinh}
+                    onChange={e => setEditLaSo(p => ({ ...p, gioiTinh: e.target.value }))}>
+                    <option value="nam">Nam Mạng</option>
+                    <option value="nu">Nữ Mạng</option>
+                  </select>
+                </div>
+              </div>
+              <div className="laso-cms__section-title">Ngày Sinh</div>
+              <div className="laso-cms__form-row">
+                <div className="laso-cms__form-group">
+                  <label>Ngày *</label>
+                  <input type="number" min={1} max={31} value={editLaSo.ngaySinh}
+                    onChange={e => setEditLaSo(p => ({ ...p, ngaySinh: parseInt(e.target.value) }))} />
+                </div>
+                <div className="laso-cms__form-group">
+                  <label>Tháng *</label>
+                  <input type="number" min={1} max={12} value={editLaSo.thangSinh}
+                    onChange={e => setEditLaSo(p => ({ ...p, thangSinh: parseInt(e.target.value) }))} />
+                </div>
+                <div className="laso-cms__form-group">
+                  <label>Năm *</label>
+                  <input type="number" min={1900} max={2030} value={editLaSo.namSinh}
+                    onChange={e => setEditLaSo(p => ({ ...p, namSinh: parseInt(e.target.value) }))} />
+                </div>
+              </div>
+              <div className="laso-cms__form-row">
+                <div className="laso-cms__form-group">
+                  <label>Giờ Sinh (Địa Chi)</label>
+                  <select value={editLaSo.gioSinh}
+                    onChange={e => setEditLaSo(p => ({ ...p, gioSinh: e.target.value }))}>
+                    {GIO_CHI_LIST.map((chi, i) => (
+                      <option key={chi} value={chi}>{chi} ({GIO_RANGE[i]}h)</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="laso-cms__form-group">
+                  <label>Loại Lịch</label>
+                  <select value={editLaSo.isLunar ? 'lunar' : 'solar'}
+                    onChange={e => setEditLaSo(p => ({ ...p, isLunar: e.target.value === 'lunar' }))}>
+                    <option value="solar">Dương Lịch</option>
+                    <option value="lunar">Âm Lịch</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="laso-cms__modal-footer">
+              <button className="laso-cms__btn-secondary" onClick={() => setEditLaSo(null)}>Hủy</button>
+              <button className="laso-cms__btn-primary" onClick={handleEditSave} disabled={editLoading}>
+                {editLoading ? 'Đang lưu...' : '💾 Lưu Thay Đổi'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

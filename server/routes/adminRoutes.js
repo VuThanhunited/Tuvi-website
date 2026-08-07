@@ -11,9 +11,11 @@ import {
   fetchFacebookPage,
   getFacebookPosts,
   deleteFacebookPost,
+  updateFacebookPost,
   adminCreateLaSo,
   getLaSoList,
   deleteLaSo,
+  updateLaSo,
 } from '../controllers/adminController.js';
 import {
   getMasterProfiles,
@@ -41,11 +43,13 @@ router.post('/crawl-forum', crawlForum);
 router.post('/import-facebook-post', importFacebookPost);
 router.post('/fetch-facebook-page', fetchFacebookPage);
 router.get('/facebook-posts', getFacebookPosts);
+router.put('/facebook-posts/:id', updateFacebookPost);
 router.delete('/facebook-posts/:id', deleteFacebookPost);
 
 // ── Lập Lá Số Routes ──
 router.post('/lap-la-so', adminCreateLaSo);
 router.get('/la-so-list', getLaSoList);
+router.put('/la-so/:id', updateLaSo);
 router.delete('/la-so/:id', deleteLaSo);
 
 // Master CMS Routes
