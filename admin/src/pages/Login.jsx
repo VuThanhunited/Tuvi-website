@@ -20,7 +20,7 @@ export default function Login() {
       const res = await axios.post(`${API_URL}/auth/login`, { email, password });
       
       if (res.data.success) {
-        const { token, user } = res.data.data;
+        const { accessToken, user } = res.data.data;
         
         // Kiểm tra xem có phải admin không
         if (user.role !== 'admin') {
@@ -29,7 +29,7 @@ export default function Login() {
           return;
         }
 
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', accessToken);
         localStorage.setItem('user', JSON.stringify(user));
         window.location.href = '/dashboard';
       }
