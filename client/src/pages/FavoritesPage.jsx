@@ -1,12 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../components/Toast/Toast.jsx';
 import { useFavorites } from '../contexts/FavoritesContext.jsx';
-import './StaticPages.css';
+import './FavoritesPage.css';
+
+const CATEGORY_ICONS = {
+  'Tử Vi & Cuộc Sống': '☀️',
+  'Phong Thủy Ứng Dụng': '🏯',
+  'Tarot Thông Điệp': '🃏',
+  'Phong Thủy': '🏮',
+};
 
 export default function FavoritesPage() {
   const { favorites, loading, error, fetchFavorites, removeFavorite } = useFavorites();
-  const { error: showError } = useToast();
+  const { error: showError, success: showSuccess } = useToast();
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [removingId, setRemovingId] = useState(null);
 
   useEffect(() => {
     loadFavorites();
@@ -21,207 +32,228 @@ export default function FavoritesPage() {
   };
 
   const handleRemove = async (favoriteId) => {
+    setRemovingId(favoriteId);
     try {
       await removeFavorite(favoriteId);
-    } catch (err) {
+      showSuccess('Đã xóa khỏi yêu thích');
+    } catch {
       showError('Không thể xóa bài viết');
+    } finally {
+      setRemovingId(null);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="static-page">
-        <div className="container">
-          <div className="static-page-header">
-            <h1>❤️ Bài Viết Yêu Thích</h1>
-            <p>Các bài viết bạn đã lưu để đọc lại</p>
-          </div>
+  // All unique categories
+  const categories = useMemo(() => {
+    if (!favorites) return [];
+    const cats = [...new Set(favorites.map(f => f.category).filter(Boolean))];
+    return cats;
+  }, [favorites]);
 
-          <div className="content-card">
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <div style={{ fontSize: '32px', marginBottom: '10px' }}>⏳</div>
-              <p>Đang tải...</p>
+  // Filtered + sorted
+  const filtered = useMemo(() => {
+    if (!favorites) return [];
+    let list = [...favorites];
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(f =>
+        f.title?.toLowerCase().includes(q) ||
+        f.category?.toLowerCase().includes(q)
+      );
+    }
+    if (selectedCategory !== 'all') {
+      list = list.filter(f => f.category === selectedCategory);
+    }
+    if (sortBy === 'newest') list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    else if (sortBy === 'oldest') list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    else if (sortBy === 'az') list.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'vi'));
+    return list;
+  }, [favorites, search, selectedCategory, sortBy]);
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="fav-skeleton-grid">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="fav-skeleton-card">
+              <div className="fav-skeleton-img" />
+              <div className="fav-skeleton-body">
+                <div className="fav-skeleton-line fav-skeleton-line--wide" />
+                <div className="fav-skeleton-line fav-skeleton-line--medium" />
+                <div className="fav-skeleton-line fav-skeleton-line--narrow" />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="fav-error-card">
+          <div className="fav-error-icon">⚠️</div>
+          <p>{error}</p>
+          <button onClick={loadFavorites} className="fav-retry-btn">🔄 Thử Lại</button>
+        </div>
+      );
+    }
+
+    if (!favorites || favorites.length === 0) {
+      return (
+        <div className="fav-empty-state">
+          <div className="fav-empty-icon">💝</div>
+          <h3>Chưa có bài viết yêu thích</h3>
+          <p>Hãy khám phá các bài viết và nhấn nút ❤️ để lưu lại.</p>
+          <Link to="/kien-thuc" className="fav-cta-btn">📖 Khám Phá Kiến Thức</Link>
+        </div>
+      );
+    }
+
+    if (filtered.length === 0) {
+      return (
+        <div className="fav-empty-state fav-empty-state--search">
+          <div className="fav-empty-icon">🔍</div>
+          <h3>Không tìm thấy kết quả</h3>
+          <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+          <button
+            className="fav-cta-btn"
+            onClick={() => { setSearch(''); setSelectedCategory('all'); }}
+          >
+            Xóa Bộ Lọc
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="fav-grid">
+        {filtered.map(fav => (
+          <div
+            key={fav._id}
+            className={`fav-card ${removingId === fav._id ? 'fav-card--removing' : ''}`}
+          >
+            {/* Thumbnail */}
+            <div className="fav-card-img-wrap">
+              {fav.thumbnail ? (
+                <img src={fav.thumbnail} alt={fav.title} className="fav-card-img" />
+              ) : (
+                <div className="fav-card-img-placeholder">
+                  <span>{CATEGORY_ICONS[fav.category] || '📖'}</span>
+                </div>
+              )}
+              {fav.category && (
+                <div className="fav-card-cat-badge">
+                  {CATEGORY_ICONS[fav.category] || '📌'} {fav.category}
+                </div>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="fav-card-body">
+              <h3 className="fav-card-title">{fav.title || 'Bài viết không có tiêu đề'}</h3>
+              <p className="fav-card-date">
+                ❤️ Lưu: {new Date(fav.createdAt).toLocaleDateString('vi-VN')}
+              </p>
+              <div className="fav-card-actions">
+                <Link
+                  to={`/kien-thuc#${fav.articleId?.slug || ''}`}
+                  className="fav-btn fav-btn--read"
+                >
+                  📖 Đọc bài
+                </Link>
+                <button
+                  onClick={() => handleRemove(fav._id)}
+                  className="fav-btn fav-btn--remove"
+                  disabled={removingId === fav._id}
+                  title="Xóa khỏi yêu thích"
+                >
+                  {removingId === fav._id ? '⏳' : '🗑️'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     );
-  }
-
-  if (error) {
-    return (
-      <div className="static-page">
-        <div className="container">
-          <div className="static-page-header">
-            <h1>❤️ Bài Viết Yêu Thích</h1>
-            <p>Các bài viết bạn đã lưu để đọc lại</p>
-          </div>
-
-          <div className="content-card">
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <div style={{ fontSize: '32px', marginBottom: '10px', color: '#dc3545' }}>❌</div>
-              <p style={{ color: '#dc3545', marginBottom: '20px' }}>{error}</p>
-              <button
-                onClick={loadFavorites}
-                className="btn btn-primary"
-              >
-                🔄 Thử Lại
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  };
 
   return (
-    <div className="static-page">
-      <div className="container">
-        <div className="static-page-header">
-          <h1>❤️ Bài Viết Yêu Thích</h1>
-          <p>Các bài viết bạn đã lưu để đọc lại</p>
+    <div className="fav-page">
+      <div className="fav-container">
+        {/* Header */}
+        <div className="fav-header">
+          <div className="fav-header-icon">❤️</div>
+          <div>
+            <h1 className="fav-title">Bài Viết Yêu Thích</h1>
+            <p className="fav-subtitle">
+              Các bài viết bạn đã lưu để đọc lại
+              {favorites && favorites.length > 0 && (
+                <span className="fav-count-badge">{favorites.length} bài</span>
+              )}
+            </p>
+          </div>
         </div>
 
-        <div className="content-card">
-          {favorites && favorites.length > 0 ? (
-            <div className="favorites-list">
-              {favorites.map(favorite => (
-                <div key={favorite._id} className="favorite-item">
-                  {favorite.thumbnail && (
-                    <img
-                      src={favorite.thumbnail}
-                      alt={favorite.title}
-                      className="favorite-thumbnail"
-                    />
-                  )}
-                  <div className="favorite-content">
-                    <h3>{favorite.title}</h3>
-                    {favorite.category && (
-                      <span className="favorite-category">{favorite.category}</span>
-                    )}
-                    <small>Lưu lúc: {new Date(favorite.createdAt).toLocaleDateString('vi-VN')}</small>
-                  </div>
-                  <div className="favorite-actions">
-                    <Link to={`/kien-thuc#${favorite.articleId?.slug}`} className="btn btn-sm">
-                      Đọc
-                    </Link>
-                    <button
-                      onClick={() => handleRemove(favorite._id)}
-                      className="btn btn-sm btn-danger"
-                    >
-                      Xóa
-                    </button>
-                  </div>
-                </div>
+        {/* Controls — only show when has data */}
+        {!loading && favorites && favorites.length > 0 && (
+          <div className="fav-controls">
+            {/* Search */}
+            <div className="fav-search-box">
+              <span>🔍</span>
+              <input
+                type="text"
+                placeholder="Tìm kiếm bài viết..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="fav-search-input"
+              />
+              {search && (
+                <button className="fav-clear-btn" onClick={() => setSearch('')}>✕</button>
+              )}
+            </div>
+
+            {/* Category filter */}
+            <div className="fav-filter-row">
+              <button
+                className={`fav-filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
+                onClick={() => setSelectedCategory('all')}
+              >
+                🌟 Tất cả
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  className={`fav-filter-btn ${selectedCategory === cat ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {CATEGORY_ICONS[cat] || '📌'} {cat}
+                </button>
               ))}
             </div>
-          ) : (
-            <div className="history-empty">
-              <div className="history-empty-icon">💝</div>
-              <h3>Chưa có bài viết yêu thích</h3>
-              <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-xl)' }}>
-                Hãy khám phá các bài viết kiến thức và nhấn nút yêu thích để lưu lại.
-              </p>
-              <Link to="/kien-thuc" className="btn btn-primary">📖 Khám Phá Kiến Thức</Link>
+
+            {/* Sort */}
+            <div className="fav-sort-row">
+              <span className="fav-sort-label">Sắp xếp:</span>
+              {[
+                { val: 'newest', label: 'Mới nhất' },
+                { val: 'oldest', label: 'Cũ nhất' },
+                { val: 'az', label: 'A → Z' },
+              ].map(s => (
+                <button
+                  key={s.val}
+                  className={`fav-sort-btn ${sortBy === s.val ? 'active' : ''}`}
+                  onClick={() => setSortBy(s.val)}
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Content */}
+        {renderContent()}
       </div>
-
-      <style>{`
-        .favorites-list {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .favorite-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 16px;
-          padding: 16px;
-          background: #f9f9f9;
-          border-radius: 6px;
-          border-left: 4px solid #ffc107;
-        }
-
-        .favorite-thumbnail {
-          width: 80px;
-          height: 80px;
-          object-fit: cover;
-          border-radius: 4px;
-          flex-shrink: 0;
-        }
-
-        .favorite-content {
-          flex: 1;
-        }
-
-        .favorite-content h3 {
-          margin: 0 0 8px 0;
-          font-size: 16px;
-        }
-
-        .favorite-category {
-          display: inline-block;
-          background: #e7f3ff;
-          color: #0066cc;
-          padding: 2px 8px;
-          border-radius: 3px;
-          font-size: 12px;
-          margin-bottom: 8px;
-        }
-
-        .favorite-content small {
-          display: block;
-          color: #999;
-          font-size: 12px;
-        }
-
-        .favorite-actions {
-          display: flex;
-          gap: 8px;
-          flex-shrink: 0;
-        }
-
-        .btn-sm {
-          padding: 6px 12px;
-          font-size: 12px;
-          white-space: nowrap;
-        }
-
-        .btn-danger {
-          background-color: #dc3545;
-          color: white;
-          border: none;
-          cursor: pointer;
-          border-radius: 4px;
-        }
-
-        .btn-danger:hover {
-          background-color: #c82333;
-        }
-
-        @media (max-width: 768px) {
-          .favorite-item {
-            flex-direction: column;
-          }
-
-          .favorite-thumbnail {
-            width: 100%;
-            height: 150px;
-          }
-
-          .favorite-actions {
-            width: 100%;
-          }
-
-          .favorite-actions button,
-          .favorite-actions a {
-            flex: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }

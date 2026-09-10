@@ -1,14 +1,21 @@
+/* ============================================================
+   MASTER PROFILE CMS — MasterProfileCMS.css v2
+   Uses variables from admin-theme.css
+   ============================================================ */
+
+/* local aliases for backward compat */
 :root {
   --primary-gold: #c5a059;
-  --accent-gold: #e2c286;
+  --accent-gold:  #e2c286;
   --primary-dark: #0f172a;
   --secondary-dark: #1e293b;
-  --card-bg: rgba(30, 41, 59, 0.7);
+  --card-bg: rgba(30,41,59,0.7);
   --success: #10b981;
   --warning: #f59e0b;
-  --danger: #ef4444;
-  --border: rgba(197, 160, 89, 0.2);
+  --danger:  #ef4444;
+  --border:  rgba(197,160,89,0.18);
 }
+
 
 .cms-page-container {
   padding: 2.5rem;

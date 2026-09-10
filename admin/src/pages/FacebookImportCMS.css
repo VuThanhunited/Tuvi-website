@@ -1,7 +1,13 @@
-/* ===== FacebookImportCMS.css ===== */
+/* ===== FacebookImportCMS.css v2 ===== */
 .fb-cms {
   padding: 2rem;
   color: #e2e8f0;
+  animation: pageEnter 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .fb-cms__header {
@@ -92,11 +98,18 @@
 }
 
 .fb-cms__card {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(197, 160, 89, 0.2);
-  border-radius: 16px;
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(197, 160, 89, 0.15);
+  border-radius: 20px;
   padding: 1.8rem;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  transition: border-color 0.25s;
+}
+
+.fb-cms__card:hover {
+  border-color: rgba(197, 160, 89, 0.25);
 }
 
 .fb-cms__card-header {
@@ -230,11 +243,19 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  transition: border-color 0.2s;
+  padding: 1rem 1.2rem;
+  background: rgba(9, 18, 42, 0.5);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  transition: all 0.2s;
+  animation: pageEnter 0.3s ease both;
+}
+
+.fb-cms__post-item:hover {
+  background: rgba(24, 119, 242, 0.04);
+  border-color: rgba(24, 119, 242, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 .fb-cms__post-item:hover { border-color: rgba(24, 119, 242, 0.3); }

@@ -1,14 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import './StaticPages.css';
+import './HistoryPage.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
-const NGU_HANH_COLORS = {
-  'Kim': '#C0C0C0', 'Thủy': '#1E90FF', 'Hỏa': '#FF4500',
-  'Thổ': '#DAA520', 'Mộc': '#2E8B57',
+const NGU_HANH_CONFIG = {
+  'Kim':  { color: '#C0C0C0', bg: 'rgba(192,192,192,0.12)', icon: '⚔️' },
+  'Thủy': { color: '#1E90FF', bg: 'rgba(30,144,255,0.12)',  icon: '💧' },
+  'Hỏa':  { color: '#FF6B35', bg: 'rgba(255,107,53,0.12)',  icon: '🔥' },
+  'Thổ':  { color: '#DAA520', bg: 'rgba(218,165,32,0.12)',  icon: '🌍' },
+  'Mộc':  { color: '#2ECC71', bg: 'rgba(46,204,113,0.12)',  icon: '🌿' },
 };
+
+const RATING_COLORS = { 5: '#10b981', 4: '#22c55e', 3: '#f59e0b', 2: '#f97316', 1: '#ef4444' };
+
+function StarRating({ value }) {
+  return (
+    <div className="hist-stars">
+      {[1, 2, 3, 4, 5].map(i => (
+        <span key={i} className={`hist-star ${i <= value ? 'filled' : ''}`}>★</span>
+      ))}
+    </div>
+  );
+}
 
 export default function HistoryPage() {
   const { token } = useAuth();
@@ -16,6 +31,9 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 1 });
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('newest'); // newest | oldest | rating
+  const [deletingId, setDeletingId] = useState(null);
 
   const fetchHistory = async (page = 1) => {
     setLoading(true);
@@ -39,6 +57,7 @@ export default function HistoryPage() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa lá số này?')) return;
+    setDeletingId(id);
     try {
       const res = await fetch(`${API_URL}/tuvi/${id}`, {
         method: 'DELETE',
@@ -51,6 +70,8 @@ export default function HistoryPage() {
       }
     } catch {
       alert('Xóa thất bại');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -64,133 +85,210 @@ export default function HistoryPage() {
     });
   };
 
+  // Filter + sort
+  const filtered = useMemo(() => {
+    let list = [...results];
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(r => r.hoTen?.toLowerCase().includes(q));
+    }
+    if (sortBy === 'newest') list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    else if (sortBy === 'oldest') list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    else if (sortBy === 'rating') list.sort((a, b) => (b.overallRating || 0) - (a.overallRating || 0));
+    return list;
+  }, [results, search, sortBy]);
+
   return (
-    <div className="static-page">
-      <div className="container">
-        <div className="static-page-header">
-          <h1>📜 Lịch Sử Lá Số Tử Vi</h1>
-          <p>Xem lại những lần tính tử vi trước đây của bạn ({pagination.total} kết quả)</p>
+    <div className="hist-page">
+      <div className="hist-container">
+        {/* Header */}
+        <div className="hist-header">
+          <div className="hist-header-icon">📜</div>
+          <div>
+            <h1 className="hist-title">Lịch Sử Lá Số Tử Vi</h1>
+            <p className="hist-subtitle">
+              Xem lại những lần tính tử vi trước đây của bạn
+              {pagination.total > 0 && <span className="hist-count-badge">{pagination.total} lá số</span>}
+            </p>
+          </div>
         </div>
 
+        {/* Controls */}
+        {!loading && !error && results.length > 0 && (
+          <div className="hist-controls">
+            <div className="hist-search-box">
+              <span className="hist-search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Tìm theo tên..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="hist-search-input"
+              />
+              {search && (
+                <button className="hist-search-clear" onClick={() => setSearch('')}>✕</button>
+              )}
+            </div>
+            <div className="hist-sort-tabs">
+              {[
+                { val: 'newest', label: '🕐 Mới nhất' },
+                { val: 'oldest', label: '📅 Cũ nhất' },
+                { val: 'rating', label: '⭐ Điểm cao' },
+              ].map(s => (
+                <button
+                  key={s.val}
+                  className={`hist-sort-tab ${sortBy === s.val ? 'active' : ''}`}
+                  onClick={() => setSortBy(s.val)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Content */}
         {loading ? (
-          <div className="content-card" style={{ textAlign: 'center', padding: '3rem' }}>
-            <div className="spinner" style={{ margin: '0 auto 1rem' }} />
-            <p style={{ color: '#888' }}>Đang tải lịch sử...</p>
+          <div className="hist-skeleton-list">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="hist-skeleton-card">
+                <div className="hist-skeleton-avatar" />
+                <div className="hist-skeleton-body">
+                  <div className="hist-skeleton-line hist-skeleton-line--wide" />
+                  <div className="hist-skeleton-line hist-skeleton-line--medium" />
+                  <div className="hist-skeleton-line hist-skeleton-line--narrow" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : error ? (
-          <div className="content-card" style={{ textAlign: 'center', padding: '2rem', color: '#c0392b' }}>
-            {error}
+          <div className="hist-error-card">
+            <div className="hist-error-icon">⚠️</div>
+            <p>{error}</p>
+            <button onClick={() => fetchHistory()} className="hist-retry-btn">🔄 Thử lại</button>
           </div>
-        ) : results.length === 0 ? (
-          <div className="content-card">
-            <div className="history-empty">
-              <div className="history-empty-icon">📭</div>
-              <h3>Chưa có lịch sử tính toán</h3>
-              <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-xl)' }}>
-                Hãy tạo lá số tử vi đầu tiên của bạn ngay!
-              </p>
-              <Link to="/xem-tu-vi" className="btn btn-primary">✨ Xem Tử Vi Ngay</Link>
+        ) : filtered.length === 0 ? (
+          <div className="hist-empty-card">
+            <div className="hist-empty-icon">
+              {search ? '🔍' : '📭'}
             </div>
+            <h3>{search ? `Không tìm thấy lá số nào khớp với "${search}"` : 'Chưa có lịch sử tính toán'}</h3>
+            <p>{search ? 'Thử tìm với từ khóa khác.' : 'Hãy tạo lá số tử vi đầu tiên của bạn ngay!'}</p>
+            {!search && (
+              <Link to="/xem-tu-vi" className="hist-cta-btn">✨ Xem Tử Vi Ngay</Link>
+            )}
           </div>
         ) : (
           <>
-            {/* History List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {results.map((r) => (
-                <div key={r._id} className="content-card" style={{
-                  padding: '1.2rem 1.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '1rem',
-                  flexWrap: 'wrap',
-                  transition: 'box-shadow 0.2s',
-                }}>
-                  {/* Info */}
-                  <div style={{ flex: 1, minWidth: '200px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                      <span style={{ fontSize: '1.3rem' }}>{r.conGiap?.emoji || '☯'}</span>
-                      <strong style={{ fontSize: '1.05rem' }}>{r.hoTen}</strong>
-                      <span style={{
-                        background: NGU_HANH_COLORS[r.nguHanh] || '#d4af37',
-                        color: '#fff',
-                        padding: '2px 10px',
-                        borderRadius: '12px',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                      }}>
-                        {r.nguHanh}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.85rem', color: '#666' }}>
-                      {r.canChi} • {r.gioiTinh === 'nam' ? 'Nam' : 'Nữ'} • 
-                      Sinh: {r.ngaySinh}/{r.thangSinh}/{r.namSinh} • 
-                      Giờ {r.gioChiName}
-                    </div>
-                  </div>
+            <div className="hist-list">
+              {filtered.map((r, idx) => {
+                const nguHanh = NGU_HANH_CONFIG[r.nguHanh] || { color: '#d4af37', bg: 'rgba(212,175,55,0.12)', icon: '☯' };
+                const isDeleting = deletingId === r._id;
+                return (
+                  <div
+                    key={r._id}
+                    className={`hist-card ${isDeleting ? 'hist-card--deleting' : ''}`}
+                    style={{ '--accent-color': nguHanh.color }}
+                  >
+                    {/* Left accent bar */}
+                    <div className="hist-card-accent" style={{ background: nguHanh.color }} />
 
-                  {/* Rating */}
-                  <div style={{ textAlign: 'center', minWidth: '80px' }}>
-                    <div style={{
-                      fontSize: '1.5rem', fontWeight: 700,
-                      color: r.overallRating >= 4 ? '#27ae60' : r.overallRating >= 3 ? '#f39c12' : '#e74c3c',
-                    }}>
-                      {r.overallRating}/5
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: '#999' }}>Điểm tổng</div>
-                  </div>
-
-                  {/* Date */}
-                  <div style={{ textAlign: 'center', minWidth: '120px', fontSize: '0.82rem', color: '#888' }}>
-                    {formatDate(r.createdAt)}
-                    <div style={{ color: '#bbb', fontSize: '0.72rem' }}>
-                      Xem: {r.viewCount || 1} lần
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Link
-                      to={`/ket-qua?id=${r._id}`}
-                      className="btn btn-primary btn-sm"
-                      style={{ fontSize: '0.8rem', padding: '0.4rem 1rem' }}
+                    {/* Avatar */}
+                    <div
+                      className="hist-card-avatar"
+                      style={{ background: nguHanh.bg, borderColor: nguHanh.color + '40' }}
                     >
-                      🔮 Xem
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(r._id)}
-                      className="btn btn-outline btn-sm"
-                      style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', color: '#c0392b', borderColor: '#c0392b' }}
-                    >
-                      🗑️
-                    </button>
+                      <span className="hist-avatar-emoji">{r.conGiap?.emoji || nguHanh.icon}</span>
+                      <span className="hist-avatar-num">#{idx + 1}</span>
+                    </div>
+
+                    {/* Main Info */}
+                    <div className="hist-card-body">
+                      <div className="hist-card-top">
+                        <div>
+                          <h3 className="hist-card-name">{r.hoTen}</h3>
+                          <div className="hist-card-meta">
+                            <span className="hist-tag" style={{ color: nguHanh.color, background: nguHanh.bg }}>
+                              {nguHanh.icon} {r.nguHanh}
+                            </span>
+                            <span className="hist-tag hist-tag--neutral">
+                              {r.canChi}
+                            </span>
+                            <span className="hist-tag hist-tag--neutral">
+                              {r.gioiTinh === 'nam' ? '♂' : '♀'} {r.gioiTinh === 'nam' ? 'Nam' : 'Nữ'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="hist-card-rating">
+                          <div className="hist-rating-num" style={{ color: RATING_COLORS[r.overallRating] || '#d4af37' }}>
+                            {r.overallRating}/5
+                          </div>
+                          <StarRating value={r.overallRating} />
+                        </div>
+                      </div>
+
+                      <div className="hist-card-detail">
+                        <span>📅 Sinh: {r.ngaySinh}/{r.thangSinh}/{r.namSinh}</span>
+                        <span>⏰ Giờ {r.gioChiName}</span>
+                        <span>👁 Xem {r.viewCount || 1} lần</span>
+                      </div>
+
+                      <div className="hist-card-footer">
+                        <span className="hist-card-date">🕐 {formatDate(r.createdAt)}</span>
+                        <div className="hist-card-actions">
+                          <Link
+                            to={`/ket-qua?id=${r._id}`}
+                            className="hist-btn hist-btn--primary"
+                          >
+                            🔮 Xem lại
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(r._id)}
+                            className="hist-btn hist-btn--danger"
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? '⏳' : '🗑️'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pagination */}
             {pagination.totalPages > 1 && (
-              <div style={{
-                display: 'flex', justifyContent: 'center', gap: '0.5rem',
-                marginTop: '2rem', flexWrap: 'wrap',
-              }}>
+              <div className="hist-pagination">
+                <button
+                  className="hist-page-btn hist-page-btn--nav"
+                  disabled={pagination.page <= 1}
+                  onClick={() => fetchHistory(pagination.page - 1)}
+                >
+                  ← Trước
+                </button>
                 {Array.from({ length: pagination.totalPages }, (_, i) => (
                   <button
                     key={i + 1}
+                    className={`hist-page-btn ${pagination.page === i + 1 ? 'active' : ''}`}
                     onClick={() => fetchHistory(i + 1)}
-                    className={`btn btn-sm ${pagination.page === i + 1 ? 'btn-primary' : 'btn-outline'}`}
-                    style={{ minWidth: '40px' }}
                   >
                     {i + 1}
                   </button>
                 ))}
+                <button
+                  className="hist-page-btn hist-page-btn--nav"
+                  disabled={pagination.page >= pagination.totalPages}
+                  onClick={() => fetchHistory(pagination.page + 1)}
+                >
+                  Sau →
+                </button>
               </div>
             )}
 
             {/* CTA */}
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-              <Link to="/xem-tu-vi" className="btn btn-primary">✨ Lập Lá Số Mới</Link>
+            <div className="hist-cta-row">
+              <Link to="/xem-tu-vi" className="hist-cta-btn">✨ Lập Lá Số Mới</Link>
             </div>
           </>
         )}

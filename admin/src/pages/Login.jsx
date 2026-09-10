@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Shield, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import './Login.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 
@@ -18,17 +19,13 @@ export default function Login() {
 
     try {
       const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-      
       if (res.data.success) {
         const { accessToken, user } = res.data.data;
-        
-        // Kiểm tra xem có phải admin không
         if (user.role !== 'admin') {
           setError('Tài khoản này không có quyền truy cập quản trị.');
           setLoading(false);
           return;
         }
-
         localStorage.setItem('token', accessToken);
         localStorage.setItem('user', JSON.stringify(user));
         window.location.href = '/dashboard';
@@ -41,180 +38,111 @@ export default function Login() {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={loginBoxStyle}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div style={logoIconStyle}>
-            <Shield size={32} color="#c5a059" />
+    <div className="login-page">
+      {/* Animated background */}
+      <div className="login-bg">
+        <div className="login-orb login-orb--1" />
+        <div className="login-orb login-orb--2" />
+        <div className="login-orb login-orb--3" />
+        <div className="login-grid" />
+      </div>
+
+      <div className="login-card scale-in">
+        {/* Top shimmer line */}
+        <div className="login-card__shimmer" />
+
+        {/* Logo */}
+        <div className="login-logo">
+          <div className="login-logo__icon">
+            <Shield size={28} color="#c5a059" strokeWidth={1.5} />
           </div>
-          <h1 style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '0.5rem' }}>TuVi CMS Login</h1>
-          <p style={{ color: '#94a3b8' }}>Hệ thống quản trị nội dung tử vi</p>
+          <div className="login-logo__badge">ADMIN</div>
         </div>
 
+        {/* Heading */}
+        <div className="login-heading">
+          <h1 className="login-heading__title">TuVi CMS</h1>
+          <p className="login-heading__sub">Hệ thống quản trị nội dung tử vi</p>
+        </div>
+
+        {/* Error */}
         {error && (
-          <div style={errorStyle}>
-            {error}
+          <div className="alert alert-error login-error">
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleLogin}>
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Email quản trị</label>
-            <div style={inputWrapperStyle}>
-              <User size={18} color="#94a3b8" style={inputIconStyle} />
-              <input 
-                type="email" 
+        {/* Form */}
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group">
+            <label className="form-label">Email quản trị</label>
+            <div className="login-input-wrap">
+              <User size={16} className="login-input-icon" />
+              <input
+                type="email"
+                className="form-control login-input"
                 placeholder="admin@tuvi.vn"
-                style={inputStyle}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
+                autoComplete="email"
               />
             </div>
           </div>
 
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Mật khẩu</label>
-            <div style={inputWrapperStyle}>
-              <Lock size={18} color="#94a3b8" style={inputIconStyle} />
-              <input 
-                type={showPassword ? "text" : "password"} 
+          <div className="form-group">
+            <label className="form-label">Mật khẩu</label>
+            <div className="login-input-wrap">
+              <Lock size={16} className="login-input-icon" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control login-input"
                 placeholder="••••••••"
-                style={inputStyle}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
+                className="login-eye-btn"
                 onClick={() => setShowPassword(!showPassword)}
-                style={eyeBtnStyle}
+                tabIndex={-1}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            style={loginBtnStyle}
+          <button
+            type="submit"
+            className={`btn btn-gold btn-lg login-submit ${loading ? 'btn-loading' : ''}`}
             disabled={loading}
           >
-            {loading ? <Loader2 className="spin" size={20} /> : 'Đăng nhập hệ thống'}
+            {loading ? (
+              <>
+                <Loader2 size={18} className="spin" />
+                Đang xác thực...
+              </>
+            ) : (
+              <>
+                <Shield size={18} />
+                Đăng nhập hệ thống
+              </>
+            )}
           </button>
         </form>
 
-        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-          <p style={{ color: '#64748b', fontSize: '0.85rem' }}>
-            &copy; 2026 TuVi Web Platform. All rights reserved.
+        {/* Footer */}
+        <div className="login-footer">
+          <div className="login-footer__divider" />
+          <p className="login-footer__copy">
+            © {new Date().getFullYear()} TuVi Web Platform
           </p>
+          <p className="login-footer__note">Chỉ dành cho quản trị viên có thẩm quyền</p>
         </div>
       </div>
     </div>
   );
 }
-
-// Styles
-const containerStyle = {
-  minHeight: '100vh',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: '#0f172a',
-  backgroundImage: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%)',
-  fontFamily: "'Inter', sans-serif"
-};
-
-const loginBoxStyle = {
-  width: '100%',
-  maxWidth: '420px',
-  padding: '3rem',
-  backgroundColor: '#1a1a2e',
-  borderRadius: '24px',
-  border: '1px solid rgba(197, 160, 89, 0.2)',
-  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-};
-
-const logoIconStyle = {
-  width: '64px',
-  height: '64px',
-  backgroundColor: 'rgba(197, 160, 89, 0.1)',
-  borderRadius: '16px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  margin: '0 auto 1.5rem',
-  border: '1px solid rgba(197, 160, 89, 0.2)'
-};
-
-const inputGroupStyle = {
-  marginBottom: '1.5rem'
-};
-
-const labelStyle = {
-  display: 'block',
-  color: '#94a3b8',
-  fontSize: '0.9rem',
-  marginBottom: '0.5rem',
-  fontWeight: '500'
-};
-
-const inputWrapperStyle = {
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center'
-};
-
-const inputIconStyle = {
-  position: 'absolute',
-  left: '1rem'
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '0.8rem 1rem 0.8rem 3rem',
-  backgroundColor: '#0f172a',
-  border: '1px solid rgba(197, 160, 89, 0.2)',
-  borderRadius: '12px',
-  color: '#fff',
-  fontSize: '1rem',
-  outline: 'none',
-  transition: 'border-color 0.3s'
-};
-
-const eyeBtnStyle = {
-  position: 'absolute',
-  right: '1rem',
-  background: 'none',
-  border: 'none',
-  color: '#94a3b8',
-  cursor: 'pointer'
-};
-
-const loginBtnStyle = {
-  width: '100%',
-  padding: '0.9rem',
-  backgroundColor: '#c5a059',
-  color: '#1a1a2e',
-  border: 'none',
-  borderRadius: '12px',
-  fontSize: '1rem',
-  fontWeight: '600',
-  cursor: 'pointer',
-  marginTop: '1rem',
-  transition: 'all 0.3s',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center'
-};
-
-const errorStyle = {
-  padding: '1rem',
-  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-  border: '1px solid rgba(239, 68, 68, 0.2)',
-  color: '#ef4444',
-  borderRadius: '12px',
-  marginBottom: '1.5rem',
-  fontSize: '0.9rem',
-  textAlign: 'center'
-};

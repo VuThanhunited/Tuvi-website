@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import './StaticPages.css';
+import './AuthPages.css';
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If already logged in, redirect
   const from = location.state?.from?.pathname || '/';
   useEffect(() => {
     if (isAuthenticated) {
@@ -23,10 +23,8 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const user = await login(form.email, form.password);
-      // Redirect admin to dashboard, others to previous page
       if (user.role === 'admin') {
         navigate('/admin/interpretations', { replace: true });
       } else {
@@ -40,65 +38,121 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-header">
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>☯</div>
-          <h1>Đăng Nhập</h1>
-          <p>Đăng nhập để lưu lịch sử và trải nghiệm đầy đủ</p>
+    <div className="auth-page-premium">
+      {/* Animated background */}
+      <div className="auth-bg-orbs">
+        <div className="auth-orb auth-orb--1" />
+        <div className="auth-orb auth-orb--2" />
+        <div className="auth-orb auth-orb--3" />
+      </div>
+
+      <div className="auth-card-premium">
+        {/* Top accent line */}
+        <div className="auth-card-accent" />
+
+        {/* Logo / Icon */}
+        <div className="auth-logo-section">
+          <div className="auth-logo-icon">
+            <span className="auth-logo-symbol">☯</span>
+          </div>
+          <h1 className="auth-title">Đăng Nhập</h1>
+          <p className="auth-subtitle">Chào mừng trở lại! Đăng nhập để lưu lịch sử và trải nghiệm đầy đủ.</p>
         </div>
 
+        {/* Error message */}
         {error && (
-          <div className="auth-error" style={{
-            background: '#ffeaea',
-            color: '#c0392b',
-            padding: '0.75rem 1rem',
-            borderRadius: '6px',
-            marginBottom: '1rem',
-            fontSize: '0.9rem',
-            textAlign: 'center',
-          }}>
-            {error}
+          <div className="auth-error-box">
+            <span className="auth-error-icon">⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input 
-              type="email" 
-              className="form-input" 
-              placeholder="Nhập email của bạn" 
-              value={form.email} 
-              onChange={e => setForm({...form, email: e.target.value})} 
-              required 
-              disabled={loading}
-            />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-form-group">
+            <label className="auth-label">
+              <span className="auth-label-icon">📧</span> Email
+            </label>
+            <div className="auth-input-wrapper">
+              <input
+                type="email"
+                className="auth-input"
+                placeholder="Nhập email của bạn"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                required
+                disabled={loading}
+                autoComplete="email"
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">Mật khẩu</label>
-            <input 
-              type="password" 
-              className="form-input" 
-              placeholder="Nhập mật khẩu" 
-              value={form.password} 
-              onChange={e => setForm({...form, password: e.target.value})} 
-              required 
-              disabled={loading}
-            />
+
+          <div className="auth-form-group">
+            <label className="auth-label">
+              <span className="auth-label-icon">🔑</span> Mật khẩu
+            </label>
+            <div className="auth-input-wrapper auth-input-wrapper--password">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="auth-input"
+                placeholder="Nhập mật khẩu"
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                required
+                disabled={loading}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="auth-eye-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
-          <button 
-            type="submit" 
-            className="btn btn-primary btn-lg" 
-            style={{ width: '100%' }}
+
+          <div className="auth-forgot-row">
+            <Link to="/quen-mat-khau" className="auth-forgot-link">Quên mật khẩu?</Link>
+          </div>
+
+          <button
+            type="submit"
+            className="auth-submit-btn"
             disabled={loading}
           >
-            {loading ? '⏳ Đang đăng nhập...' : '🔐 Đăng Nhập'}
+            {loading ? (
+              <span className="auth-spinner-row">
+                <span className="auth-spinner" />
+                Đang đăng nhập...
+              </span>
+            ) : (
+              <>🔐 Đăng Nhập</>
+            )}
           </button>
         </form>
 
-        <div className="auth-footer">
-          Chưa có tài khoản? <Link to="/dang-ky">Đăng ký ngay</Link>
+        {/* Divider */}
+        <div className="auth-divider">
+          <span>hoặc</span>
+        </div>
+
+        {/* Social hints */}
+        <div className="auth-social-row">
+          <button className="auth-social-btn" disabled title="Sắp ra mắt">
+            <span>G</span> Google
+          </button>
+          <button className="auth-social-btn" disabled title="Sắp ra mắt">
+            <span>f</span> Facebook
+          </button>
+        </div>
+
+        {/* Footer */}
+        <div className="auth-footer-text">
+          Chưa có tài khoản?{' '}
+          <Link to="/dang-ky" className="auth-footer-link">Đăng ký ngay →</Link>
         </div>
       </div>
     </div>
