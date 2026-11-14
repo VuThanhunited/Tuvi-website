@@ -39,14 +39,33 @@
 }
 
 .ketqua-title-line {
-  width: 78px;
+  width: 96px;
   height: 1.5px;
   background: linear-gradient(90deg, transparent, #c9a154);
   position: relative;
 }
 
+.ketqua-title-line--left::after,
+.ketqua-title-line--right::before {
+  content: '◇';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-52%);
+  font-size: 0.7rem;
+  color: #c9a154;
+  line-height: 1;
+}
+
+.ketqua-title-line--left::after {
+  right: -8px;
+}
+
 .ketqua-title-line--right {
   background: linear-gradient(90deg, #c9a154, transparent);
+}
+
+.ketqua-title-line--right::before {
+  left: -8px;
 }
 
 .ketqua-main-title {
@@ -493,6 +512,23 @@
 .center-main-title--emblem {
   font-size: 1.72rem;
   margin-bottom: 4px;
+}
+
+.center-yinyang-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.center-cloud-svg {
+  width: 30px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.center-cloud-svg--right {
+  transform: scaleX(-1);
 }
 
 .center-yinyang-svg {

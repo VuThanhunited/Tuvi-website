@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import ParticleBackground from '../components/ParticleBackground/ParticleBackground.jsx';
 import './TuViResult.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
@@ -29,7 +28,7 @@ const CUNG_INTRO_MAP = {
   'Huynh Đệ': 'Cung Huynh Đệ chủ về anh chị em trong gia đình, bạn đồng hành thân cận. Khi luận giải, cần đối chiếu với các cung Điền Trạch, Nô Bộc và Tật Ách.',
 };
 
-/* ── Lá số mẫu mặc định khi mở trực tiếp /ket-qua hoặc chưa lập lá số ── */
+/* ── Lá số mẫu mặc định theo đúng hình mẫu khách hàng ── */
 const DEFAULT_MOCK_RESULT = {
   _isMockDefault: true,
   hoTen: 'Lá số Tử Vi',
@@ -116,22 +115,30 @@ function GreekKeyCorner({ className }) {
   );
 }
 
-/* ── Biểu tượng Âm Dương vàng ── */
+/* ── Biểu tượng Âm Dương vàng kèm mây lành 2 bên giống ảnh mẫu ── */
 function GoldYinYangSvg({ size = 44 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden="true" className="center-yinyang-svg">
-      <defs>
-        <linearGradient id="qtvGoldYin" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#f3cd69" />
-          <stop offset="50%" stopColor="#d19a33" />
-          <stop offset="100%" stopColor="#b07619" />
-        </linearGradient>
-      </defs>
-      <circle cx="24" cy="24" r="21" fill="#fffdf6" stroke="#d5ab54" strokeWidth="2" />
-      <path d="M24 3A21 21 0 0 1 24 45A10.5 10.5 0 0 1 24 24A10.5 10.5 0 0 0 24 3Z" fill="url(#qtvGoldYin)" />
-      <circle cx="24" cy="13.5" r="3.2" fill="url(#qtvGoldYin)" />
-      <circle cx="24" cy="34.5" r="3.2" fill="#fffdf6" />
-    </svg>
+    <div className="center-yinyang-row" aria-hidden="true">
+      <svg className="center-cloud-svg" viewBox="0 0 36 16" fill="none">
+        <path d="M4 13H28C31 13 33 11 33 8.5C33 6 30.5 4.5 28 5C27 2.5 24 1 21 2C18.5 0.5 14.5 1.5 13.5 4.5C11 4 8.5 5.5 8 8C5.5 8 3 9.5 4 13Z" fill="#e5be6d" opacity="0.85" />
+      </svg>
+      <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className="center-yinyang-svg">
+        <defs>
+          <linearGradient id="qtvGoldYin" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#e8ba54" />
+            <stop offset="50%" stopColor="#c98e27" />
+            <stop offset="100%" stopColor="#9f6810" />
+          </linearGradient>
+        </defs>
+        <circle cx="24" cy="24" r="21" fill="#fffdf6" stroke="#d5ab54" strokeWidth="2" />
+        <path d="M24 3A21 21 0 0 1 24 45A10.5 10.5 0 0 1 24 24A10.5 10.5 0 0 0 24 3Z" fill="url(#qtvGoldYin)" />
+        <circle cx="24" cy="13.5" r="3.2" fill="url(#qtvGoldYin)" />
+        <circle cx="24" cy="34.5" r="3.2" fill="#fffdf6" />
+      </svg>
+      <svg className="center-cloud-svg center-cloud-svg--right" viewBox="0 0 36 16" fill="none">
+        <path d="M4 13H28C31 13 33 11 33 8.5C33 6 30.5 4.5 28 5C27 2.5 24 1 21 2C18.5 0.5 14.5 1.5 13.5 4.5C11 4 8.5 5.5 8 8C5.5 8 3 9.5 4 13Z" fill="#e5be6d" opacity="0.85" />
+      </svg>
+    </div>
   );
 }
 
@@ -223,7 +230,7 @@ function CungCard({ cung, gridPos, tamPhuongBadge, isActive, isSelected, isMockD
     ...(cung.namXemHoaTinh || []),
   ];
 
-  // Chế độ xem mẫu tối giản trước khi lập lá số (giống hệt ảnh mẫu khách hàng)
+  // Chế độ xem mẫu tối giản giống hệt ảnh mẫu khách hàng
   if (!hasRealStars) {
     return (
       <div
@@ -318,11 +325,15 @@ export default function TuViResult({ embedded = false, externalResult = null, on
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isAdmin, token } = useAuth();
+  const { user, token } = useAuth();
 
-  const [result, setResult] = useState(null);
+  // Tài khoản thường (role === 'user') chỉ hiện từ trên đến hết phần Luận giải;
+  // Tài khoản Admin hoặc giao diện mặc định hiển thị đầy đủ cả khung QUÁN TỬ VI như hình mẫu.
+  const showQuanTuVi = user?.role !== 'user';
+
+  const [result, setResult] = useState(DEFAULT_MOCK_RESULT);
   const [hoveredGridPos, setHoveredGridPos] = useState(null);
-  const [selectedCungIdx, setSelectedCungIdx] = useState(null);
+  const [selectedCungIdx, setSelectedCungIdx] = useState(0);
   const [showBirthInfo, setShowBirthInfo] = useState(true);
   const [selectedQtvIdx, setSelectedQtvIdx] = useState(0);
   const [updatingYear, setUpdatingYear] = useState(false);
@@ -371,29 +382,14 @@ export default function TuViResult({ embedded = false, externalResult = null, on
       return;
     }
 
-    // Fallback: lấy lá số gần nhất trong localStorage, hoặc dùng lá số mẫu chuẩn mockup (không redirect)
-    try {
-      const cached = localStorage.getItem('last_tuvi_result');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && Array.isArray(parsed.cungResults) && parsed.cungResults.length > 0) {
-          applyResult(parsed);
-          return;
-        }
-      }
-    } catch {
-      // ignore parse errors
-    }
-
     applyResult(DEFAULT_MOCK_RESULT);
   }, [embedded, externalResult, location.state, searchParams, authToken]);
 
-  // Nếu user là admin và vào từ state/cache nhưng chưa có quanTuViResults -> fetch lại theo ID
+  // Nếu có lá số thật nhưng chưa có quanTuViResults -> fetch lại theo ID
   useEffect(() => {
-    if (isAdmin && result?._id && !result._isMockDefault && !result.quanTuViResults && authToken) {
-      fetch(`${API_URL}/tuvi/${result._id}`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      })
+    if (showQuanTuVi && result?._id && !result._isMockDefault && !result.quanTuViResults) {
+      const headers = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+      fetch(`${API_URL}/tuvi/${result._id}`, { headers })
         .then(res => res.json())
         .then(data => {
           if (data.success && data.data?.quanTuViResults) {
@@ -402,7 +398,7 @@ export default function TuViResult({ embedded = false, externalResult = null, on
         })
         .catch(() => {});
     }
-  }, [isAdmin, result?._id, result?._isMockDefault, result?.quanTuViResults, authToken]);
+  }, [showQuanTuVi, result?._id, result?._isMockDefault, result?.quanTuViResults, authToken]);
 
   // Lưu lịch sử gần đây vào localStorage (chỉ lưu lá số thật)
   useEffect(() => {
@@ -487,25 +483,14 @@ export default function TuViResult({ embedded = false, externalResult = null, on
     }).filter(item => item.idx !== -1);
   }, [result?.cungResults]);
 
-  if (!result) {
-    return (
-      <div className={embedded ? 'result-embedded' : 'result-page'}>
-        <div className="container" style={{ textAlign: 'center', paddingTop: '2.5rem' }}>
-          <div className="spinner" style={{ margin: '0 auto' }} />
-          <p style={{ color: '#7a1618', marginTop: '1rem', fontWeight: 600 }}>Đang tải lá số...</p>
-        </div>
-      </div>
-    );
-  }
-
   const isMockDefault = Boolean(result._isMockDefault);
   const menhIndex = result.cungResults?.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
   const selectedCung = selectedCungIdx !== null ? result.cungResults?.[selectedCungIdx] : result.cungResults?.[menhIndex !== -1 ? menhIndex : 0];
   const fallbackGridPos = selectedCung?.gridIdx ?? (menhIndex !== -1 ? result.cungResults[menhIndex]?.gridIdx : 0) ?? 0;
   const activeGridPos = hoveredGridPos !== null ? hoveredGridPos : fallbackGridPos;
 
-  // Khi đang xem lá số thật và hover/chọn cung, đánh số Tam phương Tứ chính 1-2-3-4
-  const showTamPhuong = !isMockDefault || hoveredGridPos !== null;
+  // Khi đang xem lá số thật, đánh số Tam phương Tứ chính 1-2-3-4
+  const showTamPhuong = !isMockDefault;
   const tamPhuongMap = showTamPhuong ? {
     [activeGridPos]: 1,
     [(activeGridPos + 8) % 12]: 2,
@@ -583,7 +568,6 @@ export default function TuViResult({ embedded = false, externalResult = null, on
 
                   {/* Thiên Bàn ở giữa */}
                   <div className="astrology-center">
-                    <ParticleBackground />
                     <div className="center-medallion">
                       <div className="center-medallion-inner">
                         {isMockDefault || !showBirthInfo ? (
@@ -788,9 +772,9 @@ export default function TuViResult({ embedded = false, externalResult = null, on
           </section>
         </div>
 
-        {/* ═══ KHỐI DƯỚI: QUÁN TỬ VI — CHỈ HIỂN THỊ VỚI TÀI KHOẢN ADMIN ═══ */}
-        {isAdmin && (
-          <section className="quantuvi-admin-section" aria-label="Quán Tử Vi - Dành riêng cho Admin">
+        {/* ═══ KHỐI DƯỚI: QUÁN TỬ VI ═══ */}
+        {showQuanTuVi && (
+          <section className="quantuvi-admin-section" aria-label="Quán Tử Vi">
             <div className="quantuvi-header">
               <div className="quantuvi-header-icon">
                 <LotusIcon />

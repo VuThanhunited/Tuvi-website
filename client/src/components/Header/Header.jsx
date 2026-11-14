@@ -72,7 +72,7 @@ export default function Header() {
   }, [menuOpen]);
 
   const isGroupActive = (paths) => paths.some((p) => {
-    if (p === '/') return location.pathname === '/' || location.pathname === '/bai-viet';
+    if (p === '/') return location.pathname === '/' || location.pathname === '/bai-viet' || location.pathname === '/ket-qua';
     return location.pathname === p || location.pathname.startsWith(`${p}/`);
   });
 
@@ -87,7 +87,7 @@ export default function Header() {
       to: '/xem-tu-vi',
       label: 'Lập lá số Tử Vi',
       icon: <YinYangNavIcon />,
-      active: isGroupActive(['/xem-tu-vi', '/la-so', '/ket-qua']),
+      active: isGroupActive(['/xem-tu-vi', '/la-so']),
     },
     {
       to: '/kien-thuc',
@@ -109,14 +109,10 @@ export default function Header() {
     },
   ];
 
-  const showBannerInHeader = location.pathname !== '/';
-
   return (
     <>
       <header className="qtv-header" id="main-header">
         <div className="qtv-header-inner">
-          <div className="qtv-header-spacer" aria-hidden="true" />
-
           {/* Main 5 Navigation Links matching mockup */}
           <nav className={`qtv-nav ${menuOpen ? 'open' : ''}`} id="nav-menu" aria-label="Điều hướng chính">
             {navItems.map((item, idx) => (
@@ -133,30 +129,23 @@ export default function Header() {
             ))}
 
             {/* Mobile Auth Section inside Drawer */}
-            <div className="qtv-nav-mobile-auth">
-              {isAuthenticated ? (
-                <>
-                  <div className="qtv-mobile-user-info">
-                    <span>{user?.hoTen || user?.email || 'Thành viên'}</span>
-                    {isAdmin && <span className="qtv-admin-pill">Admin</span>}
-                  </div>
-                  <Link to="/lich-su" className="qtv-mobile-btn">Lịch sử lá số</Link>
-                  <button type="button" className="qtv-mobile-btn qtv-mobile-btn-logout" onClick={handleLogout}>
-                    Đăng xuất
-                  </button>
-                </>
-              ) : (
-                <div className="qtv-mobile-auth-btns">
-                  <Link to="/dang-nhap" className="qtv-mobile-btn">Đăng nhập</Link>
-                  <Link to="/dang-ky" className="qtv-mobile-btn qtv-mobile-btn-gold">Đăng ký</Link>
+            {isAuthenticated && (
+              <div className="qtv-nav-mobile-auth">
+                <div className="qtv-mobile-user-info">
+                  <span>{user?.hoTen || user?.email || 'Thành viên'}</span>
+                  {isAdmin && <span className="qtv-admin-pill">Admin</span>}
                 </div>
-              )}
-            </div>
+                <Link to="/lich-su" className="qtv-mobile-btn">Lịch sử lá số</Link>
+                <button type="button" className="qtv-mobile-btn qtv-mobile-btn-logout" onClick={handleLogout}>
+                  Đăng xuất
+                </button>
+              </div>
+            )}
           </nav>
 
-          {/* Compact Auth Controls on Top Right */}
-          <div className="qtv-header-auth">
-            {isAuthenticated ? (
+          {/* Compact Auth Controls on Top Right when logged in */}
+          {isAuthenticated && (
+            <div className="qtv-header-auth">
               <div className="qtv-user-chip">
                 {isAdmin && <span className="qtv-admin-pill">Admin</span>}
                 <Link to="/lich-su" className="qtv-auth-user-name" title="Xem lịch sử lá số">
@@ -166,13 +155,8 @@ export default function Header() {
                   Thoát
                 </button>
               </div>
-            ) : (
-              <div className="qtv-auth-links">
-                <Link to="/dang-nhap" className="qtv-auth-mini-link">Đăng nhập</Link>
-                <Link to="/dang-ky" className="qtv-auth-mini-link qtv-auth-mini-gold">Đăng ký</Link>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Mobile Hamburger */}
           <button
@@ -189,8 +173,8 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Banner Quán Tử Vi hiển thị ngay dưới thanh menu trên các trang con (Trang chủ đã có HomeBanner riêng) */}
-      {showBannerInHeader && <HomeBanner />}
+      {/* Banner Quán Tử Vi hiển thị ngay dưới thanh menu trên mọi trang */}
+      <HomeBanner />
     </>
   );
 }

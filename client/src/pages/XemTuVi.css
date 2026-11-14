@@ -1,9 +1,9 @@
 /* ============================================
-   XEM TU VI PAGE — Quán Tử Vi Warm Parchment Theme
+   XEM TU VI PAGE — Thiết kế Quán Tử Vi đồng bộ
    ============================================ */
 
 .xemtuvi-page {
-  padding-top: 24px;
+  padding-top: 22px;
   padding-bottom: 36px;
   min-height: 100vh;
   background: radial-gradient(circle at top, #fffaf0 0%, #f7ebd0 65%, #f0dcaf 100%);
@@ -11,9 +11,66 @@
 }
 
 .xemtuvi-form-section {
-  max-width: 820px;
+  max-width: 780px;
   margin: 0 auto 24px;
   padding: 0 18px;
+}
+
+.qtv-form-card {
+  background: #fbf1da;
+  border: 1.5px solid #d5b473;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(90, 48, 12, 0.12);
+}
+
+.qtv-form-card-header {
+  background: linear-gradient(180deg, #8e1416 0%, #64080a 100%);
+  border-bottom: 2px solid #d8b468;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.qtv-form-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.xemtuvi-lotus-svg {
+  width: 28px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.qtv-form-card-header h2 {
+  margin: 0;
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #fce4a6;
+  letter-spacing: 0.01em;
+}
+
+.qtv-form-badge-free {
+  background: linear-gradient(180deg, #b8dc8e 0%, #8fbc60 100%);
+  color: #244711;
+  border: 1px solid #6c9a3f;
+  border-radius: 999px;
+  padding: 3px 13px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.qtv-form-card-body {
+  padding: 20px 24px;
+  background: #fffcf4;
+  border-top: 1px solid rgba(213, 180, 115, 0.3);
 }
 
 .xemtuvi-error-alert {
@@ -47,97 +104,21 @@
   font-size: 0.85rem;
 }
 
-/* ====== SCROLL ROLL STYLING ====== */
-.scroll-wrapper-container {
-  width: 100%;
-  padding: 0 28px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 465px;
-  box-sizing: border-box;
-}
-
-.scroll-edge-left {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.scroll-edge-right {
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: rotate(180deg);
-  height: 100%;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.scroll-paper-body {
-  width: 100%;
-  min-height: 430px;
-  background-color: #fbf0d9;
-  background-image: url("/images/page-roll.png");
-  background-size: cover;
-  background-position: center center;
-  border: 1.5px solid #d5b473;
-  box-shadow: 0 6px 20px rgba(90, 48, 12, 0.14);
-  padding: 42px 34px 28px 34px;
-  z-index: 5;
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 6px;
-}
-
-/* Red Title Capsule Banner */
-.scroll-title-capsule {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: -60px auto 20px auto;
-  background: linear-gradient(135deg, #8e1416, #64080a);
-  border: 2px solid #f5d27b;
-  padding: 8px 30px;
-  border-radius: 30px;
-  box-shadow: 0 4px 10px rgba(60, 8, 8, 0.25);
-  max-width: 300px;
-  position: relative;
-  z-index: 10;
-}
-
-.scroll-title-text {
-  font-family: var(--font-display, 'Playfair Display', serif);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #fce4a6;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.45);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 /* Form Fields */
-.scroll-form-inner {
+.qtv-form-inner {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 14px;
 }
 
-.scroll-form-row {
+.qtv-form-row {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.scroll-form-label {
-  width: 90px;
+.qtv-form-label {
+  width: 95px;
   font-size: 0.9rem;
   font-weight: 700;
   color: #4a2611;
@@ -145,44 +126,44 @@
   text-align: left;
 }
 
-.scroll-form-input {
+.qtv-form-input {
   flex: 1;
   padding: 8px 12px;
   font-size: 0.9rem;
   color: #2c1b0e;
   background-color: #fffdf8;
   border: 1px solid #d5b473;
-  border-radius: 5px;
+  border-radius: 6px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.scroll-form-input:focus {
+.qtv-form-input:focus {
   border-color: #8e1416;
   box-shadow: 0 0 0 2px rgba(142, 20, 22, 0.12);
 }
 
-.scroll-form-input::placeholder {
+.qtv-form-input::placeholder {
   color: #a69174;
 }
 
-.scroll-form-select {
+.qtv-form-select {
   flex: 1;
   padding: 8px 12px;
   font-size: 0.9rem;
   color: #2c1b0e;
   background-color: #fffdf8;
   border: 1px solid #d5b473;
-  border-radius: 5px;
+  border-radius: 6px;
   outline: none;
   cursor: pointer;
 }
 
-.scroll-form-select:focus {
+.qtv-form-select:focus {
   border-color: #8e1416;
 }
 
-.scroll-form-date-group {
+.qtv-form-date-group {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -190,29 +171,24 @@
   flex-wrap: wrap;
 }
 
-.scroll-form-date-group--half {
-  flex: 1;
-  max-width: 100%;
-}
-
-.scroll-input--year {
+.qtv-input--year {
   max-width: 120px;
 }
 
-.scroll-inline-label {
+.qtv-inline-label {
   font-size: 0.85rem;
   color: #5c3e21;
   font-weight: 600;
   white-space: nowrap;
 }
 
-.scroll-form-radio-group {
+.qtv-form-radio-group {
   display: flex;
   gap: 20px;
   align-items: center;
 }
 
-.scroll-radio-label {
+.qtv-radio-label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -223,60 +199,48 @@
   user-select: none;
 }
 
-.scroll-radio-label input[type="radio"] {
+.qtv-radio-label input[type="radio"] {
   width: 16px;
   height: 16px;
   accent-color: #8e1416;
   cursor: pointer;
 }
 
-.scroll-submit-row {
-  margin-top: 8px;
+.qtv-submit-row {
+  margin-top: 6px;
   display: flex;
   justify-content: center;
 }
 
-.scroll-submit-btn {
+.qtv-submit-btn {
   background: linear-gradient(180deg, #9a181a 0%, #6d0709 100%);
   color: #fce4a6;
   border: 1.5px solid #e2b85c;
-  border-radius: 6px;
-  padding: 9px 38px;
+  border-radius: 7px;
+  padding: 10px 38px;
   font-size: 0.95rem;
   font-weight: 700;
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
   cursor: pointer;
   box-shadow: 0 3px 10px rgba(107, 21, 21, 0.25);
   transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
-.scroll-submit-btn:hover {
-  background: linear-gradient(180deg, #b01e21 0%, #83090c 100%);
+.qtv-submit-btn:hover {
+  background: linear-gradient(180deg, #b31d20 0%, #7d0a0c 100%);
   transform: translateY(-1px);
-  box-shadow: 0 5px 14px rgba(107, 21, 21, 0.35);
 }
 
-@media (max-width: 768px) {
-  .scroll-wrapper-container {
-    padding: 0 12px;
+@media (max-width: 680px) {
+  .qtv-form-card-body {
+    padding: 16px;
   }
-  .scroll-edge-left,
-  .scroll-edge-right {
-    display: none;
-  }
-  .scroll-paper-body {
-    padding: 36px 18px 22px;
-  }
-  .scroll-form-row {
+  .qtv-form-row {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 6px;
   }
-  .scroll-form-label {
-    width: 100%;
-  }
-  .scroll-form-date-group {
-    width: 100%;
+  .qtv-form-label {
+    width: auto;
   }
 }

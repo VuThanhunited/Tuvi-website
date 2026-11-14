@@ -13,10 +13,23 @@ const THANG_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
 
 const NGAY_OPTIONS = Array.from({ length: 31 }, (_, i) => ({
   value: String(i + 1),
-  label: String(i + 1),
+  label: `Ngày ${i + 1}`,
 }));
 
 const currentYear = new Date().getFullYear();
+
+function LotusIcon() {
+  return (
+    <svg className="xemtuvi-lotus-svg" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M18 3C15.5 8 14.5 13 18 19C21.5 13 20.5 8 18 3Z" stroke="#f5d27b" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M18 19C12 16 9.5 11.5 10.5 6.5C13.5 9.5 16 13.5 18 19Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 19C24 16 26.5 11.5 25.5 6.5C22.5 9.5 20 13.5 18 19Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 20C10.5 20 6 16.5 4.5 11.5C9.5 13 13.5 15.5 18 20Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 20C25.5 20 30 16.5 31.5 11.5C26.5 13 22.5 15.5 18 20Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M8 22.5C13 21 23 21 28 22.5" stroke="#f5d27b" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export default function XemTuVi() {
   const navigate = useNavigate();
@@ -27,6 +40,7 @@ export default function XemTuVi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isLunar, setIsLunar] = useState(false);
+  const [calculatedResult, setCalculatedResult] = useState(null);
   const [formData, setFormData] = useState({
     hoTen: '',
     gioiTinh: 'nam',
@@ -99,6 +113,7 @@ export default function XemTuVi() {
         // ignore storage quota
       }
 
+      setCalculatedResult(data.data);
       navigate('/ket-qua', { state: data.data });
     } catch (err) {
       setError(err.message);
@@ -110,17 +125,16 @@ export default function XemTuVi() {
   return (
     <div className="xemtuvi-page">
       <div className="xemtuvi-form-section" ref={formSectionRef}>
-        <div className="scroll-wrapper-container">
-          <img className="scroll-edge-left" src="/images/page-edge.png" alt="Scroll Handle Left" />
-          <img className="scroll-edge-right" src="/images/page-edge.png" alt="Scroll Handle Right" />
-
-          <div className="scroll-paper-body">
-            <div className="scroll-title-capsule">
-              <div className="capsule-left-decor" />
-              <span className="scroll-title-text">Lập lá số Tử Vi</span>
-              <div className="capsule-right-decor" />
+        <section className="qtv-form-card">
+          <div className="qtv-form-card-header">
+            <div className="qtv-form-card-title-group">
+              <LotusIcon />
+              <h2>Lập lá số Tử Vi</h2>
             </div>
+            <span className="qtv-form-badge-free">Miễn phí</span>
+          </div>
 
+          <div className="qtv-form-card-body">
             {loading ? (
               <div className="xemtuvi-loading">
                 <div className="spinner" />
@@ -128,34 +142,34 @@ export default function XemTuVi() {
                 <span>Phân tích 12 cung, an sao, luận giải chi tiết</span>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="scroll-form-inner">
+              <form onSubmit={handleSubmit} className="qtv-form-inner">
                 {error && (
                   <div className="xemtuvi-error-alert">
                     {error}
                   </div>
                 )}
 
-                <div className="scroll-form-row">
-                  <label className="scroll-form-label" htmlFor="hoTen-xem">Họ Tên</label>
+                <div className="qtv-form-row">
+                  <label className="qtv-form-label" htmlFor="hoTen-xem">Họ Tên</label>
                   <input
                     ref={nameInputRef}
                     type="text"
                     id="hoTen-xem"
                     name="hoTen"
-                    className="scroll-form-input"
-                    placeholder="Nhập họ tên"
+                    className="qtv-form-input"
+                    placeholder="Nhập họ tên đương số"
                     value={formData.hoTen}
                     onChange={handleChange}
                     required
                   />
                 </div>
 
-                <div className="scroll-form-row">
-                  <label className="scroll-form-label">Ngày sinh</label>
-                  <div className="scroll-form-date-group">
+                <div className="qtv-form-row">
+                  <label className="qtv-form-label">Ngày sinh</label>
+                  <div className="qtv-form-date-group">
                     <select
                       name="ngaySinh"
-                      className="scroll-form-select"
+                      className="qtv-form-select"
                       value={formData.ngaySinh}
                       onChange={handleChange}
                       required
@@ -166,7 +180,7 @@ export default function XemTuVi() {
                     </select>
                     <select
                       name="thangSinh"
-                      className="scroll-form-select"
+                      className="qtv-form-select"
                       value={formData.thangSinh}
                       onChange={handleChange}
                       required
@@ -178,7 +192,7 @@ export default function XemTuVi() {
                     <input
                       type="number"
                       name="namSinh"
-                      className="scroll-form-input scroll-input--year"
+                      className="qtv-form-input qtv-input--year"
                       placeholder="1990"
                       min="1900"
                       max={currentYear}
@@ -189,10 +203,10 @@ export default function XemTuVi() {
                   </div>
                 </div>
 
-                <div className="scroll-form-row">
-                  <label className="scroll-form-label" />
-                  <div className="scroll-form-radio-group">
-                    <label className={`scroll-radio-label ${!isLunar ? 'active' : ''}`}>
+                <div className="qtv-form-row">
+                  <label className="qtv-form-label">Loại lịch</label>
+                  <div className="qtv-form-radio-group">
+                    <label className={`qtv-radio-label ${!isLunar ? 'active' : ''}`}>
                       <input
                         type="radio"
                         name="calendarType"
@@ -201,7 +215,7 @@ export default function XemTuVi() {
                       />
                       <span>Lịch dương</span>
                     </label>
-                    <label className={`scroll-radio-label ${isLunar ? 'active' : ''}`}>
+                    <label className={`qtv-radio-label ${isLunar ? 'active' : ''}`}>
                       <input
                         type="radio"
                         name="calendarType"
@@ -213,11 +227,11 @@ export default function XemTuVi() {
                   </div>
                 </div>
 
-                <div className="scroll-form-row">
-                  <label className="scroll-form-label">Giờ sinh</label>
-                  <div className="scroll-form-date-group">
+                <div className="qtv-form-row">
+                  <label className="qtv-form-label">Giờ sinh</label>
+                  <div className="qtv-form-date-group">
                     <select
-                      className="scroll-form-select"
+                      className="qtv-form-select"
                       value={timezone}
                       onChange={(e) => setTimezone(e.target.value)}
                     >
@@ -226,7 +240,7 @@ export default function XemTuVi() {
                       <option value="GMT+9">GMT +9</option>
                     </select>
                     <select
-                      className="scroll-form-select"
+                      className="qtv-form-select"
                       value={birthHour}
                       onChange={(e) => setBirthHour(e.target.value)}
                     >
@@ -235,7 +249,7 @@ export default function XemTuVi() {
                       ))}
                     </select>
                     <select
-                      className="scroll-form-select"
+                      className="qtv-form-select"
                       value={birthMin}
                       onChange={(e) => setBirthMin(e.target.value)}
                     >
@@ -246,10 +260,10 @@ export default function XemTuVi() {
                   </div>
                 </div>
 
-                <div className="scroll-form-row">
-                  <label className="scroll-form-label">Giới tính</label>
-                  <div className="scroll-form-radio-group">
-                    <label className={`scroll-radio-label ${formData.gioiTinh === 'nam' ? 'active' : ''}`}>
+                <div className="qtv-form-row">
+                  <label className="qtv-form-label">Giới tính</label>
+                  <div className="qtv-form-radio-group">
+                    <label className={`qtv-radio-label ${formData.gioiTinh === 'nam' ? 'active' : ''}`}>
                       <input
                         type="radio"
                         name="gioiTinh"
@@ -259,7 +273,7 @@ export default function XemTuVi() {
                       />
                       <span>Nam</span>
                     </label>
-                    <label className={`scroll-radio-label ${formData.gioiTinh === 'nu' ? 'active' : ''}`}>
+                    <label className={`qtv-radio-label ${formData.gioiTinh === 'nu' ? 'active' : ''}`}>
                       <input
                         type="radio"
                         name="gioiTinh"
@@ -272,20 +286,20 @@ export default function XemTuVi() {
                   </div>
                 </div>
 
-                <div className="scroll-form-row">
-                  <label className="scroll-form-label">Năm xem</label>
-                  <div className="scroll-form-date-group scroll-form-date-group--half">
+                <div className="qtv-form-row">
+                  <label className="qtv-form-label">Năm xem</label>
+                  <div className="qtv-form-date-group">
                     <input
                       type="number"
-                      className="scroll-form-input"
+                      className="qtv-form-input"
                       min="2020"
                       max="2035"
                       value={namXem}
                       onChange={(e) => setNamXem(e.target.value)}
                     />
-                    <div className="scroll-inline-label">Tháng xem (Âm lịch)</div>
+                    <div className="qtv-inline-label">Tháng xem (Âm lịch)</div>
                     <select
-                      className="scroll-form-select"
+                      className="qtv-form-select"
                       value={thangXem}
                       onChange={(e) => setThangXem(e.target.value)}
                     >
@@ -296,19 +310,19 @@ export default function XemTuVi() {
                   </div>
                 </div>
 
-                <div className="scroll-submit-row">
-                  <button type="submit" className="scroll-submit-btn">
-                    Lập lá số
+                <div className="qtv-submit-row">
+                  <button type="submit" className="qtv-submit-btn">
+                    Lập lá số Tử Vi
                   </button>
                 </div>
               </form>
             )}
           </div>
-        </div>
+        </section>
       </div>
 
       {/* Hiển thị trực tiếp giao diện Kết quả lá số Tử Vi ngay bên dưới */}
-      <TuViResult embedded onRequestNew={handleScrollToForm} />
+      <TuViResult embedded externalResult={calculatedResult} onRequestNew={handleScrollToForm} />
     </div>
   );
 }

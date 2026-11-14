@@ -1,109 +1,127 @@
-/* HOROSCOPE CARDS */
+/* HOROSCOPE CARDS — Quán Tử Vi Parchment & Crimson-Gold Theme */
 .horoscope-section {
-  padding: var(--space-4xl) 0;
-  background: linear-gradient(180deg, var(--color-dark-bg) 0%, rgba(0, 51, 102, 0.08) 50%, var(--color-dark-bg) 100%);
+  padding: 28px 0 48px;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #fffaf0 0%, #f7ebd0 65%, #f0dcaf 100%);
 }
 
 .horoscope-date-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
 .horoscope-date-btn {
-  display: flex; align-items: center; gap: var(--space-xs);
-  padding: 0.5rem 1rem;
-  background: var(--color-dark-surface);
-  border: 1px solid var(--color-dark-elevated);
-  border-radius: var(--border-radius-sm);
-  color: var(--color-text-light);
-  cursor: pointer; font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: linear-gradient(180deg, #fffdf7 0%, #f5e5c1 100%);
+  border: 1px solid #cfa962;
+  border-radius: 6px;
+  color: #5c2b12;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 600;
   font-family: var(--font-body);
-  transition: all var(--transition-fast);
+  transition: all 0.18s ease;
 }
 
-.horoscope-date-btn:hover { border-color: rgba(212, 175, 55, 0.3); color: var(--color-gold); }
+.horoscope-date-btn:hover {
+  background: linear-gradient(180deg, #fff9ea 0%, #eed7a1 100%);
+  color: #6b1515;
+}
 
 .horoscope-current-date {
-  font-size: 1rem; font-weight: 600; color: var(--color-gold);
-  padding: 0.5rem 1.25rem;
-  background: rgba(212, 175, 55, 0.1);
-  border-radius: var(--border-radius-sm);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #6b1515;
+  padding: 7px 18px;
+  background: #fbf1da;
+  border-radius: 6px;
+  border: 1px solid #d5b473;
 }
 
 .horoscope-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-md);
+  gap: 16px;
 }
 
 .horoscope-card {
-  background: var(--color-dark-card);
-  border-radius: var(--border-radius-md);
-  border: 1px solid rgba(212, 175, 55, 0.08);
-  padding: var(--space-lg);
+  background: #fbf1da;
+  border-radius: 10px;
+  border: 1.5px solid #d5b473;
+  box-shadow: 0 5px 16px rgba(90, 48, 12, 0.1);
+  padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  position: relative; overflow: hidden;
-}
-
-.horoscope-card::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08), transparent 70%);
-  opacity: 0;
-  transition: opacity var(--transition-normal);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .horoscope-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(212, 175, 55, 0.3);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  border-color: #8e1416;
+  background: #fff9ec;
+  box-shadow: 0 8px 22px rgba(90, 48, 12, 0.15);
 }
-
-.horoscope-card:hover::after { opacity: 1; }
 
 .horoscope-emoji {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-sm);
-  position: relative; z-index: 1;
-  transition: transform var(--transition-spring);
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+  transition: transform 0.25s ease;
 }
 
-.horoscope-card:hover .horoscope-emoji { transform: scale(1.15); }
+.horoscope-card:hover .horoscope-emoji { transform: scale(1.12); }
 
-.horoscope-name { font-size: 1rem; font-weight: 700; color: var(--color-text-on-dark); margin-bottom: var(--space-xs); position: relative; z-index: 1; }
-.horoscope-years { font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: var(--space-sm); position: relative; z-index: 1; }
+.horoscope-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #6b1515;
+  margin-bottom: 4px;
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+}
 
-.horoscope-stars { display: flex; justify-content: center; gap: 2px; margin-bottom: var(--space-sm); position: relative; z-index: 1; }
+.horoscope-years {
+  font-size: 0.78rem;
+  color: #7c6244;
+  margin-bottom: 8px;
+}
+
+.horoscope-stars {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 8px;
+}
 
 .horoscope-summary {
-  font-size: 0.8rem; padding: 0.3rem 0.8rem;
-  border-radius: 50px; display: inline-block;
-  position: relative; z-index: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 50px;
+  display: inline-block;
 }
 
-.horoscope-summary.excellent { background: rgba(39, 174, 96, 0.15); color: var(--color-success-light); }
-.horoscope-summary.good { background: rgba(212, 175, 55, 0.15); color: var(--color-gold-light); }
-.horoscope-summary.average { background: rgba(230, 126, 34, 0.15); color: var(--color-warning-light); }
-.horoscope-summary.caution { background: rgba(231, 76, 60, 0.15); color: var(--color-danger-light); }
+.horoscope-summary.excellent { background: #e5f5e0; color: #245818; border: 1px solid #a1d99b; }
+.horoscope-summary.good { background: #faecc8; color: #6e470b; border: 1px solid #dfb860; }
+.horoscope-summary.average { background: #fde6cc; color: #8c3d07; border: 1px solid #f0b27a; }
+.horoscope-summary.caution { background: #fde0dd; color: #991b1b; border: 1px solid #f5a3a3; }
 
 .horoscope-detail-link {
-  display: block; margin-top: var(--space-sm);
-  font-size: 0.8rem; color: var(--color-gold);
-  opacity: 0; transform: translateY(5px);
-  transition: all var(--transition-normal);
-  position: relative; z-index: 1;
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #8e1416;
 }
-
-.horoscope-card:hover .horoscope-detail-link { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 900px) { .horoscope-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) {
   .horoscope-grid { grid-template-columns: repeat(2, 1fr); }
-  .horoscope-date-nav { gap: var(--space-sm); flex-wrap: wrap; justify-content: center; }
+  .horoscope-date-nav { gap: 8px; flex-wrap: wrap; justify-content: center; }
 }

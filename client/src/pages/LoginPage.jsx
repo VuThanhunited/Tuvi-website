@@ -26,7 +26,7 @@ export default function LoginPage() {
     try {
       const user = await login(form.email, form.password);
       if (user.role === 'admin') {
-        navigate('/admin/interpretations', { replace: true });
+        navigate('/', { replace: true });
       } else {
         navigate(from, { replace: true });
       }

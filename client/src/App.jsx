@@ -5,9 +5,6 @@ import { ToastProvider } from './components/Toast/Toast.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
 import Header from './components/Header/Header.jsx';
-import Footer from './components/Footer/Footer.jsx';
-import InterestedArticles from './components/InterestedArticles/InterestedArticles.jsx';
-import Chatbot from './components/Chatbot/Chatbot.jsx';
 
 // Pages
 import Home from './pages/Home.jsx';
@@ -80,9 +77,6 @@ export default function App() {
                   <Route path="*" element={<Home />} />
                 </Routes>
               </main>
-              <InterestedArticles />
-              <Footer />
-              <Chatbot />
             </div>
           </FavoritesProvider>
         </AuthProvider>

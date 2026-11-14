@@ -1078,7 +1078,7 @@ export const calculate = async (req, res, next) => {
 
     const saved = await TuViResult.create(finalResult);
     const responseData = saved.toObject();
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role === 'user') {
       delete responseData.quanTuViResults;
     }
 
@@ -1095,7 +1095,7 @@ export const getResult = async (req, res, next) => {
     await r.save();
 
     const responseData = r.toObject();
-    if (req.user?.role === 'admin') {
+    if (req.user?.role !== 'user') {
       const boSaoRules = await Interpretation.find({ type: { $in: ['bo_sao_phoi', 'cach_cuc'] } }).lean();
       responseData.quanTuViResults = matchBoSaoPhoi(responseData.cungResults, boSaoRules);
     } else {
