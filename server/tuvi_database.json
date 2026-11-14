@@ -177,7 +177,52 @@
     },
     {
       "id": 5,
+      "ten": "Thìn",
+      "chi": "辰",
+      "sao_chinh": "Thái Dương",
+      "sao_phu": ["Thiên Cơ", "Thiên Đồng"],
+      "ngay_bat_dau": "21/03",
+      "ngay_ket_thuc": "19/04",
+      "sac_thai": {
+        "nam": "Mạnh mẽ, hào phóng, có tầm nhìn xa",
+        "nu": "Kiêu sa, quyết đoán, có bản lĩnh"
+      },
+      "tinh_cach": "Tự tin, tham vọng, có khí phách lãnh đạo thiên bẩm. Thích làm chủ, không chịu bị ràng buộc. Sáng tạo, đổi mới không ngừng. Đôi khi quá tự tin dẫn đến bỏ qua ý kiến người khác.",
+      "diem_manh": ["Tự tin", "Tham vọng", "Sáng tạo", "Lãnh đạo tốt", "Kiên định"],
+      "diem_yeu": ["Hay độc đoán", "Kiêu ngạo", "Khó chịu khi thất bại", "Khó nhận sai"],
+      "su_nghiep": {
+        "phu_hop": ["Kinh doanh", "Quản lý", "Chính trị", "Sáng tạo", "Đầu tư"],
+        "luận_giải": "Tuổi Thìn có thiên tài lãnh đạo bẩm sinh. Phù hợp với vai trò quản lý, điều hành, sáng lập doanh nghiệp. Khi gặp đúng thời cơ sẽ vươn lên mạnh mẽ, thành công vang dội."
+      },
+      "tinh_cam": {
+        "dac_diem": "Lãng mạn, đam mê, nhưng cần sự tôn trọng",
+        "luận_giải": "Tuổi Thìn yêu mãnh liệt và chân thành. Cần bạn đời hiểu và tôn trọng cái tôi của mình. Gia đình ổn định khi cả hai biết nhường nhịn."
+      },
+      "suc_khoe": "Thể chất mạnh mẽ. Cần chú ý đến bệnh về gan, tiêu hóa và tránh làm việc quá sức.",
+      "tai_loc": "Khả năng tạo ra của cải tốt, có tầm nhìn đầu tư. Nên tránh đầu cơ mạo hiểm ngắn hạn, tập trung vào mục tiêu dài hạn.",
+      "nam_tot": [2024, 2026, 2028],
+      "thang_tot": [1, 4, 7, 10],
+      "so_may_man": [1, 6, 7],
+      "mau_may_man": ["Vàng", "Bạc", "Trắng"],
+      "van_han_nam_2026": {
+        "tong_quan": "Năm 2026 (Bính Ngọ) tuổi Thìn gặp vận khí tương xung. Cần cẩn trọng hơn, không mạo hiểm lớn.",
+        "tien_tai": "Tài chính ổn định nếu quản lý tốt. Tránh đầu tư rủi ro, cẩn thận với các hợp đồng lớn.",
+        "tinh_cam": "Mối quan hệ cần nhiều thấu hiểu hơn. Tránh cái tôi quá cao, lắng nghe bạn đời nhiều hơn.",
+        "su_nghiep": "Công việc có thể gặp trở ngại đầu năm nhưng cải thiện từ giữa năm. Kiên nhẫn và bền bỉ.",
+        "suc_khoe": "Cần nghỉ ngơi đầy đủ, tránh làm việc quá sức. Chú ý đến gan và tiêu hóa.",
+        "phuong_huong": "Nên hành xử khiêm nhường hơn, lắng nghe ý kiến người xung quanh. Cúng sao đầu năm giúp hóa giải vận hạn."
+      },
+      "van_han_theo_thang": [
+        { "thang": 1, "luận": "Tháng đầu năm cần thận trọng, không nên ra quyết định lớn.", "tien_tai": "Ổn định", "su_nghiep": "Bình thường", "tinh_cam": "Hòa thuận" },
+        { "thang": 4, "luận": "Tháng 4 vận khí cải thiện, cơ hội xuất hiện.", "tien_tai": "Khá tốt", "su_nghiep": "Phát triển", "tinh_cam": "Tốt" },
+        { "thang": 7, "luận": "Tháng 7 là thời điểm tốt để mở rộng kinh doanh.", "tien_tai": "Tốt", "su_nghiep": "Rất tốt", "tinh_cam": "Hạnh phúc" },
+        { "thang": 10, "luận": "Cuối năm tổng kết và lên kế hoạch cho năm mới.", "tien_tai": "Ổn định", "su_nghiep": "Bình thường", "tinh_cam": "Ổn định" }
+      ]
+    },
+    {
+      "id": 6,
       "ten": "Tỵ",
+
       "chi": "巳",
       "sao_chinh": "Tham Lang",
       "sao_phu": ["Lộc Tồn", "Phúc Sinh"],

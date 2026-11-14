@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Users, BookOpen, TrendingUp, Clock,
   MessageSquare, Star, Activity, UserCheck,
   FileText, Zap, RefreshCw, Database,
-  Server, Eye, BarChart2
+  Server, Eye, BarChart2, ArrowUpRight,
+  Sparkles, Shield, Globe, ChevronRight,
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
@@ -26,11 +27,11 @@ function useCounter(target, duration = 1200) {
   return count;
 }
 
-/* ── Mini Bar Chart (CSS only) ── */
-function MiniBarChart({ data, color = '#c5a059' }) {
+/* ── Mini Sparkline (CSS) ── */
+function MiniSparkline({ data, color }) {
   const max = Math.max(...data.map(d => d.value), 1);
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '40px' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '36px' }}>
       {data.map((d, i) => (
         <div
           key={i}
@@ -39,9 +40,8 @@ function MiniBarChart({ data, color = '#c5a059' }) {
             flex: 1,
             background: color,
             borderRadius: '3px 3px 0 0',
-            height: `${(d.value / max) * 100}%`,
-            minHeight: '3px',
-            opacity: i === data.length - 1 ? 1 : 0.5 + (i / data.length) * 0.4,
+            height: `${Math.max((d.value / max) * 100, 8)}%`,
+            opacity: 0.35 + (i / data.length) * 0.65,
             transition: 'height 0.6s ease',
           }}
         />
@@ -51,62 +51,99 @@ function MiniBarChart({ data, color = '#c5a059' }) {
 }
 
 /* ── Stat Card ── */
-function StatCard({ icon, label, value, trend, trendColor, chartData, chartColor, delay = 0 }) {
+function StatCard({ icon, label, value, trend, trendUp = true, bgColor, iconBg, iconColor, chartData, chartColor, delay = 0 }) {
   const animated = useCounter(typeof value === 'number' ? value : 0, 1200 + delay);
   return (
     <div style={{
-      ...cardStyle,
-      animation: `dashCardIn 0.5s ease ${delay}ms both`,
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+      background: '#ffffff',
+      borderRadius: '16px',
+      padding: '1.4rem',
+      border: '1px solid #e2e8f0',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      animation: `cardSlideIn 0.5s ease ${delay}ms both`,
+      transition: 'transform 0.2s, box-shadow 0.2s',
+      cursor: 'default',
+      position: 'relative',
+      overflow: 'hidden',
+    }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = 'translateY(-3px)';
+        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+      }}
+    >
+      {/* Accent bar top */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+        background: bgColor || 'linear-gradient(90deg, #c5a059, #e2b04a)',
+        borderRadius: '16px 16px 0 0',
+      }} />
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', marginTop: '0.3rem' }}>
         <div style={{
-          padding: '0.7rem',
-          background: 'rgba(197, 160, 89, 0.1)',
-          border: '1px solid rgba(197, 160, 89, 0.15)',
+          width: '44px', height: '44px',
+          background: iconBg || 'rgba(197,160,89,0.1)',
           borderRadius: '12px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
         }}>
-          {icon}
+          {React.cloneElement(icon, { size: 20, color: iconColor || '#c5a059' })}
         </div>
         <span style={{
-          color: trendColor || '#10b981',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          textAlign: 'right',
-          maxWidth: '100px',
-          lineHeight: 1.3,
+          display: 'flex', alignItems: 'center', gap: '3px',
+          color: trendUp ? '#059669' : '#dc2626',
+          fontSize: '0.75rem', fontWeight: 700,
+          background: trendUp ? '#f0fdf4' : '#fef2f2',
+          padding: '3px 8px', borderRadius: '99px',
+          maxWidth: '120px', textAlign: 'right',
         }}>
+          <ArrowUpRight size={12} style={{ transform: trendUp ? 'none' : 'rotate(90deg)' }} />
           {trend}
         </span>
       </div>
-      <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: '0.3rem' }}>{label}</div>
-      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', lineHeight: 1, marginBottom: '0.8rem' }}>
+
+      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 500, marginBottom: '0.3rem' }}>{label}</div>
+      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', lineHeight: 1, marginBottom: '0.9rem' }}>
         {typeof value === 'number' ? animated.toLocaleString('vi-VN') : value}
       </div>
+
       {chartData && (
-        <MiniBarChart data={chartData} color={chartColor || '#c5a059'} />
+        <MiniSparkline data={chartData} color={chartColor || '#c5a059'} />
       )}
     </div>
   );
 }
 
 /* ── Activity Item ── */
-function ActivityItem({ icon, text, time }) {
+function ActivityItem({ icon, text, time, color }) {
   return (
     <div style={{
-      display: 'flex', gap: '0.8rem', alignItems: 'center',
-      padding: '0.7rem 0.9rem', borderRadius: '10px',
-      background: 'rgba(255,255,255,0.02)',
-      border: '1px solid rgba(255,255,255,0.03)',
-      transition: 'background 0.2s',
-    }}>
-      <div style={{ padding: '0.4rem', background: 'rgba(197,160,89,0.08)', borderRadius: '8px', flexShrink: 0 }}>
-        {icon}
+      display: 'flex', gap: '0.75rem', alignItems: 'center',
+      padding: '0.7rem 0.9rem',
+      borderRadius: '10px',
+      background: '#fafafa',
+      border: '1px solid #f1f5f9',
+      transition: 'background 0.18s',
+    }}
+      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+      onMouseLeave={e => e.currentTarget.style.background = '#fafafa'}
+    >
+      <div style={{
+        width: '32px', height: '32px',
+        background: color ? `${color}15` : 'rgba(197,160,89,0.1)',
+        borderRadius: '8px', flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {React.cloneElement(icon, { size: 14, color: color || '#c5a059' })}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: '0.875rem', color: '#e0e0e0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ fontSize: '0.855rem', color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
           {text}
         </div>
-        <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px' }}>{time}</div>
+        <div style={{ fontSize: '0.73rem', color: '#94a3b8', marginTop: '1px' }}>{time}</div>
       </div>
     </div>
   );
@@ -115,14 +152,15 @@ function ActivityItem({ icon, text, time }) {
 /* ── Health Item ── */
 function HealthItem({ label, status, color, pulse = false }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0' }}>
-      <span style={{ color: '#94a3b8', fontSize: '0.875rem' }}>{label}</span>
-      <span style={{ color, fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0' }}>
+      <span style={{ color: '#64748b', fontSize: '0.855rem' }}>{label}</span>
+      <span style={{ color, fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
         <span style={{
           width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color,
-          boxShadow: pulse ? `0 0 6px ${color}` : 'none',
+          boxShadow: pulse ? `0 0 0 0 ${color}` : 'none',
           animation: pulse ? 'hPulse 2s ease-in-out infinite' : 'none',
           flexShrink: 0,
+          display: 'inline-block',
         }} />
         {status}
       </span>
@@ -131,14 +169,14 @@ function HealthItem({ label, status, color, pulse = false }) {
 }
 
 /* ── Quick Action ── */
-function QuickAction({ icon, label, desc, color, onClick }) {
+function QuickAction({ icon, label, desc, color, iconBg, onClick }) {
   return (
     <button
       onClick={onClick}
       style={{
-        background: 'rgba(255,255,255,0.02)',
-        border: `1px solid ${color}22`,
-        borderRadius: '12px',
+        background: '#fafafa',
+        border: '1.5px solid #e2e8f0',
+        borderRadius: '14px',
         padding: '1rem',
         cursor: 'pointer',
         transition: 'all 0.2s',
@@ -147,20 +185,62 @@ function QuickAction({ icon, label, desc, color, onClick }) {
         fontFamily: 'inherit',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = `${color}10`;
-        e.currentTarget.style.borderColor = `${color}44`;
+        e.currentTarget.style.background = '#fff';
+        e.currentTarget.style.borderColor = color;
         e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = `0 6px 16px ${color}20`;
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-        e.currentTarget.style.borderColor = `${color}22`;
+        e.currentTarget.style.background = '#fafafa';
+        e.currentTarget.style.borderColor = '#e2e8f0';
         e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      <div style={{ fontSize: '1.4rem', marginBottom: '0.4rem' }}>{icon}</div>
-      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.2rem' }}>{label}</div>
-      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{desc}</div>
+      <div style={{
+        width: '36px', height: '36px',
+        background: iconBg || `${color}15`,
+        borderRadius: '10px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: '0.6rem',
+      }}>
+        {React.cloneElement(icon, { size: 18, color })}
+      </div>
+      <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.2rem' }}>{label}</div>
+      <div style={{ fontSize: '0.73rem', color: '#94a3b8' }}>{desc}</div>
     </button>
+  );
+}
+
+/* ── Section Card ── */
+function SectionCard({ title, icon, iconColor, badge, children }) {
+  return (
+    <div style={{
+      background: '#ffffff',
+      borderRadius: '16px',
+      border: '1px solid #e2e8f0',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '1.1rem 1.4rem',
+        borderBottom: '1px solid #f1f5f9',
+      }}>
+        <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.95rem', color: '#1e293b', fontWeight: 700 }}>
+          {React.cloneElement(icon, { size: 17, color: iconColor })}
+          {title}
+        </h3>
+        {badge && (
+          <span style={{ color: '#94a3b8', fontSize: '0.75rem', background: '#f8fafc', padding: '3px 10px', borderRadius: '99px', border: '1px solid #e2e8f0' }}>
+            {badge}
+          </span>
+        )}
+      </div>
+      <div style={{ padding: '1.1rem 1.4rem' }}>
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -175,7 +255,6 @@ export default function Dashboard() {
   const [crawlStatus, setCrawlStatus] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
-  // Fake sparkline data
   const mockSparkline = (peak, len = 7) =>
     Array.from({ length: len }, (_, i) => ({
       label: `T${i + 1}`,
@@ -231,22 +310,16 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div style={{ padding: '2rem' }}>
-        {/* Skeleton */}
+        <style>{`@keyframes skelPulse { 0%,100%{opacity:.5} 50%{opacity:.9} }`}</style>
         <div style={{ marginBottom: '2rem' }}>
-          <div style={{ height: '32px', width: '300px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '0.5rem', animation: 'skelPulse 1.5s ease infinite' }} />
-          <div style={{ height: '16px', width: '200px', background: 'rgba(255,255,255,0.04)', borderRadius: '6px', animation: 'skelPulse 1.5s ease infinite 0.15s' }} />
+          <div style={{ height: '28px', width: '280px', background: '#e2e8f0', borderRadius: '8px', marginBottom: '0.5rem', animation: 'skelPulse 1.5s ease infinite' }} />
+          <div style={{ height: '14px', width: '180px', background: '#f1f5f9', borderRadius: '6px', animation: 'skelPulse 1.5s ease infinite 0.15s' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.2rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1rem' }}>
           {[1,2,3,4].map(i => (
-            <div key={i} style={{ ...cardStyle, height: '130px', animation: 'skelPulse 1.5s ease infinite' }} />
+            <div key={i} style={{ height: '140px', background: '#e2e8f0', borderRadius: '16px', animation: `skelPulse 1.5s ease ${i * 0.1}s infinite` }} />
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.2rem' }}>
-          {[1,2,3,4].map(i => (
-            <div key={i} style={{ ...cardStyle, height: '130px', animation: `skelPulse 1.5s ease ${i * 0.1}s infinite` }} />
-          ))}
-        </div>
-        <style>{`@keyframes skelPulse { 0%,100%{opacity:.4} 50%{opacity:.7} }`}</style>
       </div>
     );
   }
@@ -258,268 +331,333 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '2rem' }}>
       <style>{`
-        @keyframes dashCardIn {
-          from { opacity: 0; transform: translateY(20px); }
+        @keyframes cardSlideIn {
+          from { opacity: 0; transform: translateY(18px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes hPulse {
-          0%,100% { box-shadow: 0 0 0 0 currentColor; }
-          50%      { box-shadow: 0 0 6px 2px currentColor; }
+          0%,100% { box-shadow: 0 0 0 0 rgba(5,150,105,0.4); }
+          70%      { box-shadow: 0 0 0 5px rgba(5,150,105,0); }
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
       {/* ── Header ── */}
-      <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+        flexWrap: 'wrap', gap: '1rem', marginBottom: '1.75rem',
+      }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.4rem', color: '#fff', fontWeight: 800 }}>
-            🔮 Tổng Quan Hệ Thống
+          <h1 style={{ fontSize: '1.65rem', fontWeight: 900, color: '#1e293b', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #c5a059, #e2b04a)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(197,160,89,0.3)' }}>
+              <BarChart2 size={18} color="#fff" />
+            </div>
+            Tổng Quan Hệ Thống
           </h1>
-          <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <Clock size={13} />
             Cập nhật lúc {lastRefresh.toLocaleTimeString('vi-VN')}
           </p>
         </div>
         <button
           onClick={fetchStats}
           style={{
-            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            display: 'flex', alignItems: 'center', gap: '0.45rem',
             padding: '0.55rem 1.1rem',
-            background: 'rgba(197,160,89,0.08)',
-            border: '1px solid rgba(197,160,89,0.2)',
+            background: '#ffffff',
+            border: '1.5px solid #e2e8f0',
             borderRadius: '10px',
-            color: '#c5a059', fontSize: '0.85rem', fontWeight: 600,
+            color: '#64748b', fontSize: '0.84rem', fontWeight: 600,
             fontFamily: 'inherit', cursor: 'pointer',
             transition: 'all 0.2s',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
           }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#c5a059'; e.currentTarget.style.color = '#c5a059'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#64748b'; }}
         >
-          <RefreshCw size={15} /> Làm mới
+          <RefreshCw size={14} /> Làm mới
         </button>
-      </header>
+      </div>
 
       {/* ── Stats Row 1 ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
         <StatCard
-          icon={<Users size={22} color="#c5a059" />}
+          icon={<Users />}
           label="Tổng Người Dùng"
           value={stats.totalUsers}
           trend={`+${stats.newUsersThisMonth} tháng này`}
-          trendColor="#10b981"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #c5a059, #e2b04a)"
+          iconBg="rgba(197,160,89,0.1)"
+          iconColor="#c5a059"
           chartData={mockSparkline(stats.newUsersThisMonth + 5)}
           chartColor="#c5a059"
           delay={0}
         />
         <StatCard
-          icon={<UserCheck size={22} color="#10b981" />}
+          icon={<UserCheck />}
           label="Đang Hoạt Động"
           value={stats.activeUsers}
           trend={`${activeRate}% tổng số`}
-          trendColor="#10b981"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #059669, #10b981)"
+          iconBg="rgba(5,150,105,0.1)"
+          iconColor="#059669"
           chartData={mockSparkline(stats.activeUsers + 3)}
-          chartColor="#10b981"
+          chartColor="#059669"
           delay={80}
         />
         <StatCard
-          icon={<Star size={22} color="#f59e0b" />}
+          icon={<Sparkles />}
           label="Lá Số Đã Lập"
           value={stats.totalLaSo}
           trend={`+${stats.newLaSoThisMonth} tháng này`}
-          trendColor="#f59e0b"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #d97706, #f59e0b)"
+          iconBg="rgba(217,119,6,0.1)"
+          iconColor="#d97706"
           chartData={mockSparkline(stats.newLaSoThisMonth + 3)}
-          chartColor="#f59e0b"
+          chartColor="#d97706"
           delay={160}
         />
         <StatCard
-          icon={<MessageSquare size={22} color="#8b5cf6" />}
+          icon={<MessageSquare />}
           label="Bài Thảo Luận"
           value={stats.totalDiscussions}
           trend="Cộng đồng"
-          trendColor="#8b5cf6"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #7c3aed, #8b5cf6)"
+          iconBg="rgba(124,58,237,0.1)"
+          iconColor="#7c3aed"
           chartData={mockSparkline(10)}
-          chartColor="#8b5cf6"
+          chartColor="#7c3aed"
           delay={240}
         />
       </div>
 
       {/* ── Stats Row 2 ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <StatCard
-          icon={<UserCheck size={22} color="#3b82f6" />}
+          icon={<Shield />}
           label="Chuyên Gia Tử Vi"
           value={stats.totalMasters}
           trend="Thầy luận giải"
-          trendColor="#3b82f6"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #2563eb, #3b82f6)"
+          iconBg="rgba(37,99,235,0.1)"
+          iconColor="#2563eb"
           delay={0}
         />
         <StatCard
-          icon={<BookOpen size={22} color="#ec4899" />}
+          icon={<BookOpen />}
           label="Luận Giải"
           value={stats.totalInterpretations}
           trend="Kho tri thức"
-          trendColor="#ec4899"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #db2777, #ec4899)"
+          iconBg="rgba(219,39,119,0.1)"
+          iconColor="#db2777"
           delay={80}
         />
         <StatCard
-          icon={<FileText size={22} color="#14b8a6" />}
+          icon={<TrendingUp />}
           label="Users Mới Tháng Này"
           value={stats.newUsersThisMonth}
           trend="↑ vs tháng trước"
-          trendColor="#14b8a6"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #0d9488, #14b8a6)"
+          iconBg="rgba(13,148,136,0.1)"
+          iconColor="#0d9488"
           delay={160}
         />
         <StatCard
-          icon={<TrendingUp size={22} color="#c5a059" />}
+          icon={<Activity />}
           label="Lá Số Mới Tháng Này"
           value={stats.newLaSoThisMonth}
           trend="Tháng này"
-          trendColor="#c5a059"
+          trendUp={true}
+          bgColor="linear-gradient(90deg, #ea580c, #f97316)"
+          iconBg="rgba(234,88,12,0.1)"
+          iconColor="#ea580c"
           delay={240}
         />
       </div>
 
       {/* ── Bottom Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
         {/* Left: Recent */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Recent LaSo */}
-          <div style={cardStyle}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.2rem', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Star size={18} color="#f59e0b" /> Lá Số Mới Nhất
-              </h3>
-              <span style={{ color: '#475569', fontSize: '0.78rem', background: 'rgba(255,255,255,0.03)', padding: '3px 8px', borderRadius: '6px' }}>
-                5 gần nhất
-              </span>
-            </div>
+          <SectionCard
+            title="Lá Số Mới Nhất"
+            icon={<Sparkles />}
+            iconColor="#d97706"
+            badge="5 gần nhất"
+          >
             {stats.recentLaSo.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#475569' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔮</div>
                 <p style={{ fontSize: '0.85rem' }}>Chưa có lá số nào được lập</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {stats.recentLaSo.map((ls, i) => (
                   <ActivityItem
                     key={i}
-                    icon={<Star size={15} color="#f59e0b" />}
+                    icon={<Sparkles />}
                     text={`${ls.hoTen} (${ls.gioiTinh === 'nam' ? 'Nam' : 'Nữ'}) đã lập lá số`}
                     time={timeAgo(ls.createdAt)}
+                    color="#d97706"
                   />
                 ))}
               </div>
             )}
-          </div>
+          </SectionCard>
 
           {/* Recent Users */}
-          <div style={cardStyle}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.2rem', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Users size={18} color="#3b82f6" /> Người Dùng Mới Nhất
-              </h3>
-              <span style={{ color: '#475569', fontSize: '0.78rem', background: 'rgba(255,255,255,0.03)', padding: '3px 8px', borderRadius: '6px' }}>
-                5 gần nhất
-              </span>
-            </div>
+          <SectionCard
+            title="Người Dùng Mới Nhất"
+            icon={<Users />}
+            iconColor="#2563eb"
+            badge="5 gần nhất"
+          >
             {stats.recentUsers.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#475569' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>👤</div>
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👤</div>
                 <p style={{ fontSize: '0.85rem' }}>Chưa có người dùng nào</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {stats.recentUsers.map((u, i) => (
                   <ActivityItem
                     key={i}
-                    icon={<Users size={15} color="#3b82f6" />}
+                    icon={<Users />}
                     text={`${u.hoTen} (${u.email}) — ${roleBadge(u.role)}`}
                     time={timeAgo(u.createdAt)}
+                    color="#2563eb"
                   />
                 ))}
               </div>
             )}
-          </div>
+          </SectionCard>
         </div>
 
-        {/* Right: System + Crawler */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Right: System + Actions + Crawler */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* System Health */}
-          <div style={cardStyle}>
-            <h3 style={{ marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Server size={18} color="#10b981" /> Trạng Thái Hệ Thống
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-              <HealthItem label="Database" status="Ổn định" color="#10b981" pulse />
-              <div style={{ height: '1px', background: 'rgba(255,255,255,0.04)', margin: '0.4rem 0' }} />
-              <HealthItem label="API Server" status="Hoạt động" color="#10b981" pulse />
-              <div style={{ height: '1px', background: 'rgba(255,255,255,0.04)', margin: '0.4rem 0' }} />
-              <HealthItem label="Users Active" status={`${stats.activeUsers} users`} color="#3b82f6" />
-              <div style={{ height: '1px', background: 'rgba(255,255,255,0.04)', margin: '0.4rem 0' }} />
-              <HealthItem label="Lá số tháng này" status={`+${stats.newLaSoThisMonth}`} color="#f59e0b" />
+          <SectionCard title="Trạng Thái Hệ Thống" icon={<Server />} iconColor="#059669">
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <HealthItem label="Database" status="Ổn định" color="#059669" pulse />
+              <div style={{ height: '1px', background: '#f1f5f9', margin: '0.2rem 0' }} />
+              <HealthItem label="API Server" status="Hoạt động" color="#059669" pulse />
+              <div style={{ height: '1px', background: '#f1f5f9', margin: '0.2rem 0' }} />
+              <HealthItem label="Users Online" status={`${stats.activeUsers} users`} color="#2563eb" />
+              <div style={{ height: '1px', background: '#f1f5f9', margin: '0.2rem 0' }} />
+              <HealthItem label="Lá số tháng này" status={`+${stats.newLaSoThisMonth}`} color="#d97706" />
             </div>
-          </div>
+          </SectionCard>
 
           {/* Quick Actions */}
-          <div style={cardStyle}>
-            <h3 style={{ marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Zap size={18} color="#c5a059" /> Thao Tác Nhanh
-            </h3>
+          <SectionCard title="Thao Tác Nhanh" icon={<Zap />} iconColor="#c5a059">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
-              <QuickAction icon="👥" label="Users" desc="Quản lý người dùng" color="#3b82f6" onClick={() => window.location.href = '/users'} />
-              <QuickAction icon="🔮" label="Lập Lá Số" desc="Lập lá số mới" color="#f59e0b" onClick={() => window.location.href = '/lap-la-so'} />
-              <QuickAction icon="📚" label="Luận Giải" desc="Quản lý luận giải" color="#ec4899" onClick={() => window.location.href = '/interpretations'} />
-              <QuickAction icon="🧙" label="Chuyên Gia" desc="Quản lý thầy" color="#8b5cf6" onClick={() => window.location.href = '/masters'} />
+              <QuickAction
+                icon={<Users />}
+                label="Users"
+                desc="Quản lý người dùng"
+                color="#2563eb"
+                iconBg="rgba(37,99,235,0.1)"
+                onClick={() => window.location.href = '/users'}
+              />
+              <QuickAction
+                icon={<Sparkles />}
+                label="Lập Lá Số"
+                desc="Lập lá số mới"
+                color="#d97706"
+                iconBg="rgba(217,119,6,0.1)"
+                onClick={() => window.location.href = '/lap-la-so'}
+              />
+              <QuickAction
+                icon={<BookOpen />}
+                label="Luận Giải"
+                desc="Quản lý luận giải"
+                color="#db2777"
+                iconBg="rgba(219,39,119,0.1)"
+                onClick={() => window.location.href = '/interpretations'}
+              />
+              <QuickAction
+                icon={<Shield />}
+                label="Chuyên Gia"
+                desc="Quản lý thầy"
+                color="#7c3aed"
+                iconBg="rgba(124,58,237,0.1)"
+                onClick={() => window.location.href = '/masters'}
+              />
             </div>
-          </div>
+          </SectionCard>
 
           {/* Forum Crawler */}
-          <div style={cardStyle}>
-            <h3 style={{ marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              🤖 Cào Dữ Liệu Diễn Đàn
-            </h3>
-            <p style={{ color: '#64748b', fontSize: '0.82rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-              Thu thập bài đăng từ <strong style={{ color: '#94a3b8' }}>tuvivietnam.vn</strong> và <strong style={{ color: '#94a3b8' }}>lyso.vn</strong>.
-            </p>
-            {crawlStatus && (
-              <div style={{
-                padding: '0.7rem', borderRadius: '8px', marginBottom: '0.8rem',
-                background: crawlStatus.success ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-                color: crawlStatus.success ? '#10b981' : '#ef4444',
-                fontSize: '0.8rem',
-                border: `1px solid ${crawlStatus.success ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-              }}>
-                {crawlStatus.message}
-                {crawlStatus.data && (
-                  <div style={{ fontSize: '0.72rem', marginTop: '4px', color: '#94a3b8' }}>
-                    Cào: {crawlStatus.data.totalCrawled} | Lưu mới: {crawlStatus.data.savedToDb}
-                  </div>
-                )}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            overflow: 'hidden',
+          }}>
+            <div style={{ padding: '1.1rem 1.4rem', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ width: '28px', height: '28px', background: 'rgba(124,58,237,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Globe size={15} color="#7c3aed" />
               </div>
-            )}
-            <button
-              onClick={handleCrawl}
-              disabled={crawling}
-              style={{
-                width: '100%',
-                background: crawling ? '#334155' : 'linear-gradient(135deg, #c5a059, #e2b04a)',
-                color: crawling ? '#94a3b8' : '#1a1a2e',
-                border: 'none',
-                padding: '0.7rem',
-                borderRadius: '10px',
-                fontWeight: 700,
-                cursor: crawling ? 'not-allowed' : 'pointer',
-                fontSize: '0.875rem',
-                fontFamily: 'inherit',
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              {crawling ? (
-                <><RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> Đang cào...</>
-              ) : (
-                <>📥 Cào Dữ Liệu Ngay</>
+              <h3 style={{ margin: 0, fontSize: '0.95rem', color: '#1e293b', fontWeight: 700 }}>Cào Dữ Liệu Diễn Đàn</h3>
+            </div>
+            <div style={{ padding: '1.1rem 1.4rem' }}>
+              <p style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: '1rem', lineHeight: '1.6' }}>
+                Thu thập bài đăng từ <strong style={{ color: '#334155' }}>tuvivietnam.vn</strong> và <strong style={{ color: '#334155' }}>lyso.vn</strong>.
+              </p>
+              {crawlStatus && (
+                <div style={{
+                  padding: '0.7rem 0.9rem', borderRadius: '10px', marginBottom: '0.9rem',
+                  background: crawlStatus.success ? '#f0fdf4' : '#fef2f2',
+                  color: crawlStatus.success ? '#059669' : '#dc2626',
+                  fontSize: '0.82rem',
+                  border: `1px solid ${crawlStatus.success ? '#bbf7d0' : '#fecaca'}`,
+                }}>
+                  {crawlStatus.message}
+                  {crawlStatus.data && (
+                    <div style={{ fontSize: '0.73rem', marginTop: '4px', color: '#64748b' }}>
+                      Cào: {crawlStatus.data.totalCrawled} | Lưu mới: {crawlStatus.data.savedToDb}
+                    </div>
+                  )}
+                </div>
               )}
-            </button>
+              <button
+                onClick={handleCrawl}
+                disabled={crawling}
+                style={{
+                  width: '100%',
+                  background: crawling ? '#f1f5f9' : 'linear-gradient(135deg, #c5a059, #e2b04a)',
+                  color: crawling ? '#94a3b8' : '#fff',
+                  border: 'none',
+                  padding: '0.75rem',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  cursor: crawling ? 'not-allowed' : 'pointer',
+                  fontSize: '0.875rem',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  boxShadow: crawling ? 'none' : '0 4px 12px rgba(197,160,89,0.35)',
+                }}
+              >
+                {crawling ? (
+                  <><RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> Đang cào...</>
+                ) : (
+                  <><Globe size={15} /> Cào Dữ Liệu Ngay</>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -543,12 +681,3 @@ function roleBadge(role) {
   if (role === 'master') return '🔮 Chuyên gia';
   return '👤 User';
 }
-
-const cardStyle = {
-  background: 'rgba(30, 41, 59, 0.7)',
-  padding: '1.4rem',
-  borderRadius: '16px',
-  border: '1px solid rgba(197, 160, 89, 0.12)',
-  backdropFilter: 'blur(10px)',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-};

@@ -1,7 +1,7 @@
-/* ===== LapLaSoCMS.css v2 ===== */
+/* ===== LapLaSoCMS.css — Light Theme ===== */
 .laso-cms {
   padding: 2rem;
-  color: #e2e8f0;
+  color: #1e293b;
   animation: pageEnter 0.35s cubic-bezier(0.16,1,0.3,1) both;
 }
 
@@ -10,67 +10,71 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-
+/* ── Header ── */
 .laso-cms__header {
   display: flex;
   align-items: center;
   gap: 1.2rem;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .laso-cms__header-icon {
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, #7c3aed, #4c1d95);
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 6px 16px rgba(124,58,237,0.3);
+  flex-shrink: 0;
 }
 
 .laso-cms__title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 0.25rem 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 0.2rem 0;
 }
 
 .laso-cms__subtitle {
-  color: #94a3b8;
+  color: #64748b;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
+/* ── Tabs ── */
 .laso-cms__tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   margin-bottom: 1.5rem;
-  background: rgba(15, 23, 42, 0.5);
-  padding: 0.4rem;
+  background: #f1f5f9;
+  padding: 0.35rem;
   border-radius: 12px;
-  border: 1px solid rgba(197, 160, 89, 0.15);
+  border: 1px solid #e2e8f0;
 }
 
 .laso-cms__tab {
   flex: 1;
-  padding: 0.7rem 1rem;
+  padding: 0.6rem 1rem;
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
 .laso-cms__tab.active {
-  background: linear-gradient(135deg, #7c3aed, #4c1d95);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  background: #ffffff;
+  color: #7c3aed;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-weight: 700;
 }
 
 .laso-cms__tab.disabled {
@@ -79,62 +83,70 @@
 }
 
 .laso-cms__tab:hover:not(.active):not(.disabled) {
-  color: #e2e8f0;
-  background: rgba(255,255,255,0.05);
+  color: #334155;
+  background: #e2e8f0;
 }
 
+/* ── Status ── */
 .laso-cms__status {
-  padding: 1rem 1.2rem;
+  padding: 0.85rem 1rem;
   border-radius: 10px;
   margin-bottom: 1.5rem;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .laso-cms__status.success {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: #f0fdf4;
+  color: #065f46;
+  border: 1px solid #bbf7d0;
 }
 
 .laso-cms__status.error {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
+/* ── Card ── */
 .laso-cms__card {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(197, 160, 89, 0.2);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 1.8rem;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .laso-cms__card-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .laso-cms__card-header h2 {
-  font-size: 1.2rem;
-  color: #fff;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin: 0 0 0.4rem 0;
+  font-weight: 700;
 }
 
 .laso-cms__card-header p {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.85rem;
   margin: 0;
 }
 
+/* ── Section Title ── */
 .laso-cms__section-title {
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #c5a059;
+  color: #7c3aed;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -145,9 +157,10 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(197, 160, 89, 0.2);
+  background: #e2e8f0;
 }
 
+/* ── Form ── */
 .laso-cms__form {
   display: flex;
   flex-direction: column;
@@ -169,41 +182,44 @@
 .laso-cms__form-group.span2 { grid-column: span 2; }
 
 .laso-cms__form-group label {
-  font-size: 0.82rem;
-  color: #94a3b8;
-  font-weight: 500;
+  font-size: 0.78rem;
+  color: #374151;
+  font-weight: 600;
 }
 
 .laso-cms__form-group input,
 .laso-cms__form-group select {
-  padding: 0.7rem 1rem;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(197, 160, 89, 0.2);
+  padding: 0.65rem 1rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
   border-radius: 8px;
-  color: #e2e8f0;
-  font-size: 0.9rem;
+  color: #1e293b;
+  font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
 }
 
 .laso-cms__form-group select option {
-  background: #1e293b;
+  background: #ffffff;
+  color: #1e293b;
 }
 
 .laso-cms__form-group input:focus,
 .laso-cms__form-group select:focus {
   border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
 }
 
+/* ── Save Option ── */
 .laso-cms__save-option {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.8rem 1rem;
-  background: rgba(197, 160, 89, 0.06);
-  border: 1px solid rgba(197, 160, 89, 0.15);
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
   border-radius: 8px;
 }
 
@@ -212,35 +228,37 @@
   align-items: center;
   gap: 0.6rem;
   cursor: pointer;
-  font-size: 0.9rem;
-  color: #e2e8f0;
+  font-size: 0.875rem;
+  color: #78350f;
+  font-weight: 500;
 }
 
 .laso-cms__checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   accent-color: #c5a059;
   cursor: pointer;
 }
 
+/* ── Buttons ── */
 .laso-cms__btn-primary {
-  padding: 0.9rem 1.5rem;
-  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 14px rgba(124,58,237,0.3);
   margin-top: 0.5rem;
+  font-family: inherit;
 }
 
 .laso-cms__btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #6d28d9, #3b0764);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 8px 20px rgba(124,58,237,0.4);
 }
 
 .laso-cms__btn-primary:disabled {
@@ -251,31 +269,33 @@
 
 .laso-cms__btn-secondary {
   padding: 0.7rem 1.2rem;
-  background: transparent;
-  color: #94a3b8;
-  border: 1px solid rgba(197, 160, 89, 0.3);
+  background: #f8fafc;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
   border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
 .laso-cms__btn-secondary:hover {
-  border-color: #c5a059;
-  color: #c5a059;
+  border-color: #7c3aed;
+  color: #7c3aed;
+  background: #f5f3ff;
 }
 
-/* Result styles */
+/* ── Result ── */
 .laso-cms__result-header {
   display: flex;
   align-items: center;
   gap: 1.2rem;
   margin-bottom: 1.5rem;
   padding: 1.2rem;
-  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(197,160,89,0.08));
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(197,160,89,0.04));
   border-radius: 12px;
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(124,58,237,0.15);
 }
 
 .laso-cms__result-avatar {
@@ -293,53 +313,55 @@
 }
 
 .laso-cms__result-name {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
   margin: 0 0 0.3rem 0;
 }
 
 .laso-cms__result-meta {
   display: flex;
   gap: 1rem;
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.85rem;
 }
 
+/* ── Info Grid ── */
 .laso-cms__info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
 .laso-cms__info-card {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(197, 160, 89, 0.15);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 0.9rem 1rem;
+  padding: 0.85rem 1rem;
 }
 
 .laso-cms__info-card.span2 { grid-column: span 2; }
 
 .laso-cms__info-label {
-  font-size: 0.72rem;
-  color: #64748b;
+  font-size: 0.7rem;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.3rem;
+  font-weight: 700;
 }
 
 .laso-cms__info-value {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
 .laso-cms__info-value.gold { color: #c5a059; }
-.laso-cms__info-value.stars { color: #f59e0b; font-size: 1.1rem; letter-spacing: 2px; }
+.laso-cms__info-value.stars { color: #d97706; font-size: 1.1rem; letter-spacing: 2px; }
 
-/* 12 Cung grid */
+/* ── 12 Cung Grid ── */
 .laso-cms__cung-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -347,48 +369,60 @@
 }
 
 .laso-cms__cung-cell {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(197, 160, 89, 0.15);
-  border-radius: 8px;
-  padding: 0.6rem 0.7rem;
+  background: #fafafa;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.7rem;
   position: relative;
   min-height: 90px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.laso-cms__cung-cell:hover { border-color: rgba(197, 160, 89, 0.4); }
-.laso-cms__cung-cell.menh { border-color: rgba(197, 160, 89, 0.5); background: rgba(197, 160, 89, 0.07); }
-.laso-cms__cung-cell.than { border-color: rgba(124, 58, 237, 0.4); background: rgba(124, 58, 237, 0.05); }
+.laso-cms__cung-cell:hover {
+  border-color: rgba(197,160,89,0.4);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+
+.laso-cms__cung-cell.menh {
+  border-color: #c5a059;
+  background: rgba(197,160,89,0.04);
+}
+
+.laso-cms__cung-cell.than {
+  border-color: #7c3aed;
+  background: rgba(124,58,237,0.03);
+}
 
 .laso-cms__cung-name {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #c5a059;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #7c3aed;
   margin-bottom: 2px;
 }
 
 .laso-cms__cung-canchhi {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #64748b;
   margin-bottom: 4px;
+  font-weight: 500;
 }
 
 .laso-cms__cung-daihan {
-  font-size: 0.68rem;
-  color: #475569;
+  font-size: 0.67rem;
+  color: #94a3b8;
   margin-bottom: 3px;
 }
 
 .laso-cms__sao-chinh {
-  font-size: 0.73rem;
-  color: #e2e8f0;
-  font-weight: 500;
+  font-size: 0.72rem;
+  color: #334155;
+  font-weight: 600;
   line-height: 1.3;
 }
 
 .laso-cms__sao-phu {
-  font-size: 0.65rem;
-  color: #94a3b8;
+  font-size: 0.64rem;
+  color: #64748b;
   line-height: 1.2;
 }
 
@@ -396,25 +430,25 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  background: rgba(197, 160, 89, 0.2);
-  color: #c5a059;
+  font-size: 0.58rem;
+  font-weight: 800;
+  background: #fef3c7;
+  color: #92400e;
   padding: 1px 5px;
   border-radius: 4px;
   letter-spacing: 0.5px;
 }
 
 .laso-cms__cung-tag.than {
-  background: rgba(124, 58, 237, 0.2);
-  color: #a78bfa;
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
-/* Advice */
+/* ── Advice ── */
 .laso-cms__advice-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -423,25 +457,26 @@
   gap: 0.7rem;
   align-items: flex-start;
   padding: 0.7rem 1rem;
-  background: rgba(15, 23, 42, 0.4);
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
   border-radius: 8px;
-  font-size: 0.88rem;
-  color: #cbd5e1;
+  font-size: 0.875rem;
+  color: #334155;
   line-height: 1.5;
 }
 
-.laso-cms__advice-bullet { color: #c5a059; flex-shrink: 0; }
+.laso-cms__advice-bullet { color: #7c3aed; flex-shrink: 0; }
 
 .laso-cms__result-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid #f1f5f9;
   margin-top: 1rem;
 }
 
-/* Table */
+/* ── Table / Search ── */
 .laso-cms__search-row {
   display: flex;
   gap: 0.6rem;
@@ -451,75 +486,103 @@
 
 .laso-cms__search {
   padding: 0.55rem 0.9rem;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(197, 160, 89, 0.2);
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
   border-radius: 8px;
-  color: #e2e8f0;
+  color: #1e293b;
   font-size: 0.85rem;
   outline: none;
   width: 240px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.laso-cms__search:focus { border-color: #7c3aed; }
+.laso-cms__search:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
 
 .laso-cms__btn-search {
   padding: 0.55rem 1rem;
-  background: rgba(124, 58, 237, 0.2);
-  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: #ede9fe;
+  border: 1.5px solid #c4b5fd;
   border-radius: 8px;
-  color: #a78bfa;
+  color: #5b21b6;
   font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
-.laso-cms__btn-search:hover { background: rgba(124, 58, 237, 0.35); }
+.laso-cms__btn-search:hover { background: #ddd6fe; }
 
 .laso-cms__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   margin-top: 1rem;
 }
 
 .laso-cms__table th {
-  background: rgba(15, 23, 42, 0.6);
-  color: #94a3b8;
-  font-size: 0.75rem;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.72rem;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  padding: 0.7rem 0.8rem;
+  padding: 0.75rem 0.8rem;
   text-align: left;
-  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 700;
 }
 
 .laso-cms__table td {
   padding: 0.7rem 0.8rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  color: #cbd5e1;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
 }
 
-.laso-cms__table tr:hover td { background: rgba(255,255,255,0.02); }
+.laso-cms__table tr:hover td { background: #f8fafc; }
 
-.laso-cms__td-name { font-weight: 600; color: #fff; }
-.laso-cms__td-gold { color: #c5a059; font-weight: 500; }
+.laso-cms__td-name { font-weight: 700; color: #1e293b; }
+.laso-cms__td-gold { color: #c5a059; font-weight: 600; }
 
 .laso-cms__btn-delete-sm {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
   padding: 0.3rem 0.7rem;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.8rem;
+  font-weight: 600;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
 .laso-cms__btn-delete-sm:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
+  background: #fee2e2;
+  border-color: #dc2626;
 }
 
+.laso-cms__btn-edit-sm {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.laso-cms__btn-edit-sm:hover { background: #fde68a; }
+
+/* ── Pagination ── */
 .laso-cms__pagination {
   display: flex;
   gap: 0.4rem;
@@ -531,51 +594,38 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid rgba(197, 160, 89, 0.2);
-  background: transparent;
-  color: #94a3b8;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
-.laso-cms__page-btn.active, .laso-cms__page-btn:hover {
-  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+.laso-cms__page-btn.active,
+.laso-cms__page-btn:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
   color: #fff;
   border-color: transparent;
+  box-shadow: 0 3px 10px rgba(124,58,237,0.3);
 }
 
-.laso-cms__loading, .laso-cms__empty {
+.laso-cms__loading,
+.laso-cms__empty {
   text-align: center;
   padding: 3rem;
   color: #94a3b8;
   font-size: 0.9rem;
 }
 
-/* ── Edit button ── */
-.laso-cms__btn-edit-sm {
-  background: rgba(197, 160, 89, 0.12);
-  border: 1px solid rgba(197, 160, 89, 0.3);
-  color: #c5a059;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  cursor: pointer;
-  margin-right: 0.4rem;
-  transition: background 0.2s;
-  white-space: nowrap;
-}
-
-.laso-cms__btn-edit-sm:hover {
-  background: rgba(197, 160, 89, 0.25);
-}
-
 /* ── Edit Modal ── */
 .laso-cms__modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(5px);
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -590,16 +640,26 @@
 }
 
 .laso-cms__modal {
-  background: #1e293b;
-  border: 1px solid rgba(197, 160, 89, 0.3);
-  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
   width: 100%;
   max-width: 580px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   animation: lasoSlideUp 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.laso-cms__modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #7c3aed, #c5a059);
 }
 
 @keyframes lasoSlideUp {
@@ -611,20 +671,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.4rem 1.8rem;
-  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+  padding: 1.4rem 1.8rem 1.2rem;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .laso-cms__modal-header h3 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: #1e293b;
   margin: 0;
 }
 
 .laso-cms__modal-close {
-  background: rgba(255, 255, 255, 0.07);
-  border: none;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   color: #94a3b8;
   width: 32px;
   height: 32px;
@@ -638,8 +698,9 @@
 }
 
 .laso-cms__modal-close:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
 }
 
 .laso-cms__modal-body {
@@ -651,34 +712,77 @@
 .laso-cms__modal-body input,
 .laso-cms__modal-body select {
   width: 100%;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(197, 160, 89, 0.2);
-  color: #e0e0e0;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #1e293b;
   padding: 0.65rem 0.9rem;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
 }
 
 .laso-cms__modal-body input:focus,
 .laso-cms__modal-body select:focus {
   border-color: #c5a059;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(197,160,89,0.12);
 }
 
 .laso-cms__modal-footer {
   display: flex;
   gap: 0.8rem;
   padding: 1.2rem 1.8rem;
-  border-top: 1px solid rgba(197, 160, 89, 0.1);
+  border-top: 1px solid #f1f5f9;
 }
+
+/* ── Modal Buttons ── */
+.fb-cms__btn-cancel,
+.laso-cms__btn-cancel {
+  flex: 1;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.7rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.laso-cms__btn-cancel:hover { background: #f1f5f9; color: #334155; }
+
+.laso-cms__btn-save {
+  flex: 2;
+  background: linear-gradient(135deg, #c5a059, #e2b04a);
+  color: #fff;
+  border: none;
+  padding: 0.7rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(197,160,89,0.3);
+  font-family: inherit;
+}
+
+.laso-cms__btn-save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(197,160,89,0.4);
+}
+
+.laso-cms__btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @media (max-width: 768px) {
   .laso-cms { padding: 1rem; }
   .laso-cms__form-row { grid-template-columns: 1fr 1fr; }
   .laso-cms__cung-grid { grid-template-columns: repeat(3, 1fr); }
   .laso-cms__tabs { flex-direction: column; }
-  .laso-cms__table { font-size: 0.75rem; }
+  .laso-cms__table { font-size: 0.78rem; }
 }
 
 @media print {
@@ -687,4 +791,3 @@
   .laso-cms__result-name, .laso-cms__cung-name { color: black; }
   .laso-cms__info-value { color: #333; }
 }
-

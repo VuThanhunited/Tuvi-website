@@ -16,6 +16,15 @@ import {
   getLaSoList,
   deleteLaSo,
   updateLaSo,
+  getDatabaseStatus,
+  importTuViDatabase,
+  seedInterpretationData,
+  createScheduledPost,
+  getScheduledPosts,
+  deleteScheduledPost,
+  postNow,
+  getFBSettings,
+  getMyFBPages,
 } from '../controllers/adminController.js';
 import {
   getMasterProfiles,
@@ -26,6 +35,12 @@ import {
   deleteMasterProfile
 } from '../controllers/masterCMSController.js';
 import upload from '../middleware/upload.js';
+import {
+  pickInterpretations,
+  pickArticles,
+  pickConGiap,
+  pickDiscussions,
+} from '../controllers/contentPickerController.js';
 
 const router = express.Router();
 
@@ -59,5 +74,26 @@ router.post('/masters', createMasterProfile);
 router.put('/masters/:id', updateMasterProfile);
 router.post('/masters/upload-image', upload.single('image'), uploadMasterImage);
 router.delete('/masters/:id', deleteMasterProfile);
+
+// ── Database Management Routes ──
+router.get('/database-status', getDatabaseStatus);
+router.post('/import-tuvi-database', importTuViDatabase);
+router.post('/seed-interpretations', seedInterpretationData);
+
+// ── Facebook Scheduled Posts ──
+router.post('/scheduled-posts', createScheduledPost);
+router.get('/scheduled-posts', getScheduledPosts);
+router.delete('/scheduled-posts/:id', deleteScheduledPost);
+router.post('/scheduled-posts/:id/post-now', postNow);
+
+// ── Facebook Settings ──
+router.get('/fb-settings', getFBSettings);
+router.post('/fb-get-pages', getMyFBPages);  // Dùng User Token → lấy danh sách Pages + Page Tokens
+
+// ── Content Picker (cho tab Lên Lịch) ──
+router.get('/content-picker/interpretations', pickInterpretations);
+router.get('/content-picker/articles', pickArticles);
+router.get('/content-picker/con-giap', pickConGiap);
+router.get('/content-picker/discussions', pickDiscussions);
 
 export default router;

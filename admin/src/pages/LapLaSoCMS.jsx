@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Sparkles } from 'lucide-react';
 import './LapLaSoCMS.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
@@ -107,7 +108,9 @@ export default function LapLaSoCMS() {
   return (
     <div className="laso-cms">
       <header className="laso-cms__header">
-        <div className="laso-cms__header-icon">🔮</div>
+        <div className="laso-cms__header-icon">
+          <Sparkles size={26} color="#fff" strokeWidth={2.5} />
+        </div>
         <div>
           <h1 className="laso-cms__title">Lập Lá Số Tử Vi</h1>
           <p className="laso-cms__subtitle">Nhập thông tin ngày sinh để lập lá số tử vi tức thì</p>

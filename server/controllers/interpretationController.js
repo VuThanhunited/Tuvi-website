@@ -16,6 +16,9 @@ export const getInterpretations = async (req, res, next) => {
       query.$or = [
         { content: { $regex: search, $options: 'i' } },
         { tenCachCuc: { $regex: search, $options: 'i' } },
+        { boSaoPhoi: { $regex: search, $options: 'i' } },
+        { sao: { $regex: search, $options: 'i' } },
+        { cung: { $regex: search, $options: 'i' } },
         { source: { $regex: search, $options: 'i' } }
       ];
     }

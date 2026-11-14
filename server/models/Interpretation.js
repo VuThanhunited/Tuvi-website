@@ -4,8 +4,28 @@ const interpretationSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Vui lòng chọn loại luận giải'],
-    enum: ['sao_cung', 'cung', 'sao', 'cach_cuc', 'tu_hoa', 'dai_han', 'tieu_han', 'khac'],
-    description: 'Loại luận giải (ví dụ: Sao đóng tại cung, Ý nghĩa cung cơ bản, Cách cục...)'
+    enum: ['sao_cung', 'cung', 'sao', 'cach_cuc', 'tu_hoa', 'dai_han', 'tieu_han', 'bo_sao_phoi', 'khac'],
+    description: 'Loại luận giải (ví dụ: Sao đóng tại cung, Ý nghĩa cung cơ bản, Cách cục, Bộ sao phối...)'
+  },
+  boSaoPhoi: {
+    type: String,
+    trim: true,
+    default: '',
+    description: 'Biểu thức hoặc tên Bộ sao Phối (Mệnh Tài Quan Di) dùng cho Quán Tử Vi'
+  },
+  cungCodes: [{
+    type: String,
+    trim: true
+  }],
+  saoCodes: [{
+    type: String,
+    trim: true
+  }],
+  tamHopGroup: {
+    type: String,
+    trim: true,
+    default: '',
+    description: 'Nhóm tam hợp địa chi (HOI_MAO_MUI, DAN_NGO_TUAT, THAN_TY_THIN, TY_DAU_SUU)'
   },
   sao: {
     type: String,
@@ -57,6 +77,7 @@ const interpretationSchema = new mongoose.Schema({
 // Create compound indexes for faster engine lookup later
 interpretationSchema.index({ type: 1, sao: 1, cung: 1 });
 interpretationSchema.index({ type: 1, tenCachCuc: 1 });
+interpretationSchema.index({ type: 1, boSaoPhoi: 1 });
 
 const Interpretation = mongoose.model('Interpretation', interpretationSchema);
 export default Interpretation;

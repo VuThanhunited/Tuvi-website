@@ -1,11 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { Facebook, Clock, Send, Trash2, CheckCircle, XCircle, AlertCircle, Settings, Eye, Zap } from 'lucide-react';
 import './FacebookImportCMS.css';
+import SchedulePostTab from './SchedulePostTab.jsx';
+import './SchedulePostTab.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
 const getToken = () => localStorage.getItem('token');
+const authHeader = () => ({ Authorization: 'Bearer ' + getToken() });
 
-const emptyForm = { title:'', content:'', author:'', imageUrl:'', originalUrl:'', likesCount:0, commentsCount:0 };
+const emptyForm = { title: '', content: '', author: '', imageUrl: '', originalUrl: '', likesCount: 0, commentsCount: 0 };
+const emptyScheduleForm = { content: '', imageUrl: '', scheduledDate: '', scheduledTime: '08:00', sourceType: 'custom' };
+
+// ── Helpers ──
+const statusLabel = (s) => ({ pending: 'Chờ đăng', posted: 'Đã đăng', failed: 'Thất bại', cancelled: 'Đã hủy' }[s] || s);
+const statusClass = (s) => ({ pending: 'badge--pending', posted: 'badge--posted', failed: 'badge--failed', cancelled: 'badge--cancelled' }[s] || '');
+
+const fmtDate = (d) => d ? new Date(d).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+const TABS = [
+  { key: 'manual', label: 'Nhập Thủ Công' },
+  { key: 'api', label: 'Kéo Từ Page' },
+  { key: 'list', label: '' }, // label set dynamically
+  { key: 'schedule', label: '📅 Lên Lịch' },
+  { key: 'scheduled-list', label: '' }, // label set dynamically
+  { key: 'settings', label: '⚙️ Cài Đặt' },
+];
 
 export default function FacebookImportCMS() {
   const [activeTab, setActiveTab] = useState('manual');
@@ -18,32 +38,83 @@ export default function FacebookImportCMS() {
   const [apiForm, setApiForm] = useState({ pageId: '', accessToken: '', limit: 10 });
 
   // Edit modal state
-  const [editPost, setEditPost] = useState(null); // null = đóng, object = đang edit
+  const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
 
+  // Scheduled posts state
+  const [scheduleForm, setScheduleForm] = useState(emptyScheduleForm);
+  const [scheduledPosts, setScheduledPosts] = useState([]);
+  const [scheduledPagination, setScheduledPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+  const [fetchingScheduled, setFetchingScheduled] = useState(false);
+  const [scheduledFilter, setScheduledFilter] = useState('');
+  const [postingNow, setPostingNow] = useState(null);
+  const [previewMode, setPreviewMode] = useState(false);
+
+  // FB Settings state
+  const [fbSettings, setFbSettings] = useState(null);
+  const [fbLoading, setFbLoading] = useState(false);
+  // User Token → Pages helper
+  const [userToken, setUserToken] = useState('');
+  const [fbPages, setFbPages] = useState([]);
+  const [fetchingPages, setFetchingPages] = useState(false);
+  const [copiedId, setCopiedId] = useState('');  // id page vừa copy token
+
+  // ── Interpretation source picker ──
+  const [interpretations, setInterpretations] = useState([]);
+  const [interpSearch, setInterpSearch] = useState('');
+  const [interpLoading, setInterpLoading] = useState(false);
+
   useEffect(() => { if (activeTab === 'list') fetchPosts(1); }, [activeTab]);
+  useEffect(() => { if (activeTab === 'scheduled-list') fetchScheduledPosts(1); }, [activeTab]);
+  useEffect(() => { if (activeTab === 'settings') loadFBSettings(); }, [activeTab]);
 
   const showStatus = (success, message) => {
     setStatus({ success, message });
-    setTimeout(() => setStatus(null), 4000);
+    setTimeout(() => setStatus(null), 5000);
   };
 
+  // ── Fetch imported FB posts ──
   const fetchPosts = async (page = 1) => {
     setFetchingList(true);
     try {
-      const url = API_URL + '/admin/facebook-posts?page=' + page + '&limit=15';
-      const res = await axios.get(url, { headers: { Authorization: 'Bearer ' + getToken() } });
+      const res = await axios.get(`${API_URL}/admin/facebook-posts?page=${page}&limit=15`, { headers: authHeader() });
       if (res.data.success) { setPosts(res.data.data); setPagination(res.data.pagination); }
     } catch (err) { console.error(err); }
     finally { setFetchingList(false); }
   };
 
+  // ── Fetch scheduled posts ──
+  const fetchScheduledPosts = useCallback(async (page = 1) => {
+    setFetchingScheduled(true);
+    try {
+      const params = new URLSearchParams({ page, limit: 20 });
+      if (scheduledFilter) params.set('status', scheduledFilter);
+      const res = await axios.get(`${API_URL}/admin/scheduled-posts?${params}`, { headers: authHeader() });
+      if (res.data.success) {
+        setScheduledPosts(res.data.data);
+        setScheduledPagination(res.data.pagination);
+      }
+    } catch (err) { console.error(err); }
+    finally { setFetchingScheduled(false); }
+  }, [scheduledFilter]);
+
+  useEffect(() => { if (activeTab === 'scheduled-list') fetchScheduledPosts(1); }, [scheduledFilter]);
+
+  // ── Load FB settings ──
+  const loadFBSettings = async () => {
+    setFbLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/admin/fb-settings`, { headers: authHeader() });
+      if (res.data.success) setFbSettings(res.data.data);
+    } catch (err) { console.error(err); }
+    finally { setFbLoading(false); }
+  };
+
+  // ── Manual submit ──
   const handleManualSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setStatus(null);
     try {
-      const res = await axios.post(API_URL + '/admin/import-facebook-post', manualForm, {
-        headers: { Authorization: 'Bearer ' + getToken() }
-      });
+      const res = await axios.post(`${API_URL}/admin/import-facebook-post`, manualForm, { headers: authHeader() });
       showStatus(res.data.success, res.data.message);
       if (res.data.success) setManualForm(emptyForm);
     } catch (err) {
@@ -51,78 +122,138 @@ export default function FacebookImportCMS() {
     } finally { setLoading(false); }
   };
 
+  // ── API submit ──
   const handleApiSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setStatus(null);
     try {
-      const res = await axios.post(API_URL + '/admin/fetch-facebook-page', apiForm, {
-        headers: { Authorization: 'Bearer ' + getToken() }
-      });
+      const res = await axios.post(`${API_URL}/admin/fetch-facebook-page`, apiForm, { headers: authHeader() });
       showStatus(res.data.success, res.data.message);
     } catch (err) {
       showStatus(false, err.response?.data?.message || 'Lỗi kết nối!');
     } finally { setLoading(false); }
   };
 
+  // ── Delete imported post ──
   const handleDelete = async (id) => {
     if (!window.confirm('Xóa bài viết này?')) return;
     try {
-      await axios.delete(API_URL + '/admin/facebook-posts/' + id, { headers: { Authorization: 'Bearer ' + getToken() } });
+      await axios.delete(`${API_URL}/admin/facebook-posts/${id}`, { headers: authHeader() });
       fetchPosts(pagination.page);
     } catch (err) { alert('Lỗi xóa bài viết'); }
   };
 
   // ── Edit handlers ──
-  const openEdit = (post) => {
-    setEditPost({
-      _id: post._id,
-      title: post.title || '',
-      content: post.content || '',
-      author: post.author || '',
-      imageUrl: post.imageUrl || '',
-      originalUrl: post.originalUrl || '',
-      likesCount: post.likesCount || 0,
-      commentsCount: post.commentsCount || 0,
-    });
-  };
+  const openEdit = (post) => setEditPost({
+    _id: post._id, title: post.title || '', content: post.content || '',
+    author: post.author || '', imageUrl: post.imageUrl || '',
+    originalUrl: post.originalUrl || '', likesCount: post.likesCount || 0, commentsCount: post.commentsCount || 0,
+  });
 
   const handleEditSave = async () => {
     setEditLoading(true);
     try {
-      const res = await axios.put(API_URL + '/admin/facebook-posts/' + editPost._id, editPost, {
-        headers: { Authorization: 'Bearer ' + getToken() }
-      });
+      const res = await axios.put(`${API_URL}/admin/facebook-posts/${editPost._id}`, editPost, { headers: authHeader() });
       if (res.data.success) {
         showStatus(true, 'Đã cập nhật bài viết thành công!');
         setPosts(prev => prev.map(p => p._id === editPost._id ? res.data.data : p));
         setEditPost(null);
-      } else {
-        showStatus(false, res.data.message);
-      }
+      } else { showStatus(false, res.data.message); }
     } catch (err) {
       showStatus(false, err.response?.data?.message || 'Lỗi cập nhật!');
-    } finally {
-      setEditLoading(false);
+    } finally { setEditLoading(false); }
+  };
+
+  // ── Schedule post ──
+  const handleScheduleSubmit = async (e) => {
+    e.preventDefault(); setLoading(true); setStatus(null);
+    try {
+      const scheduledAt = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}:00`).toISOString();
+      const payload = {
+        content: scheduleForm.content,
+        imageUrl: scheduleForm.imageUrl,
+        scheduledAt,
+        sourceType: scheduleForm.sourceType,
+      };
+      const res = await axios.post(`${API_URL}/admin/scheduled-posts`, payload, { headers: authHeader() });
+      showStatus(res.data.success, res.data.message);
+      if (res.data.success) {
+        setScheduleForm(emptyScheduleForm);
+        setPreviewMode(false);
+      }
+    } catch (err) {
+      showStatus(false, err.response?.data?.message || 'Lỗi lên lịch!');
+    } finally { setLoading(false); }
+  };
+
+  // ── Delete scheduled post ──
+  const handleDeleteScheduled = async (id) => {
+    if (!window.confirm('Hủy lịch đăng bài này?')) return;
+    try {
+      await axios.delete(`${API_URL}/admin/scheduled-posts/${id}`, { headers: authHeader() });
+      fetchScheduledPosts(scheduledPagination.page);
+      showStatus(true, 'Đã hủy lịch đăng bài.');
+    } catch (err) {
+      showStatus(false, err.response?.data?.message || 'Lỗi hủy lịch!');
     }
+  };
+
+  // ── Post now ──
+  const handlePostNow = async (id) => {
+    if (!window.confirm('Đăng ngay lập tức bài này lên Facebook?')) return;
+    setPostingNow(id);
+    try {
+      const res = await axios.post(`${API_URL}/admin/scheduled-posts/${id}/post-now`, {}, { headers: authHeader() });
+      showStatus(res.data.success, res.data.message);
+      fetchScheduledPosts(scheduledPagination.page);
+    } catch (err) {
+      showStatus(false, err.response?.data?.message || 'Lỗi đăng bài!');
+    } finally { setPostingNow(null); }
+  };
+
+  // ── Load interpretations for picker ──
+  const searchInterpretations = async () => {
+    setInterpLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/interpretations?search=${interpSearch}&limit=10`, { headers: authHeader() });
+      if (res.data.success) setInterpretations(res.data.data || []);
+    } catch (err) { console.error(err); }
+    finally { setInterpLoading(false); }
+  };
+
+  const selectInterpretation = (interp) => {
+    const hashtags = '\n\n#tửvi #tuvivi #luậngiải #phongthủy #tuviviet';
+    setScheduleForm(prev => ({
+      ...prev,
+      content: `${interp.sao ? `✨ ${interp.sao}${interp.cung ? ` tại cung ${interp.cung}` : ''}\n\n` : ''}${interp.content}${hashtags}`,
+      sourceType: 'interpretation',
+    }));
+    setInterpretations([]);
+    setInterpSearch('');
+  };
+
+  // Dynamic tab labels
+  const getTabLabel = (key) => {
+    if (key === 'list') return `Đã Nhập (${pagination.total})`;
+    if (key === 'scheduled-list') return `📋 Lịch Đăng (${scheduledPagination.total})`;
+    return TABS.find(t => t.key === key)?.label || key;
   };
 
   return (
     <div className="fb-cms">
       <header className="fb-cms__header">
-        <div className="fb-cms__header-icon">📘</div>
+        <div className="fb-cms__header-icon">
+          <Facebook size={26} color="#fff" strokeWidth={2.5} />
+        </div>
         <div>
-          <h1 className="fb-cms__title">Kéo Bài Viết Facebook</h1>
-          <p className="fb-cms__subtitle">Nhập thủ công hoặc kéo tự động bài từ trang Facebook</p>
+          <h1 className="fb-cms__title">Facebook Auto-Post</h1>
+          <p className="fb-cms__subtitle">Quản lý bài viết và lên lịch đăng tự động lên Facebook Page</p>
         </div>
       </header>
 
       <div className="fb-cms__tabs">
-        {[
-          { key: 'manual', label: 'Nhập Thủ Công' },
-          { key: 'api', label: 'Kéo Từ Page (Graph API)' },
-          { key: 'list', label: 'Đã Nhập (' + pagination.total + ')' },
-        ].map(t => (
+        {TABS.map(t => (
           <button key={t.key} className={'fb-cms__tab' + (activeTab === t.key ? ' active' : '')} onClick={() => setActiveTab(t.key)}>
-            {t.label}
+            {getTabLabel(t.key)}
           </button>
         ))}
       </div>
@@ -133,6 +264,7 @@ export default function FacebookImportCMS() {
         </div>
       )}
 
+      {/* ── Tab: Nhập thủ công ── */}
       {activeTab === 'manual' && (
         <div className="fb-cms__card">
           <div className="fb-cms__card-header">
@@ -186,6 +318,7 @@ export default function FacebookImportCMS() {
         </div>
       )}
 
+      {/* ── Tab: Kéo từ Page ── */}
       {activeTab === 'api' && (
         <div className="fb-cms__card">
           <div className="fb-cms__card-header">
@@ -226,6 +359,7 @@ export default function FacebookImportCMS() {
         </div>
       )}
 
+      {/* ── Tab: Danh sách đã nhập ── */}
       {activeTab === 'list' && (
         <div className="fb-cms__card">
           <div className="fb-cms__card-header">
@@ -241,7 +375,7 @@ export default function FacebookImportCMS() {
               <div className="fb-cms__post-list">
                 {posts.map(post => (
                   <div key={post._id} className="fb-cms__post-item">
-                    {post.imageUrl && <img src={post.imageUrl} alt="" className="fb-cms__post-thumb" onError={e => { e.target.style.display='none'; }} />}
+                    {post.imageUrl && <img src={post.imageUrl} alt="" className="fb-cms__post-thumb" onError={e => { e.target.style.display = 'none'; }} />}
                     <div className="fb-cms__post-body">
                       <div className="fb-cms__post-meta">
                         <span className="fb-cms__badge">Facebook</span>
@@ -274,6 +408,219 @@ export default function FacebookImportCMS() {
         </div>
       )}
 
+      {/* ── Tab: Lên Lịch ── */}
+      {activeTab === 'schedule' && (
+        <div className="fb-cms__card">
+          <div className="fb-cms__card-header">
+            <h2>📅 Lên Lịch Đăng Bài</h2>
+            <p>Chọn nội dung từ website và đặt giờ — hệ thống tự động đăng lên Facebook Page</p>
+          </div>
+          <SchedulePostTab onShowStatus={showStatus} />
+        </div>
+      )}
+
+      {/* ── Tab: Lịch đăng ── */}
+      {activeTab === 'scheduled-list' && (
+        <div className="fb-cms__card">
+          <div className="fb-cms__card-header">
+            <h2>📋 Lịch Đăng Đã Tạo</h2>
+            <p>Tổng <strong>{scheduledPagination.total}</strong> bài · cron job chạy mỗi 5 phút</p>
+          </div>
+
+          {/* Filter bar */}
+          <div className="sched__filter-bar">
+            {[{ v: '', l: 'Tất cả' }, { v: 'pending', l: '⏳ Chờ đăng' }, { v: 'posted', l: '✅ Đã đăng' }, { v: 'failed', l: '❌ Thất bại' }].map(({ v, l }) => (
+              <button key={v} className={'sched__filter-btn' + (scheduledFilter === v ? ' active' : '')}
+                onClick={() => setScheduledFilter(v)}>{l}</button>
+            ))}
+            <button className="sched__refresh-btn" onClick={() => fetchScheduledPosts(1)}>🔄 Làm mới</button>
+          </div>
+
+          {fetchingScheduled ? (
+            <div className="fb-cms__loading">Đang tải...</div>
+          ) : scheduledPosts.length === 0 ? (
+            <div className="fb-cms__empty">
+              <p>Chưa có bài viết nào được lên lịch.</p>
+              <button className="fb-cms__btn-primary" onClick={() => setActiveTab('schedule')}>
+                + Lên lịch bài đầu tiên
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="sched__post-list">
+                {scheduledPosts.map(post => (
+                  <div key={post._id} className={`sched__post-item sched__post-item--${post.status}`}>
+                    <div className="sched__post-time">
+                      <Clock size={14} />
+                      <span>{fmtDate(post.scheduledAt)}</span>
+                      <span className={`sched__badge ${statusClass(post.status)}`}>{statusLabel(post.status)}</span>
+                    </div>
+                    <p className="sched__post-content">{(post.content || '').substring(0, 200)}{post.content?.length > 200 ? '...' : ''}</p>
+                    {post.imageUrl && <div className="sched__post-img-hint">📷 Có ảnh đính kèm</div>}
+                    {post.fbPostUrl && (
+                      <a href={post.fbPostUrl} target="_blank" rel="noreferrer" className="sched__fb-link">
+                        Xem trên Facebook →
+                      </a>
+                    )}
+                    {post.error && <div className="sched__post-error">⚠️ {post.error}</div>}
+                    <div className="sched__post-actions">
+                      {post.status !== 'posted' && (
+                        <>
+                          <button className="sched__btn-postnow"
+                            onClick={() => handlePostNow(post._id)}
+                            disabled={postingNow === post._id}>
+                            <Zap size={13} />
+                            {postingNow === post._id ? 'Đang đăng...' : 'Đăng ngay'}
+                          </button>
+                          <button className="sched__btn-delete" onClick={() => handleDeleteScheduled(post._id)}>
+                            <Trash2 size={13} /> Hủy
+                          </button>
+                        </>
+                      )}
+                      {post.postedAt && <span className="sched__posted-at">Đã đăng: {fmtDate(post.postedAt)}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {scheduledPagination.totalPages > 1 && (
+                <div className="fb-cms__pagination">
+                  {Array.from({ length: scheduledPagination.totalPages }, (_, i) => i + 1).map(p => (
+                    <button key={p} className={'fb-cms__page-btn' + (p === scheduledPagination.page ? ' active' : '')}
+                      onClick={() => fetchScheduledPosts(p)}>{p}</button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Tab: Cài đặt ── */}
+      {activeTab === 'settings' && (
+        <div className="fb-cms__card">
+          <div className="fb-cms__card-header">
+            <h2>⚙️ Cài Đặt Facebook</h2>
+            <p>Kết nối tài khoản Facebook Page để hệ thống tự động đăng bài</p>
+          </div>
+
+          {/* ── NOTICE: Giải thích rõ cần Page, không thể dùng tài khoản cá nhân ── */}
+          <div className="settings__notice">
+            <div className="settings__notice-icon">⚠️</div>
+            <div>
+              <strong>Facebook chỉ cho phép đăng bài qua API lên Facebook PAGE</strong>
+              <p>Không thể đăng lên timeline cá nhân (Facebook đã xóa tính năng này từ 2018).
+              Bạn cần có <strong>Facebook Page / Fanpage</strong> và cấp quyền cho ứng dụng.</p>
+            </div>
+          </div>
+
+          {/* ── Bước 1: Dùng User Token lấy danh sách Pages ── */}
+          <div className="settings__section">
+            <h3 className="settings__section-title">📋 Bước 1 — Lấy danh sách Pages bạn quản lý</h3>
+            <p className="settings__section-desc">
+              Nhập <strong>User Access Token</strong> (lấy từ <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noreferrer">Graph API Explorer</a> → chọn quyền <code>pages_manage_posts</code>) → hệ thống tự tìm Page Token.
+            </p>
+            <div className="settings__token-row">
+              <input
+                type="password"
+                placeholder="EAAxxxxxxxx... (User Access Token)"
+                value={userToken}
+                onChange={e => setUserToken(e.target.value)}
+                className="settings__token-input"
+              />
+              <button
+                className="settings__btn-fetch"
+                disabled={fetchingPages || !userToken.trim()}
+                onClick={async () => {
+                  setFetchingPages(true); setFbPages([]);
+                  try {
+                    const res = await axios.post(API_URL + '/admin/fb-get-pages', { userToken }, { headers: authHeader() });
+                    if (res.data.success) { setFbPages(res.data.data); showStatus(true, res.data.message); }
+                    else showStatus(false, res.data.message);
+                  } catch (err) { showStatus(false, err.response?.data?.message || 'Lỗi kết nối!'); }
+                  finally { setFetchingPages(false); }
+                }}
+              >
+                {fetchingPages ? '⏳ Đang tìm...' : '🔍 Tìm Pages của tôi'}
+              </button>
+            </div>
+
+            {/* Danh sách Pages tìm được */}
+            {fbPages.length > 0 && (
+              <div className="settings__pages-list">
+                <p className="settings__pages-hint">Nhấn <strong>Copy Page Token</strong> → dán vào file <code>.env</code> của server</p>
+                {fbPages.map(page => (
+                  <div key={page.id} className="settings__page-card">
+                    {page.picture && <img src={page.picture} alt="" className="settings__page-avatar" />}
+                    <div className="settings__page-info-col">
+                      <strong>{page.name}</strong>
+                      <span>ID: {page.id}</span>
+                      {page.fanCount > 0 && <span>👥 {page.fanCount.toLocaleString('vi-VN')} người theo dõi</span>}
+                    </div>
+                    <div className="settings__page-actions">
+                      <button
+                        className="settings__btn-copy-id"
+                        onClick={() => { navigator.clipboard.writeText(page.id); setCopiedId('id-' + page.id); setTimeout(() => setCopiedId(''), 2000); }}
+                      >
+                        {copiedId === 'id-' + page.id ? '✅ Đã copy ID' : '📋 Copy Page ID'}
+                      </button>
+                      <button
+                        className="settings__btn-copy-token"
+                        onClick={() => { navigator.clipboard.writeText(page.pageToken); setCopiedId('tok-' + page.id); setTimeout(() => setCopiedId(''), 2000); }}
+                      >
+                        {copiedId === 'tok-' + page.id ? '✅ Đã copy Token' : '🔑 Copy Page Token'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Bước 2: Dán vào .env ── */}
+          <div className="settings__section">
+            <h3 className="settings__section-title">⚙️ Bước 2 — Cấu hình file .env server</h3>
+            <div className="settings__env-guide">
+              <AlertCircle size={16} />
+              <div>
+                <strong>Dán vào file <code>.env</code> của server:</strong>
+                <pre>{`FB_PAGE_ID=<Page ID vừa copy bên trên>\nFB_PAGE_TOKEN=<Page Token vừa copy bên trên>`}</pre>
+                <p>⚠️ Page Token hết hạn sau <strong>60 ngày</strong>. Sau khi hết hạn, lấy lại bằng cách lấy User Token mới → làm lại bước 1.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Bước 3: Kiểm tra kết nối ── */}
+          <div className="settings__section">
+            <h3 className="settings__section-title">✅ Bước 3 — Kiểm tra kết nối hiện tại</h3>
+            {fbLoading ? (
+              <div className="fb-cms__loading">Đang kiểm tra...</div>
+            ) : fbSettings ? (
+              <div>
+                <div className={`settings__status-card ${fbSettings.valid ? 'valid' : 'invalid'}`}>
+                  {fbSettings.valid ? <CheckCircle size={28} /> : <XCircle size={28} />}
+                  <div>
+                    <h3>{fbSettings.valid ? '✅ Kết nối thành công!' : '❌ Chưa kết nối'}</h3>
+                    <p>{fbSettings.valid ? `Page: ${fbSettings.page?.name || fbSettings.pageId}` : fbSettings.message}</p>
+                  </div>
+                </div>
+                {fbSettings.valid && fbSettings.page && (
+                  <div className="settings__page-info" style={{marginTop:'0.8rem'}}>
+                    <div className="settings__info-row"><span>Page ID:</span><strong>{fbSettings.page.id}</strong></div>
+                    <div className="settings__info-row"><span>Tên Page:</span><strong>{fbSettings.page.name}</strong></div>
+                    {fbSettings.page.fan_count !== undefined && (
+                      <div className="settings__info-row"><span>Người theo dõi:</span><strong>{fbSettings.page.fan_count?.toLocaleString('vi-VN')}</strong></div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : null}
+            <button className="fb-cms__btn-primary" style={{marginTop:'0.8rem'}} onClick={loadFBSettings}>
+              🔄 Kiểm tra kết nối
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Edit Modal ── */}
       {editPost && (
         <div className="fb-cms__modal-overlay" onClick={() => setEditPost(null)}>
@@ -282,7 +629,6 @@ export default function FacebookImportCMS() {
               <h3>✏️ Chỉnh Sửa Bài Viết</h3>
               <button className="fb-cms__modal-close" onClick={() => setEditPost(null)}>✕</button>
             </div>
-
             <div className="fb-cms__modal-body">
               <div className="fb-cms__form-group full">
                 <label>Nội dung bài viết *</label>
@@ -327,7 +673,6 @@ export default function FacebookImportCMS() {
                 </div>
               </div>
             </div>
-
             <div className="fb-cms__modal-footer">
               <button className="fb-cms__btn-cancel" onClick={() => setEditPost(null)}>Hủy</button>
               <button className="fb-cms__btn-save" onClick={handleEditSave} disabled={editLoading}>

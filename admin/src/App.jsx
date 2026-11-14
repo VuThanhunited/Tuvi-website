@@ -12,8 +12,9 @@ import LapLaSoCMS          from './pages/LapLaSoCMS';
 import UsersCMS             from './pages/UsersCMS';
 import {
   LayoutDashboard, Users, BookOpen, LogOut,
-  Facebook, Star, UserCog, Bell, ChevronRight,
-  Menu, X, Sparkles,
+  Facebook, Sparkles, Bell, ChevronRight,
+  Menu, X, Shield, UserCog, Globe,
+  FileSearch, CalendarDays, BarChart3,
 } from 'lucide-react';
 import './App.css';
 
@@ -40,15 +41,15 @@ const NAV_GROUPS = [
   {
     label: 'Tổng Quan',
     items: [
-      { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Bảng Điều Khiển' },
+      { to: '/dashboard', icon: <BarChart3 size={18} />, label: 'Bảng Điều Khiển' },
     ],
   },
   {
     label: 'Nội Dung',
     items: [
-      { to: '/facebook-import', icon: <Facebook size={18} />,  label: 'Kéo Bài Facebook' },
-      { to: '/lap-la-so',       icon: <Star size={18} />,       label: 'Lập Lá Số' },
-      { to: '/masters',         icon: <UserCog size={18} />,    label: 'Quản lý Chuyên gia' },
+      { to: '/facebook-import', icon: <Facebook size={18} />,   label: 'Kéo Bài Facebook' },
+      { to: '/lap-la-so',       icon: <Sparkles size={18} />,   label: 'Lập Lá Số' },
+      { to: '/masters',         icon: <Shield size={18} />,     label: 'Quản lý Chuyên gia' },
       { to: '/interpretations', icon: <BookOpen size={18} />,   label: 'Quản lý Luận giải' },
     ],
   },
@@ -140,7 +141,7 @@ function Sidebar({ open }) {
       {/* ── Logo ── */}
       <div className="admin-sidebar__logo">
         <div className="admin-sidebar__logo-icon">
-          <Sparkles size={22} color="#c5a059" />
+          <Sparkles size={20} color="#fff" />
         </div>
         <div>
           <div className="admin-sidebar__logo-name">TuVi Admin</div>

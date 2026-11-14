@@ -3,22 +3,32 @@ import mongoose from 'mongoose';
 // Schema cho mỗi sao (chính hoặc phụ)
 const saoSchema = new mongoose.Schema({
   ten: String,        // Tên sao
+  code: String,       // Mã biến chuẩn (VD: TU_VI, TA_PHU, KINH_DUONG)
+  nhomSao: String,    // 'chinh' | 'cat' | 'hung'
   trangThai: String,  // M/V/Đ/B/H
-  mau: String,        // 'do' | 'xam' | 'ham'
+  mau: String,        // 'do' | 'xanh' | 'xam' | 'ham'
   loai: String,       // 'chinh' | 'phu' | 'sat' | 'loc' | 'hoa-loc' | 'hoa-ky' | ...
   amDuong: String,    // '+' | '-'
+  isLuu: Boolean,
 }, { _id: false });
 
 // Schema cho Hóa tinh
 const hoaTinhSchema = new mongoose.Schema({
   ten: String,  // 'Hóa Lộc' | 'Hóa Quyền' | 'Hóa Khoa' | 'Hóa Kỵ'
+  code: String, // HOA_LOC | HOA_QUYEN | HOA_KHOA | HOA_KY
+  nhomSao: String, // 'cat' | 'hung'
   cung: String, // Tên cung chứa sao này
   loai: String, // 'hoa-loc' | 'hoa-quyen' | 'hoa-khoa' | 'hoa-ky'
+  isLuu: Boolean,
 }, { _id: false });
 
 // Schema cho từng cung trong lá số
 const cungResultSchema = new mongoose.Schema({
   gridIdx: Number,      // Vị trí trong lưới 4x4 (0-11)
+  bienCode: String,     // Biến x1..x12
+  cungCode: String,     // Mã cố định MENH, PHU_MAU, ...
+  diaChi: String,       // Tên địa chi thực tế (Dần, Mão, ...)
+  isMainCheckGroup: Boolean, // Thuộc nhóm kiểm tra chính (Mệnh, Tài, Quan, Di)
   name: String,         // Tên cung (Mệnh, Phụ Mẫu, ...)
   icon: String,
   daiHan: Number,       // Đại hạn (tuổi)
@@ -102,6 +112,9 @@ const tuViResultSchema = new mongoose.Schema({
 
   // Phân tích chi tiết từ Database
   detailedAnalysis: { type: mongoose.Schema.Types.Mixed },
+
+  // Kết quả đối chiếu Quán Tử Vi (Bộ sao Phối Mệnh - Tài - Quan - Di)
+  quanTuViResults: { type: mongoose.Schema.Types.Mixed, default: [] },
 }, {
   timestamps: true,
 });

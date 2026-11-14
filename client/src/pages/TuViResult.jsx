@@ -1,10 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
 import ParticleBackground from '../components/ParticleBackground/ParticleBackground.jsx';
-import ContentGate from '../components/ContentGate/ContentGate.jsx';
 import './TuViResult.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://tuvi-website.onrender.com/api';
+
+/* ── Thứ tự 12 cung hiển thị ở bảng chọn Luận giải (3 cột x 4 hàng) ── */
+const CUNG_DISPLAY_ORDER = [
+  'Mệnh', 'Phụ Mẫu', 'Phúc Đức',
+  'Điền Trạch', 'Quan Lộc', 'Nô Bộc',
+  'Thiên Di', 'Tật Ách', 'Tài Bạch',
+  'Tử Tức', 'Phu Thê', 'Huynh Đệ',
+];
+
+const CUNG_INTRO_MAP = {
+  'Mệnh': 'Cung Mệnh là phần mở đầu để xem tính cách và khuynh hướng của đương số. Khi luận giải, cần đối chiếu với các cung Tài Bạch, Quan Lộc và Thiên Di.',
+  'Phụ Mẫu': 'Cung Phụ Mẫu phản ánh mối quan hệ với cha mẹ, nền tảng gia phong và phúc ấm sinh thành. Khi luận giải, cần đối chiếu với các cung Tật Ách, Nô Bộc và Tử Tức.',
+  'Phúc Đức': 'Cung Phúc Đức thể hiện phúc phần tổ tiên, đời sống tinh thần và sự an yên nội tâm. Khi luận giải, cần đối chiếu với các cung Tài Bạch, Phu Thê và Thiên Di.',
+  'Điền Trạch': 'Cung Điền Trạch chủ về nhà cửa, đất đai, tài sản tích lũy và môi trường sống. Khi luận giải, cần đối chiếu với các cung Huynh Đệ, Tật Ách và Tử Tức.',
+  'Quan Lộc': 'Cung Quan Lộc đại diện cho sự nghiệp, công danh, vị thế xã hội và định hướng nghề nghiệp. Khi luận giải, cần đối chiếu với các cung Mệnh, Tài Bạch và Phu Thê.',
+  'Nô Bộc': 'Cung Nô Bộc phản ánh bạn bè, đồng nghiệp, cộng sự và các mối quan hệ xã hội. Khi luận giải, cần đối chiếu với các cung Huynh Đệ, Phụ Mẫu và Tử Tức.',
+  'Thiên Di': 'Cung Thiên Di chủ về xuất ngoại, giao tiếp xã hội, khả năng thích nghi và quý nhân bên ngoài. Khi luận giải, cần đối chiếu với các cung Mệnh, Phúc Đức và Phu Thê.',
+  'Tật Ách': 'Cung Tật Ách phản ánh thể chất, sức khỏe, tai ách và phương diện nội tâm ẩn giấu. Khi luận giải, cần đối chiếu với các cung Phụ Mẫu, Điền Trạch và Huynh Đệ.',
+  'Tài Bạch': 'Cung Tài Bạch chủ về năng lực tài chính, nguồn thu nhập và cách quản lý tiền bạc. Khi luận giải, cần đối chiếu với các cung Mệnh, Quan Lộc và Phúc Đức.',
+  'Tử Tức': 'Cung Tử Tức phản ánh đường con cái, mối liên kết thế hệ sau và khả năng truyền thừa. Khi luận giải, cần đối chiếu với các cung Điền Trạch, Nô Bộc và Phụ Mẫu.',
+  'Phu Thê': 'Cung Phu Thê phản ánh nhân duyên, hôn nhân và sự hòa hợp giữa hai vợ chồng. Khi luận giải, cần đối chiếu với các cung Phúc Đức, Quan Lộc và Thiên Di.',
+  'Huynh Đệ': 'Cung Huynh Đệ chủ về anh chị em trong gia đình, bạn đồng hành thân cận. Khi luận giải, cần đối chiếu với các cung Điền Trạch, Nô Bộc và Tật Ách.',
+};
 
 /*
  * Cung Chiếu Overlay - Đường chiếu cung (tam hợp + xung chiếu)
@@ -40,43 +63,64 @@ function CungChieuOverlay({ hoveredCung }) {
   );
 }
 
-// Màu Hóa tinh
-const HOA_TINH_STYLE = {
-  'hoa-loc':   { color: '#1565c0', label: 'Hóa Lộc' },
-  'hoa-quyen': { color: '#6a1b9a', label: 'Hóa Quyền' },
-  'hoa-khoa':  { color: '#00838f', label: 'Hóa Khoa' },
-  'hoa-ky':    { color: '#b71c1c', label: 'Hóa Kỵ' },
-};
+/* ── Icon hoa sen vàng ── */
+function LotusIcon() {
+  return (
+    <svg className="lotus-svg" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M18 3C15.5 8 14.5 13 18 19C21.5 13 20.5 8 18 3Z" stroke="#f5d27b" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M18 19C12 16 9.5 11.5 10.5 6.5C13.5 9.5 16 13.5 18 19Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 19C24 16 26.5 11.5 25.5 6.5C22.5 9.5 20 13.5 18 19Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 20C10.5 20 6 16.5 4.5 11.5C9.5 13 13.5 15.5 18 20Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 20C25.5 20 30 16.5 31.5 11.5C26.5 13 22.5 15.5 18 20Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M8 22.5C13 21 23 21 28 22.5" stroke="#f5d27b" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
 
-// Màu sao phụ theo loại - Match exactly tuvi.vn colors
-const SAO_PHU_COLOR = {
-  'sat':  '#555555',  // sát tinh - xám đen
-  'loc':  '#d32f2f',  // lộc - đỏ
-  'van':  '#1565c0',  // văn - xanh
-  'quy':  '#d32f2f',  // quý nhân - đỏ
-  'phu':  '#7b1fa2',  // phụ trợ - tím
-  'tro':  '#2e7d32',  // hỗ trợ - xanh lá đậm
-  'dao':  '#f57c00',  // đào hoa - cam
-  'ham':  '#888888',  // hung tinh - xám
-  'default': '#555',
-};
+/* ── Phân loại Cát tinh (xanh lá) / Hung tinh (đỏ) ── */
+const HUNG_KEYWORDS = [
+  'kình dương', 'đà la', 'hỏa tinh', 'linh tinh', 'địa không', 'địa kiếp',
+  'hóa kỵ', 'thiên hình', 'thiên diêu', 'kiếp sát', 'đại hao', 'tiểu hao',
+  'tuế phá', 'thiên khốc', 'thiên hư', 'cô thần', 'quả tú', 'bạch hổ',
+  'tang môn', 'điếu khách', 'phá toái', 'quan phù', 'quan phủ', 'tử phù',
+  'thiên la', 'địa võng', 'phục binh', 'lưu hà', 'thiên không', 'đẩu quân',
+  'thiên thương', 'thiên sứ', 'bệnh phù', 'thái tuế', 'trực phù', 'tuần không', 'triệt lộ'
+];
 
-// Color map for sao chính by trangThai - matching tuvi.vn
+function getSaoNhomColor(sao) {
+  if (sao.nhomSao === 'cat') return '#2e7d32'; // Xanh lá cho Cát tinh
+  if (sao.nhomSao === 'hung') return '#d32f2f'; // Đỏ cho Hung tinh
+  if (sao.loai === 'hoa-ky' || sao.loai === 'sat' || sao.mau === 'ham' || sao.mau === 'do') {
+    // Check if it's actually a Hung tinh by name or type
+    const low = (sao.ten || '').toLowerCase();
+    if (sao.loai === 'hoa-ky' || sao.loai === 'sat' || HUNG_KEYWORDS.some(k => low.includes(k))) {
+      return '#d32f2f';
+    }
+  }
+  const low = (sao.ten || '').toLowerCase();
+  if (HUNG_KEYWORDS.some(k => low.includes(k))) return '#d32f2f';
+  return '#2e7d32';
+}
+
 function getSaoChinhColor(trangThai) {
-  switch(trangThai) {
-    case 'M': return '#c62828'; // Miếu - đỏ đậm
-    case 'V': return '#d32f2f'; // Vượng - đỏ
-    case 'Đ': return '#e65100'; // Đắc - cam đậm
-    case 'B': return '#555555'; // Bình hòa - xám
-    case 'H': return '#9e9e9e'; // Hãm - xám nhạt
-    default:  return '#555555';
+  switch (trangThai) {
+    case 'M': return '#a31616';
+    case 'V': return '#b71c1c';
+    case 'Đ': return '#c25e00';
+    case 'B': return '#444444';
+    case 'H': return '#7a7a7a';
+    default:  return '#444444';
   }
 }
 
-// Component hiển thị sao chính - giống tuvi.vn
 function SaoChinhItem({ sao }) {
   const color = getSaoChinhColor(sao.trangThai);
-  const statusLabel = sao.trangThai === 'M' ? 'Miếu' : sao.trangThai === 'V' ? 'Vượng' : sao.trangThai === 'Đ' ? 'Đắc' : sao.trangThai === 'B' ? 'Bình hòa' : sao.trangThai === 'H' ? 'Hãm' : '';
+  const statusLabel =
+    sao.trangThai === 'M' ? 'Miếu' :
+    sao.trangThai === 'V' ? 'Vượng' :
+    sao.trangThai === 'Đ' ? 'Đắc' :
+    sao.trangThai === 'B' ? 'Bình hòa' :
+    sao.trangThai === 'H' ? 'Hãm' : '';
   const isBold = sao.trangThai === 'M' || sao.trangThai === 'V';
   return (
     <span
@@ -89,15 +133,8 @@ function SaoChinhItem({ sao }) {
   );
 }
 
-// Component hiển thị sao phụ - giống tuvi.vn
 function SaoPhuItem({ sao }) {
-  // Sao Lưu (dynamic stars) show in specific green color
-  let color;
-  if (sao.isLuu) {
-    color = '#006400'; // dark green for L. stars
-  } else {
-    color = SAO_PHU_COLOR[sao.mau] || SAO_PHU_COLOR[sao.loai] || SAO_PHU_COLOR.default;
-  }
+  const color = getSaoNhomColor(sao);
   return (
     <span className="sao-phu" style={{ color }} title={sao.ten}>
       {sao.ten}{sao.trangThai && sao.trangThai !== 'B' ? ` (${sao.trangThai})` : ''}
@@ -105,30 +142,32 @@ function SaoPhuItem({ sao }) {
   );
 }
 
-// Component hiển thị Hóa tinh
-function HoaTinhItem({ hoa, prefix = '' }) {
-  const style = HOA_TINH_STYLE[hoa.loai] || { color: '#555', label: hoa.ten };
+function HoaTinhItem({ hoa }) {
+  const isKy = hoa.loai === 'hoa-ky' || (hoa.ten || '').toLowerCase().includes('kỵ');
+  const color = isKy ? '#d32f2f' : '#2e7d32';
   return (
-    <div className="hoa-tinh-row" style={{ color: style.color }}>
-      {prefix && <span className="hoa-prefix">{prefix}</span>}
-      <span className="hoa-ten">{hoa.ten}</span>
-      {hoa.cung && <span className="hoa-cung"> - {hoa.cung}</span>}
-    </div>
+    <span className="sao-phu hoa-tinh-inline" style={{ color }} title={hoa.ten}>
+      {hoa.ten}
+    </span>
   );
 }
 
-// Đia chi order for grid positions
 const GRID_DIACHI = ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu'];
 
-// Component một ô cung trong lưới - Redesigned to match tuvi.vn exactly
-function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, onMouseLeave }) {
+/* ── Ô cung trên lá số: Chính tinh bên TRÁI, Cát tinh (xanh lá) & Hung tinh (đỏ) bên PHẢI ── */
+function CungCard({ cung, gridPos, tamPhuongBadge, isActive, isSelected, onClick, onMouseEnter, onMouseLeave }) {
   const hasNewFormat = cung.saoChinhList !== undefined;
   const fallbackDaiHan = cung.daiHan || (gridPos * 10 + 6);
-  
-  // Determine Địa Chi of cung from gridPos or canChi
-  const diaChiName = GRID_DIACHI[gridPos] || '';
-  // Get the Can part and hanh from canChi field (e.g. 'C.Thìn' -> 'C')
+  const diaChiName = cung.diaChi || GRID_DIACHI[gridPos] || '';
   const canPart = cung.canChi ? cung.canChi.split('.')[0] : '';
+
+  const rightSideStars = [
+    ...(cung.saoPhuList || []).filter(s => s.ten !== cung.trangSinh),
+  ];
+  const hoaStars = [
+    ...(cung.hoaTinhList || []),
+    ...(cung.namXemHoaTinh || []),
+  ];
 
   return (
     <div
@@ -137,10 +176,10 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Header Row: Can+Hanh | Cung Name | Đại hạn */}
+      {/* Header Row: Can.Chi + Hành | Tên Cung | Đại hạn */}
       <div className="cung-card-header">
         <div className="cung-top-left">
-          <span className="cung-canchhi-text">{canPart}.{diaChiName}</span>
+          <span className="cung-canchhi-text">{canPart ? `${canPart}.` : ''}{diaChiName}</span>
           {cung.hanhDisplay && (
             <span className="cung-hanh" style={{ color: cung.hanhColor }}>
               {cung.hanhDisplay}
@@ -158,50 +197,39 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
         </div>
       </div>
 
-      {/* Sao chính - displayed prominently in center */}
-      <div className="cung-sao-chinh-area">
-        {hasNewFormat ? (
-          cung.saoChinhList && cung.saoChinhList.length > 0 ? (
-            cung.saoChinhList.map((sao, idx) => (
-              <SaoChinhItem key={idx} sao={sao} />
-            ))
+      {/* Thân ô cung 2 cột: TRÁI = Chính tinh | PHẢI = Cát tinh (xanh lá) + Hung tinh (đỏ) */}
+      <div className="cung-stars-two-col">
+        <div className="cung-col-chinh">
+          {hasNewFormat ? (
+            cung.saoChinhList && cung.saoChinhList.length > 0 ? (
+              cung.saoChinhList.map((sao, idx) => (
+                <SaoChinhItem key={idx} sao={sao} />
+              ))
+            ) : (
+              <span className="cung-vcd">Vô chính diệu</span>
+            )
           ) : (
-            <span className="cung-no-star"></span>
-          )
-        ) : (
-          cung.label ? (
-            <span className="sao-chinh" style={{ color: cung.labelColor || '#555' }}>{cung.label}</span>
-          ) : (
-            <span className="cung-no-star"></span>
-          )
-        )}
+            cung.label && (
+              <span className="sao-chinh" style={{ color: cung.labelColor || '#555' }}>{cung.label}</span>
+            )
+          )}
+        </div>
+
+        <div className="cung-col-phu">
+          {rightSideStars.map((sao, idx) => (
+            <SaoPhuItem key={`phu-${idx}`} sao={sao} />
+          ))}
+          {hoaStars.map((hoa, idx) => (
+            <HoaTinhItem key={`hoa-${idx}`} hoa={hoa} />
+          ))}
+        </div>
       </div>
 
-      {/* Sao phụ - displayed in a single left-aligned column like tuvi.vn */}
-      {hasNewFormat && cung.saoPhuList && cung.saoPhuList.length > 0 && (
-        <div className="cung-sao-phu-area">
-          {cung.saoPhuList.map((sao, idx) => (
-            sao.ten !== cung.trangSinh && <SaoPhuItem key={idx} sao={sao} />
-          ))}
-        </div>
-      )}
-
-      {/* Hóa tinh năm sinh */}
-      {hasNewFormat && cung.hoaTinhList && cung.hoaTinhList.length > 0 && (
-        <div className="cung-hoa-area">
-          {cung.hoaTinhList.map((hoa, idx) => (
-            <HoaTinhItem key={idx} hoa={hoa} />
-          ))}
-        </div>
-      )}
-
-      {/* Hóa tinh năm xem */}
-      {hasNewFormat && cung.namXemHoaTinh && cung.namXemHoaTinh.length > 0 && (
-        <div className="cung-hoa-area">
-          {cung.namXemHoaTinh.map((hoa, idx) => (
-            <HoaTinhItem key={idx} hoa={hoa} />
-          ))}
-        </div>
+      {/* Số đánh dấu Tam phương Tứ chính (1, 2, 3, 4) */}
+      {tamPhuongBadge && (
+        <span className="tam-phuong-badge" title={`Tam phương tứ chính vị trí ${tamPhuongBadge}`}>
+          {tamPhuongBadge}
+        </span>
       )}
 
       {/* Cung Footer: ĐV | Tràng Sinh | LN */}
@@ -216,331 +244,21 @@ function CungCard({ cung, gridPos, isActive, isSelected, onClick, onMouseEnter, 
   );
 }
 
-// ===================== SIDEBAR FORM =====================
-function SidebarForm({ result }) {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    hoTen: result?.hoTen || '',
-    ngaySinh: result?.ngaySinh || 1,
-    thangSinh: result?.thangSinh || 1,
-    namSinh: result?.namSinh || 2000,
-    gioSinh: result?.gioSinh || '11-13',
-    gioiTinh: result?.gioiTinh || 'nam',
-    isLunar: result?.isLunar || false,
-  });
-  const [namXem, setNamXem] = useState(result?.namXem || new Date().getFullYear());
-  const [thangXem, setThangXem] = useState(result?.thangXem || new Date().getMonth() + 1);
-  const [loading, setLoading] = useState(false);
-  const [createdList, setCreatedList] = useState([]);
-
-  useEffect(() => {
-    try {
-      const list = JSON.parse(localStorage.getItem('created_horoscopes') || '[]');
-      setCreatedList(list);
-    } catch (e) {}
-  }, [result]);
-
-  const GIO_SINH = [
-    { value: '23-1', label: 'Tý (23:00-01:00)' },
-    { value: '1-3', label: 'Sửu (01:00-03:00)' },
-    { value: '3-5', label: 'Dần (03:00-05:00)' },
-    { value: '5-7', label: 'Mão (05:00-07:00)' },
-    { value: '7-9', label: 'Thìn (07:00-09:00)' },
-    { value: '9-11', label: 'Tỵ (09:00-11:00)' },
-    { value: '11-13', label: 'Ngọ (11:00-13:00)' },
-    { value: '13-15', label: 'Mùi (13:00-15:00)' },
-    { value: '15-17', label: 'Thân (15:00-17:00)' },
-    { value: '17-19', label: 'Dậu (17:00-19:00)' },
-    { value: '19-21', label: 'Tuất (19:00-21:00)' },
-    { value: '21-23', label: 'Hợi (21:00-23:00)' },
-  ];
-
-  const formatTimeAgo = (timestamp) => {
-    if (!timestamp) return 'Gần đây';
-    const diffMs = Date.now() - timestamp;
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays} ngày trước`;
-  };
-
-  const executeCalculate = async (params) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/tuvi/calculate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await res.json();
-      if (data.success) {
-        navigate('/ket-qua', { state: data.data });
-        window.scrollTo(0, 0);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleYearChange = (newYear) => {
-    setNamXem(newYear);
-    executeCalculate({ ...formData, namXem: newYear, thangXem });
-  };
-
-  const handleMonthChange = (newMonth) => {
-    setThangXem(newMonth);
-    executeCalculate({ ...formData, namXem, thangXem: newMonth });
-  };
-
-  const handleLoadCreated = (item) => {
-    executeCalculate({
-      hoTen: item.hoTen,
-      gioiTinh: item.gioiTinh,
-      ngaySinh: item.ngaySinh,
-      thangSinh: item.thangSinh,
-      namSinh: item.namSinh,
-      gioSinh: item.gioSinh,
-      isLunar: item.isLunar,
-      namXem: namXem,
-      thangXem: thangXem
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    executeCalculate({ ...formData, namXem, thangXem });
-  };
-
-  return (
-    <div className="sidebar-widgets-container" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-      
-      {/* Widget 1: Adjust controls */}
-      <div className="sidebar-widget controls-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', backgroundImage: "url('https://tuvi.vn/images/bg-head.jpg')", backgroundPosition: 'center', backgroundSize: 'cover', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
-          Điều chỉnh Năm/Tháng xem
-        </div>
-        <div className="widget-content" style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '0.88rem', fontWeight: '600', color: '#333' }}>Năm xem:</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <button type="button" onClick={() => handleYearChange(namXem - 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>−</button>
-              <input type="text" readOnly value={namXem} style={{ width: '55px', height: '28px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.88rem', fontWeight: 'bold' }} />
-              <button type="button" onClick={() => handleYearChange(namXem + 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
-            </div>
-          </div>
-          <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '0.88rem', fontWeight: '600', color: '#333' }}>Tháng xem:</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <button type="button" onClick={() => handleMonthChange(thangXem <= 1 ? 12 : thangXem - 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>−</button>
-              <select value={thangXem} onChange={(e) => handleMonthChange(parseInt(e.target.value))} style={{ width: '90px', height: '28px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.82rem', padding: '0 4px', fontWeight: 'bold' }}>
-                {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
-                ))}
-              </select>
-              <button type="button" onClick={() => handleMonthChange(thangXem >= 12 ? 1 : thangXem + 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Widget 2: Created Horoscopes */}
-      <div className="sidebar-widget created-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', backgroundImage: "url('https://tuvi.vn/images/bg-head.jpg')", backgroundPosition: 'center', backgroundSize: 'cover', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
-          📁 Lá số đã tạo
-        </div>
-        <div className="widget-content" style={{ padding: '0' }}>
-          {createdList.length === 0 ? (
-            <p style={{ fontSize: '0.82rem', color: '#888', margin: '15px 12px' }}>Chưa có lá số nào được tạo.</p>
-          ) : (
-            <ul className="created-horoscope-list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-              {createdList.map((item, idx) => (
-                <li 
-                  key={item.id || idx} 
-                  onClick={() => handleLoadCreated(item)}
-                  style={{ 
-                    padding: '10px 12px', 
-                    borderBottom: '1px solid #eee', 
-                    cursor: 'pointer',
-                    transition: 'background 0.15s',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#fcf8f2'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#1565c0' }}>{item.hoTen}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#888' }}>{formatTimeAgo(item.timestamp)}</span>
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#555' }}>
-                    {item.gioiTinh === 'nam' ? 'Nam mệnh' : 'Nữ mệnh'} · {item.namSinh} · {item.canChi}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#b71c1c', fontWeight: '600' }}>
-                    {item.napAm} · {item.cuc}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-
-      {/* Widget 3: Complete Horoscope Form */}
-      <div className="sidebar-widget form-widget" style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <div className="widget-header" style={{ padding: '8px 12px', background: '#7a1618', backgroundImage: "url('https://tuvi.vn/images/bg-head.jpg')", backgroundPosition: 'center', backgroundSize: 'cover', color: '#ffda75', fontWeight: 'bold', fontSize: '0.92rem' }}>
-          Lập lá số tử vi
-        </div>
-        <div className="widget-content" style={{ padding: '12px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Họ Tên</label>
-              <input
-                type="text"
-                value={formData.hoTen}
-                onChange={e => setFormData(p => ({ ...p, hoTen: e.target.value }))}
-                placeholder="Nhập họ tên..."
-                style={{ width: '100%', padding: '6px 8px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                required
-              />
-            </div>
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Ngày sinh</label>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                <select
-                  value={formData.ngaySinh}
-                  onChange={e => setFormData(p => ({ ...p, ngaySinh: parseInt(e.target.value) }))}
-                  style={{ flex: 1, padding: '5px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                >
-                  {Array.from({ length: 31 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-                <select
-                  value={formData.thangSinh}
-                  onChange={e => setFormData(p => ({ ...p, thangSinh: parseInt(e.target.value) }))}
-                  style={{ flex: 1.2, padding: '5px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                >
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  value={formData.namSinh}
-                  onChange={e => setFormData(p => ({ ...p, namSinh: parseInt(e.target.value) }))}
-                  min="1900"
-                  max="2035"
-                  style={{ width: '60px', padding: '5px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                />
-              </div>
-            </div>
-
-            <div className="radio-group" style={{ display: 'flex', gap: '15px', padding: '2px 0' }}>
-              <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                <input
-                  type="radio"
-                  name="sb-cal"
-                  checked={!formData.isLunar}
-                  onChange={() => setFormData(p => ({ ...p, isLunar: false }))}
-                />
-                &nbsp;Lịch dương
-              </label>
-              <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                <input
-                  type="radio"
-                  name="sb-cal"
-                  checked={formData.isLunar}
-                  onChange={() => setFormData(p => ({ ...p, isLunar: true }))}
-                />
-                &nbsp;Lịch âm
-              </label>
-            </div>
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Giờ sinh</label>
-              <select
-                value={formData.gioSinh}
-                onChange={e => setFormData(p => ({ ...p, gioSinh: e.target.value }))}
-                style={{ width: '100%', padding: '6px 8px', fontSize: '0.85rem', border: '1px solid #ccc', borderRadius: '4px' }}
-              >
-                {GIO_SINH.map(g => (
-                  <option key={g.value} value={g.value}>{g.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#333' }}>Giới tính</label>
-              <div className="radio-group" style={{ display: 'flex', gap: '20px' }}>
-                <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="radio"
-                    name="sb-gender"
-                    value="nam"
-                    checked={formData.gioiTinh === 'nam'}
-                    onChange={e => setFormData(p => ({ ...p, gioiTinh: e.target.value }))}
-                  />
-                  &nbsp;Nam
-                </label>
-                <label style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="radio"
-                    name="sb-gender"
-                    value="nu"
-                    checked={formData.gioiTinh === 'nu'}
-                    onChange={e => setFormData(p => ({ ...p, gioiTinh: e.target.value }))}
-                  />
-                  &nbsp;Nữ
-                </label>
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={{ 
-                width: '100%', 
-                padding: '8px 10px', 
-                background: '#8c731f',
-                backgroundImage: 'linear-gradient(180deg, #997e23, #7d6519)',
-                border: '1px solid #6b5511',
-                color: '#fff', 
-                borderRadius: '4px', 
-                fontWeight: 'bold', 
-                cursor: 'pointer',
-                fontSize: '0.88rem',
-                marginTop: '5px',
-                textTransform: 'uppercase'
-              }}
-            >
-              {loading ? 'Đang tính...' : 'LẬP LÁ SỐ'}
-            </button>
-          </form>
-        </div>
-      </div>
-
-    </div>
-  );
-}
-
 // ===================== MAIN COMPONENT =====================
 export default function TuViResult() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { isAdmin, token } = useAuth();
+
   const [result, setResult] = useState(null);
-  const [hoveredCung, setHoveredCung] = useState(null);
+  const [hoveredGridPos, setHoveredGridPos] = useState(null);
   const [selectedCungIdx, setSelectedCungIdx] = useState(null);
-  const [activeSection, setActiveSection] = useState('tong-quan');
   const [showBirthInfo, setShowBirthInfo] = useState(true);
+  const [selectedQtvIdx, setSelectedQtvIdx] = useState(0);
+  const [updatingYear, setUpdatingYear] = useState(false);
+
+  const authToken = token || localStorage.getItem('tuvi_token');
 
   useEffect(() => {
     const lasoId = searchParams.get('id');
@@ -549,31 +267,50 @@ export default function TuViResult() {
       setResult(location.state);
       const mIdx = location.state.cungResults.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
       setSelectedCungIdx(mIdx !== -1 ? mIdx : 0);
+      setSelectedQtvIdx(0);
       window.scrollTo(0, 0);
     } else if (lasoId) {
-      fetch(`${API_URL}/tuvi/${lasoId}`)
+      const headers = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+      fetch(`${API_URL}/tuvi/${lasoId}`, { headers })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
             setResult(data.data);
             const mIdx = data.data.cungResults.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
             setSelectedCungIdx(mIdx !== -1 ? mIdx : 0);
+            setSelectedQtvIdx(0);
+          } else {
+            navigate('/xem-tu-vi');
           }
-          else navigate('/xem-tu-vi');
         })
         .catch(() => navigate('/xem-tu-vi'));
       window.scrollTo(0, 0);
     } else {
       navigate('/xem-tu-vi');
     }
-  }, [location.state, searchParams, navigate]);
+  }, [location.state, searchParams, navigate, authToken]);
 
+  // Nếu user là admin và vào từ state nhưng chưa có quanTuViResults -> fetch lại theo ID để lấy dữ liệu Quán Tử Vi
   useEffect(() => {
-    if (result) {
-      let list = [];
-      try {
-        list = JSON.parse(localStorage.getItem('created_horoscopes') || '[]');
-      } catch (e) {}
+    if (isAdmin && result?._id && !result.quanTuViResults && authToken) {
+      fetch(`${API_URL}/tuvi/${result._id}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data?.quanTuViResults) {
+            setResult(prev => ({ ...prev, quanTuViResults: data.data.quanTuViResults }));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isAdmin, result?._id, result?.quanTuViResults, authToken]);
+
+  // Lưu lịch sử gần đây vào localStorage
+  useEffect(() => {
+    if (!result) return;
+    try {
+      let list = JSON.parse(localStorage.getItem('created_horoscopes') || '[]');
       const exists = list.some(item => item.hoTen === result.hoTen && item.namSinh === result.namSinh && item.ngaySinh === result.ngaySinh);
       if (!exists) {
         const newItem = {
@@ -594,25 +331,82 @@ export default function TuViResult() {
         list = [newItem, ...list].slice(0, 5);
         localStorage.setItem('created_horoscopes', JSON.stringify(list));
       }
+    } catch {
+      // ignore storage quota errors
     }
   }, [result]);
 
-  const namXemDisplay = result ? (result.namXemCanChi || `${result.namXem}`) : '';
+  const handleAdjustNamXem = async (delta) => {
+    if (!result || updatingYear) return;
+    const nextYear = (parseInt(result.namXem, 10) || new Date().getFullYear()) + delta;
+    setUpdatingYear(true);
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) headers.Authorization = `Bearer ${authToken}`;
+      const res = await fetch(`${API_URL}/tuvi/calculate`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          hoTen: result.hoTen,
+          gioiTinh: result.gioiTinh,
+          ngaySinh: result.ngaySinh,
+          thangSinh: result.thangSinh,
+          namSinh: result.namSinh,
+          gioSinh: result.gioSinh,
+          isLunar: result.isLunar,
+          namXem: nextYear,
+          thangXem: result.thangXem || 1,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        navigate('/ket-qua', { state: data.data });
+      }
+    } catch {
+      // ignore
+    } finally {
+      setUpdatingYear(false);
+    }
+  };
+
+  // Bản đồ nút 12 cung theo đúng thứ tự yêu cầu
+  const orderedCungButtons = useMemo(() => {
+    if (!result?.cungResults) return [];
+    return CUNG_DISPLAY_ORDER.map((cungName) => {
+      const idx = result.cungResults.findIndex(
+        c => c.name && c.name.trim().toLowerCase() === cungName.toLowerCase()
+      );
+      return { name: cungName, idx };
+    }).filter(item => item.idx !== -1);
+  }, [result?.cungResults]);
 
   if (!result) {
     return (
       <div className="result-page">
         <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
           <div className="spinner" style={{ margin: '0 auto' }} />
-          <p style={{ color: '#666', marginTop: '1rem' }}>Đang tải lá số...</p>
+          <p style={{ color: '#7a1618', marginTop: '1rem', fontWeight: 600 }}>Đang tải lá số...</p>
         </div>
       </div>
     );
   }
 
-  // Tìm cung Mệnh để highlight mặc định
   const menhIndex = result.cungResults?.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
-  const activeCung = hoveredCung !== null ? hoveredCung : (menhIndex !== -1 ? menhIndex : 0);
+  const selectedCung = selectedCungIdx !== null ? result.cungResults?.[selectedCungIdx] : result.cungResults?.[menhIndex !== -1 ? menhIndex : 0];
+  const fallbackGridPos = selectedCung?.gridIdx ?? (menhIndex !== -1 ? result.cungResults[menhIndex]?.gridIdx : 0) ?? 0;
+  const activeGridPos = hoveredGridPos !== null ? hoveredGridPos : fallbackGridPos;
+
+  // 4 cung Tam phương tứ chính đánh số 1 (Bản cung), 2 (Tài/Tam hợp), 3 (Xung chiếu), 4 (Quan/Tam hợp)
+  const tamPhuongMap = {
+    [activeGridPos]: 1,
+    [(activeGridPos + 8) % 12]: 2,
+    [(activeGridPos + 6) % 12]: 3,
+    [(activeGridPos + 4) % 12]: 4,
+  };
+
+  const namXemDisplay = result.namXemCanChi || `${result.namXem}`;
+  const qtvList = Array.isArray(result.quanTuViResults) ? result.quanTuViResults : [];
+  const activeQtv = qtvList[selectedQtvIdx] || qtvList[0] || null;
 
   const handlePrint = () => window.print();
   const handleShare = () => {
@@ -627,539 +421,346 @@ export default function TuViResult() {
   return (
     <div className="result-page">
       <div className="tuvi-result-container">
-
-        {/* BREADCRUMB */}
-        <div className="breadcrumb">
-          <Link to="/" className="bc-link">Trang chủ</Link>
-          <span className="bc-sep">›</span>
-          <Link to="/xem-tu-vi" className="bc-link">Xem tử vi</Link>
-          <span className="bc-sep">›</span>
-          <span className="bc-current">Lá số tử vi</span>
+        {/* ═══ HEADER TIÊU ĐỀ KẾT QUẢ ═══ */}
+        <div className="ketqua-top-bar">
+          <div className="ketqua-top-spacer" />
+          <div className="ketqua-title-wrap">
+            <span className="ketqua-title-line" />
+            <h1 className="ketqua-main-title">Kết quả lá số Tử Vi</h1>
+            <span className="ketqua-title-line" />
+          </div>
+          <div className="ketqua-top-actions">
+            <Link to="/xem-tu-vi" className="btn-lap-moi">
+              <span aria-hidden="true">↻</span> Lập lá số mới
+            </Link>
+          </div>
         </div>
 
-        <div className="tuvi-result-layout">
-          {/* ================== MAIN CONTENT ================== */}
-          <div className="main-content">
-
-            {/* ===== EXPERT SECTION ===== */}
-            <div className="expert-section">
-              <div className="expert-header">
-                <h2>》Nhận xét lá số!</h2>
+        {/* ═══ KHỐI TRÊN (2 CỘT - MỌI TÀI KHOẢN ĐỀU THẤY) ═══ */}
+        <div className="ketqua-main-grid">
+          {/* ── CỘT TRÁI: LÁ SỐ TỬ VI ── */}
+          <section className="ketqua-card card-laso">
+            <div className="ketqua-card-header">
+              <div className="ketqua-card-title-group">
+                <LotusIcon />
+                <h2>Lá số Tử Vi</h2>
               </div>
-              <div className="expert-content">
-                <p>
-                  Cung <strong>Tài Bạch, Phúc Đức, Quan Lộc</strong> của quý tín chủ đang có nhiều sao đóng,
-                  có thể tín chủ sắp gặp vận hạn về <strong>Tài vận, kinh tế, Phúc khí tổ tiên, Công danh sự nghiệp</strong>.
-                </p>
-                <p>
-                  Để được luận giải miễn phí từ cộng đồng, vui lòng đăng lá số lên nhóm{' '}
-                  <a href="#" style={{ color: '#1565c0' }}>TỬ VI LÝ SỐ - Luận Giải Miễn Phí</a>
-                </p>
-
-                <div className="expert-actions">
-                  <button className="btn-download" onClick={handlePrint}>📥 Tải lá số</button>
-                  <button className="btn-facebook">👥 Mở nhóm Facebook</button>
-                </div>
-
-                <div className="expert-profile">
-                  <div className="expert-avatar">
-                    <img
-                      src="https://tuvi.vn/images/thay-nguyen-the-anh.png"
-                      alt="Thầy Nguyễn Thế Anh"
-                      onError={e => { e.target.style.display = 'none'; }}
-                    />
-                  </div>
-                  <div className="expert-info">
-                    <h3>Thầy Nguyễn Thế Anh</h3>
-                    <p>
-                      Với 20 năm kinh nghiệm, là một chuyên gia tử vi nổi tiếng xuất thân từ dòng họ Nho gia
-                      có truyền thống ở Thái Bình. Gia đình ông có bộ sưu tập sách cổ độc đáo và giá trị,
-                      phản ánh sự am hiểu sâu sắc về thiên văn, phong thủy và dịch số của người xưa.
-                    </p>
-                    <div className="expert-links">
-                      <a href="https://www.doisongphapluat.com/" target="_blank" rel="noreferrer">Báo đời sống pháp luật ↗</a>
-                      <a href="#" target="_blank" rel="noreferrer">Báo người đưa tin ↗</a>
-                    </div>
-                    <p>
-                      Để được <strong>luận giải chuyên sâu, tư vấn, định hướng</strong> từ thầy{' '}
-                      <strong>Thế Anh</strong> của tuvi.vn, đặt lịch ngay!
-                    </p>
-                    <button className="btn-booking">🔥 Hot! Đặt lịch luận giải ngay!</button>
-                  </div>
-                </div>
-              </div>
+              <span className="badge-free">Miễn phí</span>
             </div>
 
-            {/* ===== ASTROLOGY BOARD ===== */}
-            <div className="astrology-board-wrapper">
-              <div className="astrology-board">
+            <div className="ketqua-card-body laso-card-body">
+              <div className="astrology-board-wrapper">
+                <div className="astrology-board">
+                  {result.cungResults.map((cung, i) => (
+                    <CungCard
+                      key={i}
+                      cung={cung}
+                      gridPos={cung.gridIdx}
+                      tamPhuongBadge={tamPhuongMap[cung.gridIdx] || null}
+                      isActive={tamPhuongMap[cung.gridIdx] !== undefined}
+                      isSelected={selectedCungIdx === i}
+                      onClick={() => setSelectedCungIdx(i)}
+                      onMouseEnter={() => setHoveredGridPos(cung.gridIdx)}
+                      onMouseLeave={() => setHoveredGridPos(null)}
+                    />
+                  ))}
 
-                {result.cungResults.map((cung, i) => (
-                  <CungCard
-                    key={i}
-                    cung={cung}
-                    gridPos={cung.gridIdx}
-                    isActive={activeCung === i}
-                    isSelected={selectedCungIdx === i}
-                    onClick={() => setSelectedCungIdx(i)}
-                    onMouseEnter={() => setHoveredCung(i)}
-                    onMouseLeave={() => setHoveredCung(null)}
-                  />
-                ))}
+                  {/* Thiên Bàn ở giữa */}
+                  <div className="astrology-center">
+                    <ParticleBackground />
+                    <div className="astrology-center-content">
+                      <h2 className="center-main-title">Lá số<br />Tử Vi</h2>
 
-                {/* Center Info Panel */}
-                <div className="astrology-center">
-                  <ParticleBackground />
-                  <div className="astrology-center-content">
-                    <div className="center-top-text" style={{ paddingBottom: '3px', borderBottom: '1px solid rgba(212,175,55,0.2)' }}>
-                      <div className="center-brand" style={{ fontSize: '0.62rem', letterSpacing: '0.05em' }}>TRANG TỬ VI CỔ HỌC HÀNG ĐẦU VIỆT NAM</div>
-                      <a href="https://tuvi.vn" className="center-link" target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: '#1565c0', fontWeight: 'bold' }}>https://tuvi.vn</a>
-                      <div className="center-contact" style={{ fontSize: '0.62rem', marginTop: '2px' }}>Đặt lịch luận giải qua Hotline/Zalo: <strong>0969.975.886</strong></div>
-                    </div>
-
-                    <h1 className="center-main-title" style={{ fontSize: '1.25rem', margin: '5px 0 8px 0', letterSpacing: '0.05em' }}>Lá Số Tử Vi</h1>
-
-                    {showBirthInfo ? (
-                      <div className="center-info-table">
-                        <div className="info-row">
-                          <span className="info-label">Họ tên:</span>
-                          <span className="info-value name-highlight">{result.hoTen}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Năm:</span>
-                          <span className="info-value">{result.namSinh} · {result.canChi}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Tháng:</span>
-                          <span className="info-value">
-                            {result.thangSinh} ({result.lunarMonth || result.thangSinh}) {result.lunarMonthCanChi || ''}
-                          </span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Ngày:</span>
-                          <span className="info-value">
-                            {result.ngaySinh} ({result.lunarDay || result.ngaySinh}) {result.lunarDayCanChi || ''}
-                          </span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Giờ:</span>
-                          <span className="info-value">
-                            {result.gioHour} {result.gioHour?.includes('giờ') ? '' : `(${result.gioChiName || ''})`}
-                          </span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Năm xem:</span>
-                          <span className="info-value" style={{ color: '#b71c1c', fontWeight: 600 }}>
-                            {namXemDisplay}{result.tuoi ? `, ${result.tuoi} tuổi` : ''}
-                          </span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Âm dương:</span>
-                          <span className="info-value">{result.amDuong || (result.gioiTinh === 'nam' ? 'Dương Nam' : 'Âm Nữ')}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="info-label">Bản mệnh:</span>
-                          <span className="info-value">{result.napAm || ''}</span>
-                        </div>
-                        <div className="info-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                          <div style={{ display: 'flex', width: '100%' }}>
+                      {showBirthInfo ? (
+                        <div className="center-info-table">
+                          <div className="info-row">
+                            <span className="info-label">Họ tên:</span>
+                            <span className="info-value name-highlight">{result.hoTen}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="info-label">Năm:</span>
+                            <span className="info-value">{result.namSinh} · {result.canChi}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="info-label">Tháng/Ngày:</span>
+                            <span className="info-value">
+                              {result.ngaySinh}/{result.thangSinh} (Âm: {result.lunarDay || result.ngaySinh}/{result.lunarMonth || result.thangSinh})
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="info-label">Giờ sinh:</span>
+                            <span className="info-value">{result.gioHour || result.gioSinh}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="info-label">Năm xem:</span>
+                            <span className="info-value" style={{ color: '#a31616', fontWeight: 700 }}>
+                              {namXemDisplay}{result.tuoi ? `, ${result.tuoi}t` : ''}
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="info-label">Bản mệnh:</span>
+                            <span className="info-value">{result.napAm || result.nguHanh}</span>
+                          </div>
+                          <div className="info-row">
                             <span className="info-label">Cục:</span>
                             <span className="info-value">{result.cuc?.name || ''}</span>
                           </div>
-                          {result.menhCucRelation && (
-                            <div style={{ fontSize: '0.8rem', color: '#ffda75', paddingLeft: '80px', marginTop: '-2px', fontStyle: 'italic' }}>
-                              ({result.menhCucRelation})
+                          {result.amDuong && (
+                            <div className="info-row">
+                              <span className="info-label">Âm dương:</span>
+                              <span className="info-value">{result.amDuong}</span>
                             </div>
                           )}
                         </div>
-                        {result.canXuong && (
-                          <div className="info-row">
-                            <span className="info-label">Cân lượng:</span>
-                            <span className="info-value">{result.canXuong}</span>
-                          </div>
-                        )}
-                        {result.chuMenh && (
-                          <div className="info-row">
-                            <span className="info-label">Chủ mệnh:</span>
-                            <span className="info-value" style={{ color: '#b71c1c' }}>{result.chuMenh}</span>
-                          </div>
-                        )}
-                        {result.chuThan && (
-                          <div className="info-row">
-                            <span className="info-label">Chủ thân:</span>
-                            <span className="info-value" style={{ color: '#b71c1c' }}>{result.chuThan}</span>
-                          </div>
-                        )}
-                        {result.laiNhanCung && (
-                          <div className="info-row">
-                            <span className="info-label">Lai nhân cung:</span>
-                            <span className="info-value">{result.laiNhanCung}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="center-info-placeholder-yinyang" style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '190px',
-                        color: '#ffda75',
-                        textAlign: 'center',
-                        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                        position: 'relative',
-                        zIndex: 10
-                      }}>
-                        <div className="yinyang-big-icon" style={{ fontSize: '4.5rem', lineHeight: 1, marginBottom: '5px' }}>☯</div>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333' }}>Lá Số Tử Vi</div>
-                        <div style={{ fontSize: '0.85rem', color: '#b71c1c', fontWeight: 'bold', marginTop: '2px' }}>{result.hoTen}</div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="center-hidden-yinyang">
+                          <div className="yinyang-circle-badge">☯</div>
+                          <div className="yinyang-hidden-name">{result.hoTen}</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 12 nhãn Địa Chi quanh Thiên Bàn */}
+                    <div className="center-zodiac-labels">
+                      <span className="zodiac-label zl-ty">Tỵ</span>
+                      <span className="zodiac-label zl-ngo">Ngọ</span>
+                      <span className="zodiac-label zl-mui">Mùi</span>
+                      <span className="zodiac-label zl-than">Thân</span>
+                      <span className="zodiac-label zl-dau">Dậu</span>
+                      <span className="zodiac-label zl-tuat">Tuất</span>
+                      <span className="zodiac-label zl-hoi">Hợi</span>
+                      <span className="zodiac-label zl-ti">Tý</span>
+                      <span className="zodiac-label zl-suu">Sửu</span>
+                      <span className="zodiac-label zl-dan">Dần</span>
+                      <span className="zodiac-label zl-mao">Mão</span>
+                      <span className="zodiac-label zl-thin">Thìn</span>
+                    </div>
+
+                    <CungChieuOverlay hoveredCung={activeGridPos} />
                   </div>
-
-                  {/* 12 Zodiac labels */}
-                  <div className="center-zodiac-labels">
-                    <span className="zodiac-label zl-ty">Tỵ</span>
-                    <span className="zodiac-label zl-ngo">Ngọ</span>
-                    <span className="zodiac-label zl-mui">Mùi</span>
-                    <span className="zodiac-label zl-than">Thân</span>
-                    <span className="zodiac-label zl-dau">Dậu</span>
-                    <span className="zodiac-label zl-tuat">Tuất</span>
-                    <span className="zodiac-label zl-hoi">Hợi</span>
-                    <span className="zodiac-label zl-ti">Tý</span>
-                    <span className="zodiac-label zl-suu">Sửu</span>
-                    <span className="zodiac-label zl-dan">Dần</span>
-                    <span className="zodiac-label zl-mao">Mão</span>
-                    <span className="zodiac-label zl-thin">Thìn</span>
-                  </div>
-
-                  <CungChieuOverlay hoveredCung={activeCung} />
                 </div>
               </div>
 
-              {/* BẢNG CHÚ GIẢI - Matches tuvi.vn */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '6px',
-                padding: '6px 10px',
-                background: '#f9f9f9',
-                border: '1px solid #ccc',
-                borderTop: 'none',
-                fontSize: '0.78rem',
-                color: '#555'
-              }}>
-                <div>
-                  <span style={{ color: '#c62828' }}>M</span>:Miếu&nbsp;
-                  <span style={{ color: '#d32f2f' }}>V</span>:Vượng&nbsp;
-                  <span style={{ color: '#e65100' }}>Đ</span>:Đắc&nbsp;
-                  <span style={{ color: '#555' }}>B</span>:Bình hòa&nbsp;
-                  <span style={{ color: '#9e9e9e' }}>H</span>:Hãm
+              {/* Thanh chú giải & thao tác gọn bên dưới lá số */}
+              <div className="laso-bottom-toolbar">
+                <div className="laso-legend-inline">
+                  <span><strong>Trái:</strong> Chính tinh</span>
+                  <span className="legend-dot-cat">● Cát tinh (Xanh lá)</span>
+                  <span className="legend-dot-hung">● Hung tinh (Đỏ)</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span><span className="color-box kim" style={{ display: 'inline-block', width: '10px', height: '10px', background: '#9e9e9e', marginRight: '3px', borderRadius: '2px' }}></span>Kim</span>
-                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#2E8B57', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Mộc</span>
-                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#1565c0', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Thủy</span>
-                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#c62828', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Hỏa</span>
-                  <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#DAA520', marginRight: '3px', borderRadius: '2px', verticalAlign: 'middle' }}></span>Thổ</span>
-                </div>
-                <div style={{ color: '#999', fontStyle: 'italic' }}>Lá số #{result._id?.slice(-6) || '000001'}</div>
-              </div>
-            </div>
-
-            {/* ACTION BUTTONS - tuvi.vn style bottom bar */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              padding: '8px 12px', 
-              background: '#f5f5f5', 
-              border: '1px solid #ddd',
-              borderTop: 'none',
-              flexWrap: 'wrap',
-              gap: '8px',
-              marginBottom: '16px'
-            }}>
-              {/* Toggle switch - Ẩn thông tin sinh */}
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.82rem', color: '#333', userSelect: 'none' }}>
-                <div 
-                  onClick={() => setShowBirthInfo(!showBirthInfo)}
-                  style={{
-                    width: '38px', height: '20px', borderRadius: '10px',
-                    background: showBirthInfo ? '#7a1618' : '#ccc',
-                    position: 'relative', cursor: 'pointer', transition: 'background 0.2s',
-                    flexShrink: 0
-                  }}
-                >
-                  <div style={{
-                    position: 'absolute', top: '2px', 
-                    left: showBirthInfo ? '20px' : '2px',
-                    width: '16px', height: '16px', borderRadius: '50%',
-                    background: '#fff', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
-                  }} />
-                </div>
-                Ẩn thông tin sinh
-              </label>
-
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                <button 
-                  onClick={handlePrint} 
-                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#4CAF50', color: '#fff', border: 'none', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
-                >
-                  ⬇️ Lưu lá số
-                </button>
-                <button 
-                  onClick={handlePrint} 
-                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#fff', color: '#333', border: '1px solid #ccc', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
-                >
-                  🖨 In lá số
-                </button>
-                <button 
-                  onClick={() => {
-                    if (!document.fullscreenElement) {
-                      document.documentElement.requestFullscreen?.().catch(e => console.error(e));
-                    } else {
-                      document.exitFullscreen?.();
-                    }
-                  }} 
-                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#fff', color: '#333', border: '1px solid #ccc', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
-                >
-                  ⛶ Toàn màn hình
-                </button>
-                <button 
-                  onClick={handleShare} 
-                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#1977F3', color: '#fff', border: 'none', padding: '7px 14px', fontSize: '0.82rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
-                >
-                  ⬡ Chia sẻ
-                </button>
-              </div>
-            </div>
-
-            {/* KHÁM PHÁ THÊM */}
-            <div className="explore-more">
-              <h3>Khám phá thêm</h3>
-              <div className="explore-item">Cân xương tính số <span>›</span></div>
-              <div className="explore-item">Xem ngay cưới <span>›</span></div>
-              <div className="explore-item">Tử vi con giáp <span>›</span></div>
-            </div>
-
-            {/* GỢI Ý */}
-            <div className="section-block">
-              <div className="section-header">Gợi ý</div>
-              <div className="tags-list">
-                {['Công danh sự nghiệp','Anh em, bạn bè','Con cái','Tình duyên','Vợ chồng','Tài vận, kinh tế','Sức khỏe, bệnh tật','Xuất ngoại','Bằng hữu, đồng nghiệp','Phúc khí tổ tiên','Cha mẹ','Nhà cửa, đất đai','Đại vận','Tiểu vận'].map(tag => (
-                  <span key={tag} className="tag" onClick={() => setActiveSection(tag.toLowerCase())}>{tag}</span>
-                ))}
-              </div>
-            </div>
-
-            {/* LUẬN GIẢI CHI TIẾT CUNG ĐANG CHỌN */}
-            {selectedCungIdx !== null && result.cungResults?.[selectedCungIdx] && (
-              <div className="section-block selected-cung-interpretation" id="selected-cung-giai">
-                <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <span>{result.cungResults[selectedCungIdx].icon} Luận giải chi tiết Cung {result.cungResults[selectedCungIdx].name}</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 'normal', color: '#ffda75', opacity: 0.9 }}>
-                    (Bấm vào cung khác trên lá số để xem giải nghĩa tương ứng)
-                  </span>
-                </div>
-                <div className="section-content cung-interp-content">
-                  {result.cungResults[selectedCungIdx].interpretation ? (
-                    <div 
-                      dangerouslySetInnerHTML={{ __html: result.cungResults[selectedCungIdx].interpretation }}
-                      className="cung-rich-content"
+                <div className="laso-controls-row">
+                  <label className="toggle-birth-label">
+                    <input
+                      type="checkbox"
+                      checked={!showBirthInfo}
+                      onChange={() => setShowBirthInfo(v => !v)}
                     />
-                  ) : (
-                    <p style={{ color: '#888', fontStyle: 'italic', padding: '10px 0' }}>
-                      Chưa có dữ liệu luận giải cho các sao/cung này trong cơ sở dữ liệu CMS. Vui lòng nhập dữ liệu trong trang quản trị để hiển thị tại đây!
-                    </p>
-                  )}
+                    <span>Ẩn thông tin sinh</span>
+                  </label>
+                  <div className="laso-mini-actions">
+                    <button type="button" className="mini-btn" onClick={() => handleAdjustNamXem(-1)} disabled={updatingYear} title="Giảm năm xem">
+                      −1 Năm
+                    </button>
+                    <button type="button" className="mini-btn" onClick={() => handleAdjustNamXem(1)} disabled={updatingYear} title="Tăng năm xem">
+                      +1 Năm
+                    </button>
+                    <button type="button" className="mini-btn mini-btn-gold" onClick={handlePrint}>
+                      In / Lưu
+                    </button>
+                    <button type="button" className="mini-btn" onClick={handleShare}>
+                      Chia sẻ
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* BÌNH GIẢI TỔNG QUAN */}
-            <div className="section-block" id="binh-giai">
-              <div className="section-header">Bình giải tổng quan</div>
-              <div className="section-content">
-                {result.tenCungThan && (
-                  <>
-                    <h4>Cung Thân đồng cung với cung {result.tenCungThan}</h4>
-                    <p>
-                      Thân nhập vào {result.tenCungThan === 'Thiên Di' ? 'không gian xã hội hoạt động, là giao du rộng, thích ứng được với hoàn cảnh nhiều biến động, mệnh vận một đời nhiều thay đổi lớn, thân tâm khá bận rộn vất vả, khó được thanh nhàn, ưa ra bên ngoài, đi xa chơi.' : 'cung vị đặc biệt. Thân và Mệnh tương tác, ảnh hưởng nhiều đến cuộc đời.'}
-                    </p>
-                    <p className="source-text">Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch</p>
-                  </>
-                )}
-                {result.laiNhanCung && (
-                  <>
-                    <h4 style={{ marginTop: '1rem' }}>Lai Nhân Cung ở cung {result.laiNhanCung}</h4>
-                    <p>
-                      Gia đình, sản nghiệp của tổ tiên, dời nhà, dịch mã, sẽ ảnh hưởng đến cuộc đời của mệnh tạo.
-                      "Lai nhân cung" ở tam phương của cung {result.laiNhanCung} là cách cục nhờ vả người khác để lập nghiệp.
-                    </p>
-                    <p className="source-text">Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch</p>
-                  </>
-                )}
-                {result.canXuong && (
-                  <>
-                    <h4 style={{ marginTop: '1rem' }}>Cân Xương Tính Số: {result.canXuong}</h4>
-                    <p>
-                      Số mạng xem ra phước chẳng khinh. Tự thân tự lập rạng môn đình.
-                      Tôi đòi trai gái trong ngoài đủ, kẻ dạ người vâng thật hiển vinh.
-                    </p>
-                  </>
-                )}
               </div>
             </div>
+          </section>
 
-            {/* CHI TIẾT PHÂN TÍCH TỪ DATABASE */}
-            {result.detailedAnalysis && (
-              <div className="detailed-analysis-container">
-                <div className="section-block">
-                  <div className="section-header">Đặc điểm con giáp {result.conGiap?.name} {result.conGiap?.emoji}</div>
-                  <div className="section-content">
-                    <div className="analysis-grid">
-                      <div className="analysis-item">
-                        <h5>Sắc thái {result.gioiTinh === 'nam' ? 'Nam' : 'Nữ'}</h5>
-                        <p>{result.gioiTinh === 'nam' ? result.detailedAnalysis.sacThai?.nam : result.detailedAnalysis.sacThai?.nu}</p>
+          {/* ── CỘT PHẢI: LUẬN GIẢI LÁ SỐ ── */}
+          <section className="ketqua-card card-luangiai">
+            <div className="ketqua-card-header">
+              <div className="ketqua-card-title-group">
+                <LotusIcon />
+                <h2>Luận giải lá số</h2>
+              </div>
+              <span className="badge-free">Miễn phí</span>
+            </div>
+
+            <div className="ketqua-card-body luangiai-card-body">
+              {/* Lưới 12 nút Cung (3 cột x 4 hàng) */}
+              <div className="cung-selector-grid" role="tablist" aria-label="Chọn cung luận giải">
+                {orderedCungButtons.map((item) => {
+                  const isActive = selectedCungIdx === item.idx;
+                  return (
+                    <button
+                      key={item.name}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      className={`cung-selector-btn${isActive ? ' active' : ''}`}
+                      onClick={() => setSelectedCungIdx(item.idx)}
+                    >
+                      {item.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Khung Luận giải cung đang chọn */}
+              {selectedCung && (
+                <div className="selected-cung-panel">
+                  <div className="selected-cung-panel-header">
+                    <div className="selected-cung-panel-title">
+                      <span className="yinyang-mini" aria-hidden="true">☯</span>
+                      <h3>Luận giải cung {selectedCung.name}</h3>
+                    </div>
+                    <span className="badge-sample">
+                      {selectedCung.interpretation ? 'Luận giải chi tiết' : 'Nội dung mẫu'}
+                    </span>
+                  </div>
+
+                  <div className="selected-cung-panel-body">
+                    <p className="cung-intro-lead">
+                      {CUNG_INTRO_MAP[selectedCung.name] || `Cung ${selectedCung.name} đóng tại ${selectedCung.diaChi || ''}. Khi luận giải cần đối chiếu Tam phương tứ chính.`}
+                    </p>
+
+                    <div className="gold-divider" />
+
+                    {/* Danh sách sao tóm tắt trong cung đang chọn */}
+                    <div className="cung-selected-stars-summary">
+                      <div>
+                        <strong>Địa chi:</strong> {selectedCung.canChi} ({selectedCung.hanhDisplay}) · <strong>Đại hạn:</strong> {selectedCung.daiHan}
                       </div>
-                      <div className="analysis-item">
-                        <h5>Tính cách</h5>
-                        <p>{result.detailedAnalysis.tinhCach}</p>
+                      <div>
+                        <strong>Chính tinh:</strong>{' '}
+                        {selectedCung.saoChinhList?.length
+                          ? selectedCung.saoChinhList.map(s => `${s.ten}${s.trangThai ? ` (${s.trangThai})` : ''}`).join(', ')
+                          : 'Vô chính diệu'}
                       </div>
                     </div>
 
-                    <div className="strengths-weaknesses">
-                      <div className="sw-box strength">
-                        <h5>✅ Điểm mạnh</h5>
-                        <ul>
-                          {result.detailedAnalysis.diemManh?.map((item, idx) => <li key={idx}>{item}</li>)}
-                        </ul>
+                    {/* Nội dung luận giải từ CMS */}
+                    {selectedCung.interpretation ? (
+                      <div
+                        className="cung-rich-content"
+                        dangerouslySetInnerHTML={{ __html: selectedCung.interpretation }}
+                      />
+                    ) : (
+                      <div className="cung-sample-fallback">
+                        <p>
+                          Cung <strong>{selectedCung.name}</strong> đang tọa tại <strong>{selectedCung.diaChi || '—'}</strong>.
+                          {result.tenCungThan && selectedCung.isMinh && (
+                            <> Đây cũng là vị trí <strong>Cung Thân</strong> cư {selectedCung.name}, ảnh hưởng mạnh đến hậu vận của đương số.</>
+                          )}
+                        </p>
+                        {selectedCung.isMenh && result.menhCucRelation && (
+                          <p><strong>Tương quan Mệnh - Cục:</strong> {result.menhCucRelation}. {result.canXuong ? `Cân lượng: ${result.canXuong}.` : ''}</p>
+                        )}
                       </div>
-                      <div className="sw-box weakness">
-                        <h5>⚠️ Điểm yếu</h5>
-                        <ul>
-                          {result.detailedAnalysis.diemYeu?.map((item, idx) => <li key={idx}>{item}</li>)}
-                        </ul>
-                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* ═══ KHỐI DƯỚI: QUÁN TỬ VI — CHỈ HIỂN THỊ VỚI TÀI KHOẢN ADMIN ═══ */}
+        {isAdmin && (
+          <section className="quantuvi-admin-section" aria-label="Quán Tử Vi - Dành riêng cho Admin">
+            <div className="quantuvi-header">
+              <div className="quantuvi-header-icon">
+                <LotusIcon />
+              </div>
+              <h2 className="quantuvi-header-title">QUÁN TỬ VI</h2>
+              <div className="quantuvi-header-badge">ADMIN</div>
+            </div>
+
+            <div className="quantuvi-body">
+              <div className="quantuvi-ornate-frame">
+                {/* 4 góc hoa văn cổ điển */}
+                <span className="corner-ornament corner-tl" aria-hidden="true" />
+                <span className="corner-ornament corner-tr" aria-hidden="true" />
+                <span className="corner-ornament corner-bl" aria-hidden="true" />
+                <span className="corner-ornament corner-br" aria-hidden="true" />
+
+                <div className="quantuvi-two-cols">
+                  {/* CỘT 1: BỘ SAO PHỐI (MỆNH TÀI QUAN DI) */}
+                  <div className="quantuvi-col">
+                    <div className="quantuvi-col-header">
+                      Bộ sao Phối (Mệnh Tài Quan Di)
                     </div>
-                  </div>
-                </div>
-
-                <div className="section-block">
-                  <div className="section-header">Luận giải chi tiết</div>
-                  <div className="section-content">
-                    {result.detailedAnalysis.suNghiep && (
-                      <div className="detail-item">
-                        <h4>🚀 Sự nghiệp</h4>
-                        <p><strong>Phù hợp:</strong> {result.detailedAnalysis.suNghiep.phu_hop?.join(', ')}</p>
-                        <p>{result.detailedAnalysis.suNghiep.luan_giai}</p>
-                      </div>
-                    )}
-                    {result.detailedAnalysis.tinhCam && (
-                      <div className="detail-item">
-                        <h4>❤️ Tình cảm</h4>
-                        <p><strong>Đặc điểm:</strong> {result.detailedAnalysis.tinhCam.dac_diem}</p>
-                        <p>{result.detailedAnalysis.tinhCam.luan_giai}</p>
-                      </div>
-                    )}
-                    {result.detailedAnalysis.sucKhoe && (
-                      <div className="detail-item">
-                        <h4>🏥 Sức khỏe</h4>
-                        <p>{result.detailedAnalysis.sucKhoe}</p>
-                      </div>
-                    )}
-                    {result.detailedAnalysis.taiLoc && (
-                      <div className="detail-item">
-                        <h4>💰 Tài lộc</h4>
-                        <p>{result.detailedAnalysis.taiLoc}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {result.detailedAnalysis.soMayMan && (
-                  <div className="section-block">
-                    <div className="section-header">Vận hạn & May mắn</div>
-                    <div className="section-content">
-                      <div className="luck-grid">
-                        <div className="luck-card">
-                          <h5>Số may mắn</h5>
-                          <div className="luck-values">
-                            {result.detailedAnalysis.soMayMan?.map(n => <span key={n} className="luck-tag">{n}</span>)}
-                          </div>
-                        </div>
-                        <div className="luck-card">
-                          <h5>Màu may mắn</h5>
-                          <div className="luck-values">
-                            {result.detailedAnalysis.mauMayMan?.map(c => <span key={c} className="luck-tag">{c}</span>)}
-                          </div>
-                        </div>
-                      </div>
-                      {result.detailedAnalysis.namTot && (
-                        <div className="luck-years">
-                          <h5>Năm tốt:</h5>
-                          <p>{result.detailedAnalysis.namTot.join(', ')}</p>
+                    <div className="quantuvi-col-content">
+                      {qtvList.length === 0 ? (
+                        <p className="qtv-empty-msg">
+                          Chưa có dữ liệu đối chiếu Bộ sao Phối cho lá số này. Hãy lập lại lá số hoặc thêm quy tắc trong Admin CMS.
+                        </p>
+                      ) : (
+                        <div className="qtv-rules-list">
+                          {qtvList.map((item, idx) => {
+                            const isSelected = (activeQtv?.id || idx) === (item.id || idx) && selectedQtvIdx === idx;
+                            return (
+                              <button
+                                key={item.id || idx}
+                                type="button"
+                                className={`qtv-rule-item${isSelected ? ' active' : ''}${item.isCustomRule ? ' is-custom' : ''}`}
+                                onClick={() => setSelectedQtvIdx(idx)}
+                              >
+                                <div className="qtv-rule-top">
+                                  <span className="qtv-rule-tag">
+                                    {item.isCustomRule ? '✦ Quy tắc CMS khớp' : '◈ Tổng hợp 4 cung'}
+                                  </span>
+                                  {item.tamHopGroup && (
+                                    <span className="qtv-tamhop-pill">{item.tamHopGroup}</span>
+                                  )}
+                                </div>
+                                <div className="qtv-rule-title">{item.boSaoPhoi}</div>
+                                {Array.isArray(item.matchedStars) && item.matchedStars.length > 0 && (
+                                  <ul className="qtv-matched-stars">
+                                    {item.matchedStars.map((st, sIdx) => (
+                                      <li key={sIdx}>{st}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
                   </div>
-                )}
 
-                {result.detailedAnalysis.vanHan2026 && (
-                  <div className="section-block van-han-2026">
-                    <div className="section-header">Vận hạn năm {result.namXem || 2026}</div>
-                    <div className="section-content">
-                      <p className="overview"><em>{result.detailedAnalysis.vanHan2026.tong_quan}</em></p>
-                      <div className="van-han-list">
-                        <div className="vh-item"><strong>Tiền tài:</strong> {result.detailedAnalysis.vanHan2026.tien_tai}</div>
-                        <div className="vh-item"><strong>Sự nghiệp:</strong> {result.detailedAnalysis.vanHan2026.su_nghiep}</div>
-                        <div className="vh-item"><strong>Tình cảm:</strong> {result.detailedAnalysis.vanHan2026.tinh_cam}</div>
-                        <div className="vh-item"><strong>Sức khỏe:</strong> {result.detailedAnalysis.vanHan2026.suc_khoe}</div>
-                      </div>
-                      <div className="advice-box">
-                        <h5>💡 Lời khuyên:</h5>
-                        <p>{result.detailedAnalysis.vanHan2026.phuong_huong}</p>
-                      </div>
+                  {/* CỘT 2: NỘI DUNG TRẢ VỀ */}
+                  <div className="quantuvi-col">
+                    <div className="quantuvi-col-header">
+                      Nội dung trả về
+                    </div>
+                    <div className="quantuvi-col-content">
+                      {activeQtv ? (
+                        <div className="qtv-return-content">
+                          <div className="qtv-return-head">
+                            <h4>{activeQtv.boSaoPhoi}</h4>
+                            {activeQtv.source && (
+                              <span className="qtv-return-source">{activeQtv.source}</span>
+                            )}
+                          </div>
+                          <div
+                            className="qtv-return-html"
+                            dangerouslySetInnerHTML={{ __html: activeQtv.content }}
+                          />
+                        </div>
+                      ) : (
+                        <p className="qtv-empty-msg">
+                          Chọn một Bộ sao Phối bên cột trái để xem nội dung luận giải trả về.
+                        </p>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* BÌNH GIẢI ĐẠI VẬN */}
-            <div className="section-block" id="dai-van">
-              <div className="section-header">Bình giải Đại vận</div>
-              <div className="section-content">
-                <h4>Đại vận {result.cuc?.value || 6} - {(result.cuc?.value || 6) + 9} tuổi (Cung {result.cungResults?.[0]?.name})</h4>
-                <p>
-                  Kinh doanh phát tài, mọi sự hanh thông, thường quyền hành lớn trong tay,
-                  lại gặp được nhiều quý nhân phù trợ.
-                </p>
-                <p className="source-text">Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang</p>
-              </div>
-            </div>
-
-            {/* BÌNH GIẢI TIỂU VẬN */}
-            <ContentGate requireRole="master" title="Mở Khóa Chi Tiết Đại Vận & Tiểu Vận" message="Đây là nội dung trả phí. Vui lòng nâng cấp tài khoản để xem trọn đời!">
-              <div className="section-block" id="tieu-van">
-                <div className="section-header">Chi tiết Tiểu vận</div>
-                <div className="section-content">
-                  <p><em>Chưa có luận giải</em></p>
                 </div>
               </div>
-            </ContentGate>
-
-          </div>
-
-          {/* ================== SIDEBAR ================== */}
-          <div className="sidebar">
-            <SidebarForm result={result} />
-          </div>
-        </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

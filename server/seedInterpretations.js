@@ -690,6 +690,25 @@ const seedInterpretations = async () => {
         content: 'Thân có Vũ khúc: Chồng mất trước, không tái giá nhất định cô quả.',
         source: 'Tử vi đẩu số kinh điển - Phan Tử Ngư',
         createdBy: adminUser._id
+      },
+      // Bộ sao Phối (Mệnh Tài Quan Di) - Quán Tử Vi
+      {
+        type: 'bo_sao_phoi',
+        boSaoPhoi: 'Tử Vi + Thiên Phủ hội Tả Phù, Hữu Bật (Mệnh Tài Quan Di)',
+        cungCodes: ['MENH', 'TAI_BACH', 'QUAN_LOC', 'THIEN_DI'],
+        saoCodes: ['TU_VI', 'THIEN_PHU', 'TA_PHU', 'HUU_BAT'],
+        content: 'Cách cục Tử Phủ đắc Tả Hữu giáp trợ trong Tam phương Tứ chính Mệnh – Tài – Quan – Di: Chủ về khí chất lãnh đạo vững vàng, có người phò tá đắc lực trên con đường công danh sự nghiệp.',
+        source: 'Quán Tử Vi — Luận giải nâng cao',
+        createdBy: adminUser._id
+      },
+      {
+        type: 'bo_sao_phoi',
+        boSaoPhoi: 'Thiên Cơ + Thái Âm + Thiên Đồng + Thiên Lương (Cơ Nguyệt Đồng Lương)',
+        cungCodes: ['MENH', 'TAI_BACH', 'QUAN_LOC', 'THIEN_DI'],
+        saoCodes: ['THIEN_CO', 'THAI_AM', 'THIEN_DONG', 'THIEN_LUONG'],
+        content: 'Cách cục Cơ Nguyệt Đồng Lương hội đủ ở Mệnh – Tài – Quan – Di: Thích hợp làm công tác tham mưu, kế hoạch, văn phòng, giáo dục, y tế hoặc công chức ổn định.',
+        source: 'Quán Tử Vi — Luận giải nâng cao',
+        createdBy: adminUser._id
       }
     ];
 

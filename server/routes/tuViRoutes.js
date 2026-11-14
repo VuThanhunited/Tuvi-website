@@ -9,7 +9,7 @@ const router = Router();
 router.post('/calculate', optionalAuth, validateTuVi, calculate);
 router.get('/stats', protect, adminOnly, getStats);
 router.get('/history', protect, validatePagination, getHistory);
-router.get('/:id', validateObjectId, getResult);
+router.get('/:id', optionalAuth, validateObjectId, getResult);
 router.delete('/:id', protect, validateObjectId, deleteResult);
 
 export default router;

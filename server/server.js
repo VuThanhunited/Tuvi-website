@@ -2,6 +2,7 @@ import 'dotenv/config';
 import connectDB from './config/db.js';
 import app from './app.js';
 import scraperService from './services/scraperService.js';
+import { startFacebookScheduler } from './services/cronService.js';
 
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
@@ -19,6 +20,8 @@ app.listen(PORT, () => {
 
   // Start background crawl job after server starts (only in non-test env)
   if (process.env.NODE_ENV !== 'test') {
+    // Khởi động Facebook Auto-Post Scheduler
+    startFacebookScheduler();
     // Run once on startup - chỉ crawl nếu DB chưa đủ dữ liệu (>= 20 bài thì bỏ qua)
     setTimeout(async () => {
       try {
