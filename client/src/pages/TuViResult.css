@@ -3,15 +3,21 @@
    ============================================================ */
 
 .result-page {
-  padding-top: calc(var(--header-height) + 24px);
+  padding-top: 22px;
   padding-bottom: 56px;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #fffaf0 0%, #f9edd2 60%, #f4e2bc 100%);
+  background: radial-gradient(circle at top, #fffaf0 0%, #f7ebd0 65%, #f0dcaf 100%);
+  color: #3b2313;
+}
+
+.result-embedded {
+  padding-top: 8px;
+  padding-bottom: 36px;
   color: #3b2313;
 }
 
 .tuvi-result-container {
-  max-width: 1260px;
+  max-width: 1220px;
   margin: 0 auto;
   padding: 0 18px 24px;
 }
@@ -33,16 +39,20 @@
 }
 
 .ketqua-title-line {
-  width: 68px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #c9a154, transparent);
+  width: 78px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #c9a154);
   position: relative;
+}
+
+.ketqua-title-line--right {
+  background: linear-gradient(90deg, #c9a154, transparent);
 }
 
 .ketqua-main-title {
   margin: 0;
   font-family: var(--font-display, 'Playfair Display', Georgia, serif);
-  font-size: clamp(1.35rem, 2.3vw, 1.85rem);
+  font-size: clamp(1.38rem, 2.3vw, 1.85rem);
   font-weight: 700;
   color: #6b1515;
   white-space: nowrap;
@@ -59,13 +69,15 @@
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  background: linear-gradient(180deg, #fffdf6 0%, #f6e7c4 100%);
+  background: linear-gradient(180deg, #fffdf7 0%, #f5e5c1 100%);
   border: 1px solid #cfa962;
   border-radius: 6px;
   color: #5c2b12;
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
   box-shadow: 0 2px 6px rgba(107, 21, 21, 0.08);
   transition: all 0.2s ease;
 }
@@ -79,7 +91,7 @@
 /* ── Main 2-Column Layout ── */
 .ketqua-main-grid {
   display: grid;
-  grid-template-columns: minmax(430px, 0.96fr) minmax(420px, 1.04fr);
+  grid-template-columns: minmax(410px, 0.88fr) minmax(430px, 1.12fr);
   gap: 18px;
   align-items: stretch;
   margin-bottom: 22px;
@@ -87,19 +99,19 @@
 
 /* ── Shared Card Styles ── */
 .ketqua-card {
-  background: #fdf6e6;
+  background: #fbf1da;
   border: 1.5px solid #d5b473;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(90, 48, 12, 0.1);
+  box-shadow: 0 6px 20px rgba(90, 48, 12, 0.12);
   display: flex;
   flex-direction: column;
 }
 
 .ketqua-card-header {
-  background: linear-gradient(180deg, #8e1416 0%, #65090b 100%);
+  background: linear-gradient(180deg, #8e1416 0%, #64080a 100%);
   border-bottom: 2px solid #d8b468;
-  padding: 10px 14px;
+  padding: 9px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -132,7 +144,7 @@
   color: #244711;
   border: 1px solid #6c9a3f;
   border-radius: 999px;
-  padding: 3px 12px;
+  padding: 3px 13px;
   font-size: 0.76rem;
   font-weight: 700;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -151,20 +163,24 @@
 ────────────────────────────────────── */
 .astrology-board-wrapper {
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .astrology-board {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, minmax(150px, auto));
+  grid-template-rows: repeat(4, minmax(112px, 1fr));
   gap: 0;
-  border-top: 1.5px solid #c99e57;
-  border-left: 1.5px solid #c99e57;
-  background: #fffaf0;
+  border-top: 1.5px solid #c98f54;
+  border-left: 1.5px solid #c98f54;
+  background: #fff9ec;
   position: relative;
   font-family: Arial, 'Segoe UI', sans-serif;
   border-radius: 4px;
   overflow: hidden;
+  flex: 1;
 }
 
 /* Position mapping */
@@ -183,22 +199,36 @@
 
 /* ── Cung Card ── */
 .cung-card {
-  border-right: 1.5px solid #c99e57;
-  border-bottom: 1.5px solid #c99e57;
-  padding: 4px 5px;
+  border-right: 1.5px solid #c98f54;
+  border-bottom: 1.5px solid #c98f54;
+  padding: 5px 6px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  background: #fffaf0;
+  background: #fff9ec;
   transition: background 0.15s ease;
-  min-height: 150px;
+  min-height: 112px;
   position: relative;
   overflow: hidden;
 }
 
+.cung-card--minimal {
+  align-items: center;
+  justify-content: center;
+  min-height: 108px;
+}
+
+.cung-minimal-name {
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #9e1313;
+  text-align: center;
+}
+
 .cung-card:hover,
 .cung-card.cung-hovered {
-  background: #fff4d9;
+  background: #fff3d6;
 }
 
 .cung-card.cung-selected {
@@ -342,7 +372,7 @@
 /* ── Số đánh dấu Tam phương Tứ chính (1, 2, 3, 4) ── */
 .tam-phuong-badge {
   position: absolute;
-  bottom: 20px;
+  bottom: 18px;
   right: 4px;
   width: 15px;
   height: 15px;
@@ -391,22 +421,54 @@
 }
 
 /* ──────────────────────────────────────
-   CENTER PANEL (Thiên Bàn)
+   CENTER PANEL (Thiên Bàn với vòng hào quang vàng)
 ────────────────────────────────────── */
 .astrology-center {
   grid-column: 2 / 4;
   grid-row: 2 / 4;
-  border-right: 1.5px solid #c99e57;
-  border-bottom: 1.5px solid #c99e57;
+  border-right: 1.5px solid #c98f54;
+  border-bottom: 1.5px solid #c98f54;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, #fffef9 0%, #fcf2dc 100%);
+  background: radial-gradient(circle, #fffcf2 0%, #fae9bf 68%, #f4da9c 100%);
   position: relative;
-  padding: 14px 12px;
+  padding: 10px;
   text-align: center;
   overflow: hidden;
+}
+
+.center-medallion {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-medallion-inner {
+  width: 196px;
+  min-height: 196px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffef8 0%, #fdf2d4 65%, #f3d796 100%);
+  border: 2px solid #e2bc6b;
+  box-shadow: 0 0 0 5px rgba(235, 198, 120, 0.25), 0 0 24px rgba(212, 163, 56, 0.35), inset 0 0 18px rgba(226, 188, 107, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 12px;
+}
+
+.center-mock-emblem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .astrology-center-content {
@@ -420,30 +482,40 @@
 
 .center-main-title {
   font-family: var(--font-display, 'Playfair Display', Georgia, serif);
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #8b1214;
-  margin: 0 0 8px 0;
-  line-height: 1.15;
+  font-style: italic;
+  color: #6b1515;
+  margin: 0 0 4px 0;
+  line-height: 1.12;
+}
+
+.center-main-title--emblem {
+  font-size: 1.72rem;
+  margin-bottom: 4px;
+}
+
+.center-yinyang-svg {
+  filter: drop-shadow(0 2px 4px rgba(176, 118, 25, 0.25));
 }
 
 .center-info-table {
   width: 100%;
-  max-width: 245px;
+  max-width: 185px;
   text-align: left;
-  font-size: 0.68rem;
-  margin: 0 auto;
+  font-size: 0.62rem;
+  margin: 2px auto 0;
 }
 
 .info-row {
   display: flex;
-  margin-bottom: 2px;
-  line-height: 1.3;
-  gap: 4px;
+  margin-bottom: 1px;
+  line-height: 1.25;
+  gap: 3px;
 }
 
 .info-label {
-  width: 66px;
+  width: 54px;
   font-weight: 700;
   color: #6b4c2f;
   flex-shrink: 0;
@@ -461,24 +533,9 @@
   color: #8b1214;
 }
 
-.center-hidden-yinyang {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 0;
-}
-
-.yinyang-circle-badge {
-  font-size: 3.4rem;
-  line-height: 1;
-  color: #b4832b;
-  margin-bottom: 6px;
-}
-
 .yinyang-hidden-name {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #8b1214;
   text-transform: uppercase;
 }
@@ -493,7 +550,7 @@
 
 .zodiac-label {
   position: absolute;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 700;
   color: #9e7e4f;
   white-space: nowrap;
@@ -521,7 +578,7 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  opacity: 0.55;
+  opacity: 0.45;
   transition: opacity 0.25s ease;
 }
 
@@ -625,10 +682,11 @@
   padding: 9px 10px;
   border-radius: 7px;
   border: 1px solid #e0c180;
-  background: linear-gradient(180deg, #fffaf0 0%, #f6e4b8 100%);
+  background: linear-gradient(180deg, #fffaf0 0%, #f5e1b2 100%);
   color: #4f2a14;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
   cursor: pointer;
   transition: all 0.18s ease;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 3px rgba(90, 48, 12, 0.06);
@@ -641,8 +699,8 @@
 }
 
 .cung-selector-btn.active {
-  background: linear-gradient(180deg, #a61414 0%, #700507 100%);
-  border-color: #590305;
+  background: linear-gradient(180deg, #a61414 0%, #6d0406 100%);
+  border-color: #550204;
   color: #ffeec2;
   font-weight: 700;
   box-shadow: 0 3px 8px rgba(112, 5, 7, 0.28);
@@ -653,7 +711,7 @@
   background: #fffcf4;
   border: 1px solid #d5b473;
   border-radius: 10px;
-  padding: 14px 16px;
+  padding: 15px 17px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -706,7 +764,7 @@
 }
 
 .cung-intro-lead {
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   color: #362214;
   font-weight: 500;
 }
@@ -715,7 +773,7 @@
   height: 2px;
   width: 100%;
   background: linear-gradient(90deg, transparent 0%, #d8ae58 25%, #b88428 50%, #d8ae58 75%, transparent 100%);
-  margin: 10px 0 14px;
+  margin: 12px 0 14px;
 }
 
 .cung-selected-stars-summary {
@@ -767,7 +825,7 @@
 }
 
 .quantuvi-header {
-  background: linear-gradient(180deg, #8e1416 0%, #65090b 100%);
+  background: linear-gradient(180deg, #8e1416 0%, #64080a 100%);
   border-bottom: 2px solid #d8b468;
   padding: 11px 18px;
   display: grid;
@@ -783,56 +841,47 @@
 .quantuvi-header-title {
   margin: 0;
   font-family: var(--font-display, 'Playfair Display', Georgia, serif);
-  font-size: 1.3rem;
+  font-size: 1.32rem;
   font-weight: 700;
   color: #fce4a6;
   letter-spacing: 0.08em;
   text-align: center;
 }
 
-.quantuvi-header-badge {
-  justify-self: end;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #65090b;
-  background: #fce4a6;
-  padding: 2px 9px;
-  border-radius: 999px;
+.quantuvi-header-right {
+  min-width: 28px;
 }
 
 .quantuvi-body {
   padding: 14px;
-  background: #fbf1d8;
+  background: #f9edd2;
 }
 
 .quantuvi-ornate-frame {
   position: relative;
-  border: 2px solid #c99e57;
+  border: 2px solid #cfa255;
   outline: 1px solid #e6cb8e;
-  outline-offset: -6px;
+  outline-offset: -7px;
   background: #fffaf0;
-  padding: 12px;
+  padding: 14px 20px;
   border-radius: 4px;
 }
 
-.corner-ornament {
+.corner-key-svg {
   position: absolute;
-  width: 14px;
-  height: 14px;
-  border-color: #b4832b;
-  border-style: solid;
+  width: 22px;
+  height: 22px;
   pointer-events: none;
 }
 
-.corner-tl { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
-.corner-tr { top: 4px; right: 4px; border-width: 2px 2px 0 0; }
-.corner-bl { bottom: 4px; left: 4px; border-width: 0 0 2px 2px; }
-.corner-br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+.corner-tl { top: 4px; left: 4px; }
+.corner-tr { top: 4px; right: 4px; transform: scaleX(-1); }
+.corner-bl { bottom: 4px; left: 4px; transform: scaleY(-1); }
+.corner-br { bottom: 4px; right: 4px; transform: scale(-1); }
 
 .quantuvi-two-cols {
   display: grid;
-  grid-template-columns: 0.92fr 1.08fr;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
@@ -842,12 +891,12 @@
   border-radius: 4px;
   display: flex;
   flex-direction: column;
-  min-height: 290px;
+  min-height: 280px;
   overflow: hidden;
 }
 
 .quantuvi-col-header {
-  background: linear-gradient(180deg, #fae8b8 0%, #eed08a 100%);
+  background: linear-gradient(180deg, #fae8b8 0%, #edcc7e 100%);
   border-bottom: 1px solid #cfa962;
   padding: 9px 14px;
   text-align: center;
@@ -1006,7 +1055,7 @@
 
 @media (max-width: 768px) {
   .result-page {
-    padding-top: calc(var(--header-height) + 16px);
+    padding-top: 16px;
   }
   .ketqua-top-bar {
     grid-template-columns: 1fr;

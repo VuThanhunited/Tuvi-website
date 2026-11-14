@@ -69,7 +69,8 @@
   
   /* Layout */
   --max-width: 1200px;
-  --header-height: 70px;
+  --navbar-height: 52px;
+  --header-height: 0px;
   --border-radius-sm: 6px;
   --border-radius-md: 12px;
   --border-radius-lg: 20px;
@@ -330,7 +331,10 @@ a:hover { color: var(--color-gold-light); }
 
 /* --- Responsive --- */
 @media (max-width: 768px) {
-  :root { --header-height: 60px; }
+  :root {
+    --navbar-height: 48px;
+    --header-height: 0px;
+  }
   .container { padding: 0 var(--space-md); }
   .section { padding: var(--space-2xl) 0; }
 }

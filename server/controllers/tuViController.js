@@ -51,6 +51,28 @@ const GIO_CHI = {
   '21-23':{chi:'Hợi',index:11}
 };
 
+const GIO_ALIAS_MAP = {
+  ty: '23-1', 'tý': '23-1',
+  suu: '1-3', 'sửu': '1-3',
+  dan: '3-5', 'dần': '3-5',
+  mao: '5-7', 'mão': '5-7',
+  thin: '7-9', 'thìn': '7-9',
+  ti: '9-11', 'tỵ': '9-11',
+  ngo: '11-13', 'ngọ': '11-13',
+  mui: '13-15', 'mùi': '13-15',
+  than: '15-17', 'thân': '15-17',
+  dau: '17-19', 'dậu': '17-19',
+  tuat: '19-21', 'tuất': '19-21',
+  hoi: '21-23', 'hợi': '21-23',
+};
+
+function normalizeGioSinh(gioSinh) {
+  if (!gioSinh) return '11-13';
+  const raw = String(gioSinh).trim();
+  if (GIO_TO_HOUR[raw] !== undefined) return raw;
+  return GIO_ALIAS_MAP[raw.toLowerCase()] || '11-13';
+}
+
 // ===== HELPERS =====
 function getNguHanh(napAm) {
   if (!napAm) return 'Thổ';
@@ -471,12 +493,13 @@ function addLuuStars(cungResults, namXem) {
 }
 
 // ===== MAIN CALCULATION WRAPPER =====
-async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem, birthHour: preciseHour, birthMin: preciseMin }) {
+export async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem, birthHour: preciseHour, birthMin: preciseMin }) {
   const year = parseInt(namSinh);
   const month = parseInt(thangSinh);
   const day = parseInt(ngaySinh);
   const namXemInt = parseInt(namXem) || new Date().getFullYear();
-  const birthHour = GIO_TO_HOUR[gioSinh] !== undefined ? GIO_TO_HOUR[gioSinh] : 12;
+  const normalizedGio = normalizeGioSinh(gioSinh);
+  const birthHour = GIO_TO_HOUR[normalizedGio] !== undefined ? GIO_TO_HOUR[normalizedGio] : 12;
 
   // 1. Calculate using tuvi-neo library
   const laso = generateLaSo({
@@ -526,7 +549,7 @@ async function calcTuVi({ hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh
   const cuc = { name: laso.Info.Cuc, value: laso.Info.CucNH };
 
   const gioChiName = laso.Info.Gio;
-  const gioChiIdx = GIO_CHI[gioSinh]?.index || 0;
+  const gioChiIdx = GIO_CHI[normalizedGio]?.index || 0;
 
   // Can Chi calculations for Month, Day, Hour
   const lunarMonthCanChi = getCanChiThang(tc, lMonth);

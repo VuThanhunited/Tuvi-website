@@ -4,7 +4,7 @@ import Discussion from '../models/Discussion.js';
 import Interpretation from '../models/Interpretation.js';
 import TuViDatabase from '../models/TuViDatabase.js';
 import ScheduledPost from '../models/ScheduledPost.js';
-import { generateLaSo } from 'tuvi-neo';
+import { calcTuVi } from './tuViController.js';
 import scraperService from '../services/scraperService.js';
 import { postToFacebook, getFBPageInfo, getFBPagesFromUserToken } from '../services/facebookPostService.js';
 import fs from 'fs';
@@ -408,57 +408,24 @@ const GIO_TO_HOUR_ADMIN = {
  */
 export const adminCreateLaSo = async (req, res, next) => {
   try {
-    const { hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, saveToDb } = req.body;
+    const { hoTen, gioiTinh, ngaySinh, thangSinh, namSinh, gioSinh, isLunar, namXem, thangXem, saveToDb } = req.body;
 
     // Validate
     if (!hoTen || !gioiTinh || !ngaySinh || !thangSinh || !namSinh || !gioSinh) {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập đủ thông tin: họ tên, giới tính, ngày/tháng/năm sinh, giờ sinh.' });
     }
 
-    const currentYear = namXem || new Date().getFullYear();
-    const hourValue = GIO_TO_HOUR_ADMIN[gioSinh] ?? 0;
-
-    // Generate lá số using tuvi-neo library
-    const laSoRaw = generateLaSo({
-      birthYear: parseInt(namSinh),
-      birthMonth: parseInt(thangSinh),
-      birthDay: parseInt(ngaySinh),
-      birthHour: hourValue,
-      gender: gioiTinh === 'nam' ? 1 : 0,
-      isLunar: isLunar || false,
-      currentYear,
-    });
-
-    // Build can chi
-    const tcIdx = ((namSinh - 4) % 10 + 10) % 10;
-    const dcIdx = ((namSinh - 4) % 12 + 12) % 12;
-    const canChiNam = `${THIEN_CAN[tcIdx]} ${DIA_CHI[dcIdx]}`;
-    const napAm = NAP_AM_MAP[canChiNam] || '';
-    const nguHanhStr = napAm.includes('Kim') ? 'Kim' : napAm.includes('Thủy') ? 'Thủy' : napAm.includes('Hỏa') ? 'Hỏa' : napAm.includes('Thổ') ? 'Thổ' : 'Mộc';
-
-    const resultData = {
+    const resultData = await calcTuVi({
       hoTen,
       gioiTinh,
-      ngaySinh: parseInt(ngaySinh),
-      thangSinh: parseInt(thangSinh),
-      namSinh: parseInt(namSinh),
+      ngaySinh: parseInt(ngaySinh, 10),
+      thangSinh: parseInt(thangSinh, 10),
+      namSinh: parseInt(namSinh, 10),
       gioSinh,
-      isLunar: isLunar || false,
-      namXem: currentYear,
-      canChi: canChiNam,
-      thienCan: THIEN_CAN[tcIdx],
-      diaChi: DIA_CHI[dcIdx],
-      napAm,
-      nguHanh: nguHanhStr,
-      nguHanhColor: HANH_COLOR[nguHanhStr] || '#DAA520',
-      cungResults: laSoRaw?.cungResults || [],
-      advice: laSoRaw?.advice || [],
-      overallRating: laSoRaw?.overallRating || 3,
-      cuc: laSoRaw?.cuc,
-      chuMenh: laSoRaw?.chuMenh,
-      chuThan: laSoRaw?.chuThan,
-      amDuong: laSoRaw?.amDuong,
-    };
+      isLunar: !!isLunar,
+      namXem: namXem || new Date().getFullYear(),
+      thangXem: thangXem || 1,
+    });
 
     let savedResult = null;
     if (saveToDb) {

@@ -1,21 +1,14 @@
-import bannerImg from '../../data/banner.jpg';
 import './HomeBanner.css';
 
 export default function HomeBanner() {
   return (
-    <section className="home-banner" id="home-banner">
-      <div className="home-banner-bg" style={{ backgroundImage: `url(${bannerImg})` }} />
-      
-      {/* Floating particles */}
-      <div className="banner-particles">
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="banner-particle" style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${3 + Math.random() * 4}s`
-          }} />
-        ))}
+    <section className="qtv-hero-banner" id="home-banner" aria-label="Quán Tử Vi Banner">
+      <div className="qtv-hero-banner-inner">
+        <img
+          src="/images/quan-tu-vi-banner.jpg"
+          alt="Quán Tử Vi - Luận giải Tử Vi – Định hướng Vận Mệnh"
+          className="qtv-hero-banner-img"
+        />
       </div>
     </section>
   );

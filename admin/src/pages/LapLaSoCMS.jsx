@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Sparkles } from 'lucide-react';
 import './LapLaSoCMS.css';
@@ -8,6 +8,81 @@ const getToken = () => localStorage.getItem('token');
 
 const GIO_CHI_LIST = ['Ty','Suu','Dan','Mao','Thin','Ti','Ngo','Mui','Than','Dau','Tuat','Hoi'];
 const GIO_RANGE = ['23-1','1-3','3-5','5-7','7-9','9-11','11-13','13-15','15-17','17-19','19-21','21-23'];
+
+const CUNG_DISPLAY_ORDER = [
+  'Mệnh', 'Phụ Mẫu', 'Phúc Đức',
+  'Điền Trạch', 'Quan Lộc', 'Nô Bộc',
+  'Thiên Di', 'Tật Ách', 'Tài Bạch',
+  'Tử Tức', 'Phu Thê', 'Huynh Đệ',
+];
+
+const CUNG_INTRO_MAP = {
+  'Mệnh': 'Cung Mệnh là phần mở đầu để xem tính cách và khuynh hướng của đương số. Khi luận giải, cần đối chiếu với các cung Tài Bạch, Quan Lộc và Thiên Di.',
+  'Phụ Mẫu': 'Cung Phụ Mẫu phản ánh mối quan hệ với cha mẹ, nền tảng gia phong và phúc ấm sinh thành. Khi luận giải, cần đối chiếu với các cung Tật Ách, Nô Bộc và Tử Tức.',
+  'Phúc Đức': 'Cung Phúc Đức thể hiện phúc phần tổ tiên, đời sống tinh thần và sự an yên nội tâm. Khi luận giải, cần đối chiếu với các cung Tài Bạch, Phu Thê và Thiên Di.',
+  'Điền Trạch': 'Cung Điền Trạch chủ về nhà cửa, đất đai, tài sản tích lũy và môi trường sống. Khi luận giải, cần đối chiếu với các cung Huynh Đệ, Tật Ách và Tử Tức.',
+  'Quan Lộc': 'Cung Quan Lộc đại diện cho sự nghiệp, công danh, vị thế xã hội và định hướng nghề nghiệp. Khi luận giải, cần đối chiếu với các cung Mệnh, Tài Bạch và Phu Thê.',
+  'Nô Bộc': 'Cung Nô Bộc phản ánh bạn bè, đồng nghiệp, cộng sự và các mối quan hệ xã hội. Khi luận giải, cần đối chiếu với các cung Huynh Đệ, Phụ Mẫu và Tử Tức.',
+  'Thiên Di': 'Cung Thiên Di chủ về xuất ngoại, giao tiếp xã hội, khả năng thích nghi và quý nhân bên ngoài. Khi luận giải, cần đối chiếu với các cung Mệnh, Phúc Đức và Phu Thê.',
+  'Tật Ách': 'Cung Tật Ách phản ánh thể chất, sức khỏe, tai ách và phương diện nội tâm ẩn giấu. Khi luận giải, cần đối chiếu với các cung Phụ Mẫu, Điền Trạch và Huynh Đệ.',
+  'Tài Bạch': 'Cung Tài Bạch chủ về năng lực tài chính, nguồn thu nhập và cách quản lý tiền bạc. Khi luận giải, cần đối chiếu với các cung Mệnh, Quan Lộc và Phúc Đức.',
+  'Tử Tức': 'Cung Tử Tức phản ánh đường con cái, mối liên kết thế hệ sau và khả năng truyền thừa. Khi luận giải, cần đối chiếu với các cung Điền Trạch, Nô Bộc và Phụ Mẫu.',
+  'Phu Thê': 'Cung Phu Thê phản ánh nhân duyên, hôn nhân và sự hòa hợp giữa hai vợ chồng. Khi luận giải, cần đối chiếu với các cung Phúc Đức, Quan Lộc và Thiên Di.',
+  'Huynh Đệ': 'Cung Huynh Đệ chủ về anh chị em trong gia đình, bạn đồng hành thân cận. Khi luận giải, cần đối chiếu với các cung Điền Trạch, Nô Bộc và Tật Ách.',
+};
+
+const HUNG_KEYWORDS = [
+  'kình dương', 'đà la', 'hỏa tinh', 'linh tinh', 'địa không', 'địa kiếp',
+  'hóa kỵ', 'thiên hình', 'thiên diêu', 'kiếp sát', 'đại hao', 'tiểu hao',
+  'tuế phá', 'thiên khốc', 'thiên hư', 'cô thần', 'quả tú', 'bạch hổ',
+  'tang môn', 'điếu khách', 'phá toái', 'quan phù', 'quan phủ', 'tử phù',
+  'thiên la', 'địa võng', 'phục binh', 'lưu hà', 'thiên không', 'đẩu quân',
+  'thiên thương', 'thiên sứ', 'bệnh phù', 'thái tuế', 'trực phù', 'tuần không', 'triệt lộ'
+];
+
+const GRID_DIACHI = ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu'];
+
+function getSaoNhomColor(sao) {
+  if (sao.nhomSao === 'cat') return '#2e7d32';
+  if (sao.nhomSao === 'hung') return '#d32f2f';
+  const low = (sao.ten || '').toLowerCase();
+  if (sao.loai === 'hoa-ky' || sao.loai === 'sat' || HUNG_KEYWORDS.some(k => low.includes(k))) {
+    return '#d32f2f';
+  }
+  return '#2e7d32';
+}
+
+function getSaoChinhColor(trangThai) {
+  switch (trangThai) {
+    case 'M': return '#a31616';
+    case 'V': return '#b71c1c';
+    case 'Đ': return '#c25e00';
+    case 'B': return '#444444';
+    case 'H': return '#7a7a7a';
+    default:  return '#444444';
+  }
+}
+
+function AdminLotusIcon() {
+  return (
+    <svg className="laso-qtv-lotus" viewBox="0 0 36 28" fill="none" aria-hidden="true">
+      <path d="M18 3C15.5 8 14.5 13 18 19C21.5 13 20.5 8 18 3Z" stroke="#f5d27b" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M18 19C12 16 9.5 11.5 10.5 6.5C13.5 9.5 16 13.5 18 19Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 19C24 16 26.5 11.5 25.5 6.5C22.5 9.5 20 13.5 18 19Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 20C10.5 20 6 16.5 4.5 11.5C9.5 13 13.5 15.5 18 20Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M18 20C25.5 20 30 16.5 31.5 11.5C26.5 13 22.5 15.5 18 20Z" stroke="#f5d27b" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M8 22.5C13 21 23 21 28 22.5" stroke="#f5d27b" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function AdminGreekKeyCorner({ className }) {
+  return (
+    <svg className={`laso-qtv-corner ${className}`} viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <path d="M2 26V2H26M2 10H18V18H10V13.5H14" stroke="#c99b49" strokeWidth="1.8" strokeLinecap="square" />
+    </svg>
+  );
+}
 
 export default function LapLaSoCMS() {
   const [activeTab, setActiveTab] = useState('form');
@@ -19,6 +94,10 @@ export default function LapLaSoCMS() {
   const [fetchingList, setFetchingList] = useState(false);
   const [search, setSearch] = useState('');
   const [saveToDb, setSaveToDb] = useState(false);
+  const [selectedCungIdx, setSelectedCungIdx] = useState(0);
+  const [hoveredGridPos, setHoveredGridPos] = useState(null);
+  const [selectedQtvIdx, setSelectedQtvIdx] = useState(0);
+  const [showBirthInfo, setShowBirthInfo] = useState(true);
   // Edit modal state
   const [editLaSo, setEditLaSo] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -47,7 +126,11 @@ export default function LapLaSoCMS() {
         headers: { Authorization: 'Bearer ' + getToken() }
       });
       if (res.data.success) {
-        setResult(res.data.data);
+        const data = res.data.data;
+        setResult(data);
+        const mIdx = data?.cungResults?.findIndex(c => c.name && c.name.trim().toLowerCase() === 'mệnh');
+        setSelectedCungIdx(mIdx !== -1 && mIdx !== undefined ? mIdx : 0);
+        setSelectedQtvIdx(0);
         setStatus({ success: true, message: res.data.message });
         setActiveTab('result');
       } else {
@@ -104,6 +187,27 @@ export default function LapLaSoCMS() {
     const full = r || 0;
     return '★'.repeat(full) + '☆'.repeat(5 - full);
   };
+
+  const orderedCungButtons = useMemo(() => {
+    if (!result?.cungResults) return [];
+    return CUNG_DISPLAY_ORDER.map((cungName) => {
+      const idx = result.cungResults.findIndex(
+        c => c.name && c.name.trim().toLowerCase() === cungName.toLowerCase()
+      );
+      return { name: cungName, idx };
+    }).filter(item => item.idx !== -1);
+  }, [result?.cungResults]);
+
+  const selectedCung = result?.cungResults?.[selectedCungIdx] || result?.cungResults?.[0] || null;
+  const activeGridPos = hoveredGridPos !== null ? hoveredGridPos : (selectedCung?.gridIdx ?? 0);
+  const tamPhuongMap = {
+    [activeGridPos]: 1,
+    [(activeGridPos + 8) % 12]: 2,
+    [(activeGridPos + 6) % 12]: 3,
+    [(activeGridPos + 4) % 12]: 4,
+  };
+  const qtvList = Array.isArray(result?.quanTuViResults) ? result.quanTuViResults : [];
+  const activeQtv = qtvList[selectedQtvIdx] || qtvList[0] || null;
 
   return (
     <div className="laso-cms">
@@ -208,86 +312,250 @@ export default function LapLaSoCMS() {
         </div>
       )}
       {activeTab === 'result' && result && (
-        <div className="laso-cms__card">
-          <div className="laso-cms__result-header">
-            <div className="laso-cms__result-avatar">{result.gioiTinh === 'nam' ? 'M' : 'F'}</div>
-            <div>
-              <h2 className="laso-cms__result-name">{result.hoTen}</h2>
-              <div className="laso-cms__result-meta">
-                <span>{result.ngaySinh}/{result.thangSinh}/{result.namSinh}</span>
-                <span>Giờ: {result.gioSinh}</span>
-                <span>{result.gioiTinh === 'nam' ? 'Nam Mạng' : 'Nữ Mạng'}</span>
-              </div>
+        <div className="laso-qtv-result-wrap">
+          <div className="laso-qtv-top-bar">
+            <div />
+            <div className="laso-qtv-title-wrap">
+              <span className="laso-qtv-title-line" />
+              <h2>Kết quả lá số Tử Vi</h2>
+              <span className="laso-qtv-title-line laso-qtv-title-line--right" />
+            </div>
+            <div className="laso-qtv-top-actions">
+              <button type="button" className="laso-qtv-btn-new" onClick={() => { setActiveTab('form'); setResult(null); setStatus(null); }}>
+                ↻ Lập lá số mới
+              </button>
             </div>
           </div>
-          <div className="laso-cms__info-grid">
-            <div className="laso-cms__info-card">
-              <div className="laso-cms__info-label">Can Chi Năm Sinh</div>
-              <div className="laso-cms__info-value gold">{result.canChi}</div>
-            </div>
-            <div className="laso-cms__info-card">
-              <div className="laso-cms__info-label">Nạp Âm</div>
-              <div className="laso-cms__info-value">{result.napAm}</div>
-            </div>
-            <div className="laso-cms__info-card">
-              <div className="laso-cms__info-label">Ngũ Hành Mệnh</div>
-              <div className="laso-cms__info-value" style={{ color: result.nguHanhColor }}>{result.nguHanh}</div>
-            </div>
-            <div className="laso-cms__info-card">
-              <div className="laso-cms__info-label">Âm Dương</div>
-              <div className="laso-cms__info-value">{result.amDuong}</div>
-            </div>
-            {result.cuc && (
-              <div className="laso-cms__info-card">
-                <div className="laso-cms__info-label">Cục</div>
-                <div className="laso-cms__info-value gold">{result.cuc?.name}</div>
+
+          <div className="laso-qtv-main-grid">
+            {/* Cột trái: Lá số Tử Vi */}
+            <section className="laso-qtv-card">
+              <div className="laso-qtv-card-header">
+                <div className="laso-qtv-card-title-group">
+                  <AdminLotusIcon />
+                  <h3>Lá số Tử Vi</h3>
+                </div>
+                <span className="laso-qtv-badge-free">Miễn phí</span>
               </div>
-            )}
-            {result.chuMenh && (
-              <div className="laso-cms__info-card">
-                <div className="laso-cms__info-label">Chủ Mệnh</div>
-                <div className="laso-cms__info-value">{result.chuMenh}</div>
+              <div className="laso-qtv-card-body">
+                <div className="laso-qtv-board">
+                  {(result.cungResults || []).map((cung, i) => {
+                    const gridPos = cung.gridIdx ?? i;
+                    const diaChiName = cung.diaChi || GRID_DIACHI[gridPos] || '';
+                    const canPart = cung.canChi ? cung.canChi.split('.')[0] : '';
+                    const rightSideStars = (cung.saoPhuList || []).filter(s => s.ten !== cung.trangSinh);
+                    const hoaStars = [...(cung.hoaTinhList || []), ...(cung.namXemHoaTinh || [])];
+                    const badge = tamPhuongMap[gridPos] || null;
+
+                    return (
+                      <div
+                        key={i}
+                        className={`laso-qtv-cell pos-${gridPos}${badge ? ' hovered' : ''}${selectedCungIdx === i ? ' selected' : ''}`}
+                        onClick={() => setSelectedCungIdx(i)}
+                        onMouseEnter={() => setHoveredGridPos(gridPos)}
+                        onMouseLeave={() => setHoveredGridPos(null)}
+                      >
+                        <div className="laso-qtv-cell-head">
+                          <div className="laso-qtv-cell-tl">
+                            <span>{canPart ? `${canPart}.` : ''}{diaChiName}</span>
+                            {cung.hanhDisplay && <small style={{ color: cung.hanhColor }}>{cung.hanhDisplay}</small>}
+                          </div>
+                          <div className="laso-qtv-cell-tc">
+                            <span className={`laso-qtv-cname${cung.isMenh ? ' menh' : ''}`}>
+                              {(cung.isMinh ? `${cung.name} <Thân>` : (cung.name || '')).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="laso-qtv-cell-tr">
+                            <span>{cung.daiHan || (gridPos * 10 + 6)}</span>
+                          </div>
+                        </div>
+
+                        <div className="laso-qtv-stars-cols">
+                          <div className="laso-qtv-col-chinh">
+                            {cung.saoChinhList && cung.saoChinhList.length > 0 ? (
+                              cung.saoChinhList.map((s, si) => (
+                                <span key={si} className="laso-qtv-schinh" style={{ color: getSaoChinhColor(s.trangThai), fontWeight: (s.trangThai === 'M' || s.trangThai === 'V') ? 700 : 600 }}>
+                                  {s.ten}{s.trangThai ? ` (${s.trangThai})` : ''}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="laso-qtv-vcd">Vô chính diệu</span>
+                            )}
+                          </div>
+                          <div className="laso-qtv-col-phu">
+                            {rightSideStars.map((s, si) => (
+                              <span key={`p-${si}`} className="laso-qtv-sphu" style={{ color: getSaoNhomColor(s) }}>
+                                {s.ten}{s.trangThai && s.trangThai !== 'B' ? ` (${s.trangThai})` : ''}
+                              </span>
+                            ))}
+                            {hoaStars.map((h, hi) => (
+                              <span key={`h-${hi}`} className="laso-qtv-sphu" style={{ color: (h.loai === 'hoa-ky' || (h.ten || '').toLowerCase().includes('kỵ')) ? '#d32f2f' : '#2e7d32', fontWeight: 700 }}>
+                                {h.ten}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {badge && <span className="laso-qtv-tp-badge">{badge}</span>}
+
+                        <div className="laso-qtv-cell-foot">
+                          <span className="dv">{cung.dvLabel || ''}</span>
+                          <span className="ts">{cung.trangSinh || ''}</span>
+                          <span className="ln">{cung.lnLabel || ''}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <div className="laso-qtv-center">
+                    <div className="laso-qtv-medallion">
+                      {showBirthInfo ? (
+                        <>
+                          <h4 className="laso-qtv-center-title">Lá số Tử Vi</h4>
+                          <div className="laso-qtv-center-info">
+                            <div><strong>Họ tên:</strong> <span className="red">{result.hoTen}</span></div>
+                            <div><strong>Năm:</strong> {result.namSinh} · {result.canChi}</div>
+                            <div><strong>Ngày:</strong> {result.ngaySinh}/{result.thangSinh} (Âm: {result.lunarDay || result.ngaySinh}/{result.lunarMonth || result.thangSinh})</div>
+                            <div><strong>Giờ:</strong> {result.gioHour || result.gioSinh}</div>
+                            <div><strong>Mệnh:</strong> {result.napAm || result.nguHanh}</div>
+                            {result.cuc?.name && <div><strong>Cục:</strong> {result.cuc.name}</div>}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <h4 className="laso-qtv-center-title big">Lá số<br />Tử Vi</h4>
+                          <div className="laso-qtv-yinyang">☯</div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="laso-qtv-legend">
+                  <span><strong>Trái:</strong> Chính tinh</span>
+                  <span style={{ color: '#2e7d32', fontWeight: 700 }}>● Cát tinh (Xanh lá)</span>
+                  <span style={{ color: '#d32f2f', fontWeight: 700 }}>● Hung tinh (Đỏ)</span>
+                  <label className="laso-qtv-toggle">
+                    <input type="checkbox" checked={!showBirthInfo} onChange={() => setShowBirthInfo(v => !v)} />
+                    <span>Ẩn chi tiết</span>
+                  </label>
+                </div>
               </div>
-            )}
-            <div className="laso-cms__info-card span2">
-              <div className="laso-cms__info-label">Đánh Giá Tổng Hợp</div>
-              <div className="laso-cms__info-value stars">{getRatingStars(result.overallRating)}</div>
-            </div>
+            </section>
+
+            {/* Cột phải: Luận giải lá số */}
+            <section className="laso-qtv-card">
+              <div className="laso-qtv-card-header">
+                <div className="laso-qtv-card-title-group">
+                  <AdminLotusIcon />
+                  <h3>Luận giải lá số</h3>
+                </div>
+                <span className="laso-qtv-badge-free">Miễn phí</span>
+              </div>
+              <div className="laso-qtv-card-body lg">
+                <div className="laso-qtv-cung-btns">
+                  {orderedCungButtons.map((item) => (
+                    <button
+                      key={item.name}
+                      type="button"
+                      className={`laso-qtv-cung-btn${selectedCungIdx === item.idx ? ' active' : ''}`}
+                      onClick={() => setSelectedCungIdx(item.idx)}
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+
+                {selectedCung && (
+                  <div className="laso-qtv-selected-box">
+                    <div className="laso-qtv-selected-head">
+                      <div className="laso-qtv-selected-title">
+                        <span className="yy">☯</span>
+                        <h4>Luận giải cung {selectedCung.name}</h4>
+                      </div>
+                      <span className="laso-qtv-sample-pill">
+                        {selectedCung.interpretation ? 'Luận giải chi tiết' : 'Nội dung mẫu'}
+                      </span>
+                    </div>
+                    <p className="laso-qtv-intro">
+                      {CUNG_INTRO_MAP[selectedCung.name] || `Cung ${selectedCung.name} tọa tại ${selectedCung.diaChi || '—'}.`}
+                    </p>
+                    <div className="laso-qtv-divider" />
+                    <div className="laso-qtv-stars-summary">
+                      <div><strong>Địa chi:</strong> {selectedCung.canChi} ({selectedCung.hanhDisplay}) · <strong>Đại hạn:</strong> {selectedCung.daiHan}</div>
+                      <div><strong>Chính tinh:</strong> {selectedCung.saoChinhList?.length ? selectedCung.saoChinhList.map(s => `${s.ten}${s.trangThai ? ` (${s.trangThai})` : ''}`).join(', ') : 'Vô chính diệu'}</div>
+                    </div>
+                    {selectedCung.interpretation && (
+                      <div className="laso-qtv-rich" dangerouslySetInnerHTML={{ __html: selectedCung.interpretation }} />
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
-          {result.cungResults && result.cungResults.length > 0 && (
-            <>
-              <div className="laso-cms__section-title" style={{marginTop:'2rem'}}>12 Cung Trong Lá Số</div>
-              <div className="laso-cms__cung-grid">
-                {result.cungResults.slice(0, 12).map((cung, i) => (
-                  <div key={i} className={'laso-cms__cung-cell' + (cung.isMenh ? ' menh' : '') + (cung.isMinh ? ' than' : '')}>
-                    <div className="laso-cms__cung-name">{cung.name}</div>
-                    <div className="laso-cms__cung-canchhi">{cung.canChi}</div>
-                    {cung.daiHan && <div className="laso-cms__cung-daihan">DH: {cung.daiHan}</div>}
-                    {(cung.saoChinhList || []).slice(0, 3).map((s, si) => (
-                      <div key={si} className="laso-cms__sao-chinh">{s.ten}</div>
-                    ))}
-                    {(cung.saoPhuList || []).slice(0, 4).map((s, si) => (
-                      <div key={si} className="laso-cms__sao-phu">{s.ten}</div>
-                    ))}
-                    {cung.isMenh && <div className="laso-cms__cung-tag">MENH</div>}
-                    {cung.isMinh && <div className="laso-cms__cung-tag than">THAN</div>}
+
+          {/* Khối Quán Tử Vi 2 cột (Admin) */}
+          <section className="laso-qtv-admin-box">
+            <div className="laso-qtv-admin-header">
+              <AdminLotusIcon />
+              <h3>QUÁN TỬ VI</h3>
+              <div />
+            </div>
+            <div className="laso-qtv-admin-body">
+              <div className="laso-qtv-ornate-frame">
+                <AdminGreekKeyCorner className="tl" />
+                <AdminGreekKeyCorner className="tr" />
+                <AdminGreekKeyCorner className="bl" />
+                <AdminGreekKeyCorner className="br" />
+                <div className="laso-qtv-two-cols">
+                  <div className="laso-qtv-col">
+                    <div className="laso-qtv-col-head">Bộ sao Phối (Mệnh Tài Quan Di)</div>
+                    <div className="laso-qtv-col-body">
+                      {qtvList.length === 0 ? (
+                        <p className="laso-qtv-empty">Chưa có quy tắc Bộ sao Phối khớp cho lá số này.</p>
+                      ) : (
+                        <div className="laso-qtv-rule-list">
+                          {qtvList.map((item, idx) => (
+                            <button
+                              key={item.id || idx}
+                              type="button"
+                              className={`laso-qtv-rule-item${selectedQtvIdx === idx ? ' active' : ''}`}
+                              onClick={() => setSelectedQtvIdx(idx)}
+                            >
+                              <div className="laso-qtv-rule-tag">
+                                {item.isCustomRule ? '✦ Quy tắc CMS khớp' : '◈ Tổng hợp 4 cung'}
+                                {item.tamHopGroup ? ` · ${item.tamHopGroup}` : ''}
+                              </div>
+                              <div className="laso-qtv-rule-title">{item.boSaoPhoi}</div>
+                              {Array.isArray(item.matchedStars) && item.matchedStars.length > 0 && (
+                                <ul className="laso-qtv-rule-stars">
+                                  {item.matchedStars.map((st, si) => <li key={si}>{st}</li>)}
+                                </ul>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-          {result.advice && result.advice.length > 0 && (
-            <>
-              <div className="laso-cms__section-title" style={{marginTop:'1.5rem'}}>Luận Giải Tổng Quát</div>
-              <div className="laso-cms__advice-list">
-                {result.advice.map((a, i) => (
-                  <div key={i} className="laso-cms__advice-item">
-                    <span className="laso-cms__advice-bullet">✦</span> {a}
+                  <div className="laso-qtv-col">
+                    <div className="laso-qtv-col-head">Nội dung trả về</div>
+                    <div className="laso-qtv-col-body">
+                      {activeQtv ? (
+                        <div className="laso-qtv-return">
+                          <h4>{activeQtv.boSaoPhoi}</h4>
+                          <div className="laso-qtv-return-html" dangerouslySetInnerHTML={{ __html: activeQtv.content }} />
+                        </div>
+                      ) : (
+                        <p className="laso-qtv-empty">Chọn một Bộ sao Phối bên trái để xem nội dung trả về.</p>
+                      )}
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
-            </>
-          )}
+            </div>
+          </section>
+
           <div className="laso-cms__result-actions">
             <button className="laso-cms__btn-secondary" onClick={() => { setActiveTab('form'); setResult(null); setStatus(null); }}>
               Lập Lá Số Khác
